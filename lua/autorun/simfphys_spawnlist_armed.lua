@@ -28,6 +28,96 @@ local light_table = {
 }
 list.Set( "simfphys_lights", "conapc_armed", light_table)
 
+
+local V = {
+	Name = "Synergy Elite Jeep",
+	Model = "models/vehicles/buggy_elite.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+
+	Members = {
+		Mass = 1200,
+		
+		LightsTable = "elitejeep",
+		
+		FrontWheelRadius = 18,
+		RearWheelRadius = 20,
+		
+		SeatOffset = Vector(0,0,-3),
+		SeatPitch = 0,
+		
+		PassengerSeats = {
+			{
+			pos = Vector(16,-35,21),
+			ang = Angle(0,0,9)
+			}
+		},
+		
+		Backfire = true,
+		ExhaustPositions = {
+			{
+				pos = Vector(-15.69,-105.94,14.94),
+				ang = Angle(90,-90,0)
+			},
+			{
+				pos = Vector(16.78,-105.46,14.35),
+				ang = Angle(90,-90,0)
+			}
+		},
+		
+		StrengthenSuspension = true,
+		
+		FrontHeight = 13.5,
+		FrontConstant = 25000,
+		FrontDamping = 1000,
+		FrontRelativeDamping = 1000,
+		
+		RearHeight = 13.5,
+		RearConstant = 25000,
+		RearDamping = 1000,
+		RearRelativeDamping = 1000,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 44,
+		Efficiency = 1.1,
+		GripOffset = 0,
+		BrakePower = 40,
+		
+		IdleRPM = 750,
+		LimitRPM = 7500,
+		PeakTorque = 185,
+		PowerbandStart = 2500,
+		PowerbandEnd = 7300,
+		Turbocharged = false,
+		Supercharged = false,
+		
+		PowerBias = 0.6,
+		
+		EngineSoundPreset = -1,
+		
+		snd_pitch = 1,
+		snd_idle = "simulated_vehicles/v8elite/v8elite_idle.wav",
+		
+		snd_low = "simulated_vehicles/v8elite/v8elite_low.wav",
+		snd_low_revdown = "simulated_vehicles/v8elite/v8elite_revdown.wav",
+		snd_low_pitch = 0.8,
+		
+		snd_mid = "simulated_vehicles/v8elite/v8elite_mid.wav",
+		snd_mid_gearup = "simulated_vehicles/v8elite/v8elite_second.wav",
+		snd_mid_pitch = 1,
+		
+		snd_horn = "simulated_vehicles/horn_4.wav",
+		
+		DifferentialGear = 0.52,
+		Gears = {-0.1,0,0.1,0.18,0.25,0.31,0.40}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_v8elite_armed", V )
+
 local V = {
 	Name = "HL2 APC",
 	Model = "models/apc/apc.mdl",
@@ -49,6 +139,14 @@ local V = {
 		CustomMassCenter = Vector(0,0,-12),
 		
 		PassengerSeats = {
+			{
+				pos = Vector(-17,8,40),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-5,60,-3),
+				ang = Angle(0,0,0)
+			},
 		},
 		
 		Attachments = {
@@ -158,8 +256,7 @@ local V = {
 			}
 		},
 		
-		Weapons = true,
-		LimitView = true,
+		--LimitView = true,
 		--[[
 		Weapons = {
 			{
@@ -233,20 +330,172 @@ if (!armedAPCSTable) then -- lets make sure we dont ruin all the spawned vehicle
 	armedAPCSTable = {}
 end
 
+if (!armedJEEPSTable) then -- lets make sure we dont ruin all the spawned vehicles when reloading this luafile
+	armedJEEPSTable = {}
+end
+
 hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
 	if (vehicle:GetModel( ) == "models/apc/apc.mdl") then
 		timer.Simple( 0.2, function()
 			if (!IsValid(vehicle)) then return end
-			if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base" and vehicle.Weapons == true) then
+			if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base" and vehicle:GetSpawn_List() == "sim_fphys_conscriptapc_armed") then
 				table.insert(armedAPCSTable, vehicle)
+			end
+		end)
+	end
+	
+	if (vehicle:GetModel( ) == "models/vehicles/buggy_elite.mdl") then
+		timer.Simple( 0.2, function()
+			if (!IsValid(vehicle)) then return end
+			if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base" and vehicle:GetSpawn_List() == "sim_fphys_v8elite_armed") then
+				table.insert(armedJEEPSTable, vehicle)
+				vehicle:SetBodygroup(1,1)
 			end
 		end)
 	end
 end)
 
+local function HandleJEEPWeapons( vehicle )
+	local curtime = CurTime()
+	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
+	
+	local pod = vehicle.pSeat[1]
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	if (!IsValid(ply)) then return end
+
+	local tr = util.TraceLine( {
+		start = ply:EyePos(),
+		endpos = ply:EyePos() + ply:EyeAngles():Forward() * 10000,
+		filter = {vehicle}
+	} )
+	local Aimpos = tr.HitPos
+	
+	local ID = vehicle:LookupAttachment( "muzzle" )
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	local deltapos = vehicle:GetPos() - vehicle.wOldPos
+	vehicle.wOldPos = vehicle:GetPos()
+
+	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval() 
+	
+	local Aimang = (Aimpos - shootOrigin):Angle()
+	
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.2) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw - 5 )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch - 10 + (math.abs(vehicle.sm_pp_yaw) / 45) * 4 )
+	
+	local fire = ply:KeyDown( IN_ATTACK )
+	
+	if (!fire) then return end
+	
+	vehicle.NextShoot = vehicle.NextShoot or 0
+	if ( vehicle.NextShoot > curtime ) then return end
+	
+	vehicle.NextShoot = curtime + 0.2
+	
+	vehicle:EmitSound("simulated_vehicles/weapons/tau_fire"..math.Round(math.random(1,4),0)..".wav")
+	
+	local bullet = {}
+		bullet.Num 			= 1
+		bullet.Src 			= shootOrigin
+		bullet.Dir 			= Attachment.Ang:Forward()
+		bullet.Spread 		= Vector(0.01,0.01,0)
+		bullet.Tracer		= 0
+		bullet.Force		= 10
+		bullet.Damage		= 12
+		bullet.HullSize		= 1
+		bullet.Callback = function(att, tr, dmginfo)
+		
+		local effect = ents.Create("env_spark")
+			effect:SetKeyValue("targetname", "target")
+			effect:SetPos( tr.HitPos + tr.HitNormal * 2 )
+			effect:SetAngles( tr.HitNormal:Angle() )
+			effect:Spawn()
+			effect:SetKeyValue("spawnflags","128")
+			effect:SetKeyValue("Magnitude",5)
+			effect:SetKeyValue("TrailLength",3)
+			effect:Fire( "SparkOnce" )
+			effect:Fire("kill","",0.21)
+			
+		local effectdata = EffectData()
+			effectdata:SetOrigin( tr.HitPos )
+			effectdata:SetStart( shootOrigin )
+			effectdata:SetAttachment( 1 )
+			effectdata:SetEntity( self )
+			effectdata:SetScale( 6000 )	
+			effectdata:SetMagnitude( 30 )	
+			util.Effect( "arctaucannon", effectdata )
+			
+		local laser1 = ents.Create("env_laser")
+			laser1:SetKeyValue("renderamt", "200")
+			laser1:SetKeyValue("rendercolor", "255 255 150")
+			laser1:SetKeyValue("texture", "sprites/laserbeam.spr")
+			laser1:SetKeyValue("TextureScroll", "14")
+			laser1:SetKeyValue("targetname", "laser1" )
+			laser1:SetKeyValue("renderfx", "2")
+			laser1:SetKeyValue("width", "0.5")
+			laser1:SetKeyValue("dissolvetype", "None")
+			laser1:SetKeyValue("EndSprite", "")
+			laser1:SetKeyValue("LaserTarget", "target")
+			laser1:SetKeyValue("TouchType", "-1")
+			laser1:SetKeyValue("NoiseAmplitude", "2")
+			laser1:Spawn()
+			laser1:Fire("SetParent",self,0)
+			laser1:Fire("TurnOn", "", 0.01)
+			laser1:Fire("kill", "", 0.12)
+			laser1:SetPos(shootOrigin)
+		
+		local laser2 = ents.Create("env_laser")
+			laser2:SetKeyValue("renderamt", "200")
+			laser2:SetKeyValue("rendercolor", "255 145 "..math.random(0,16))
+			laser2:SetKeyValue("texture", "sprites/laserbeam.spr")
+			laser2:SetKeyValue("TextureScroll", "14")
+			laser2:SetKeyValue("targetname", "laser2" )
+			laser2:SetKeyValue("renderfx", "2")
+			laser2:SetKeyValue("width", "1")
+			laser2:SetKeyValue("dissolvetype", "None")
+			laser2:SetKeyValue("EndSprite", "")
+			laser2:SetKeyValue("LaserTarget", "target")
+			laser2:SetKeyValue("TouchType", "-1")
+			laser2:SetKeyValue("NoiseAmplitude", "0")
+			laser2:Spawn()
+			laser2:Fire("SetParent",self,0)
+			laser2:Fire("TurnOn", "", 0.01)
+			laser2:Fire("kill", "", 0.12)
+			laser2:SetPos(shootOrigin)
+			
+		util.Decal("fadingscorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
+		end
+		bullet.Attacker 	= ply
+	vehicle:FireBullets( bullet )
+	
+	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * 10000, shootOrigin ) 
+end
+
 local function HandleAPCWeapons( vehicle )
 	local curtime = CurTime()
-	local pod = vehicle:GetDriverSeat()
+	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
+	
+	local pod = vehicle.pSeat[1]
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
 	local ply = pod:GetDriver()
 	
 	if (!IsValid(ply)) then return end
@@ -273,11 +522,12 @@ local function HandleAPCWeapons( vehicle )
 	
 	local Aimang = (Aimpos - shootOrigin):Angle()
 	
-	local Angles = vehicle:WorldToLocalAngles( Aimang - Angle(0,90,0) )
-	Angles:Normalize() 
-	Angles.y = (Angles.y / 180) * 120
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
 	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.1) or 0
+	Angles.y = (Angles.y / 180) * 130
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.08) or 0
 	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_pp_yaw )
 	--vehicle:SetPoseParameter("vehicle_weapon_pitch", Angles.p )
 	
@@ -288,7 +538,7 @@ local function HandleAPCWeapons( vehicle )
 	vehicle.NextShoot = vehicle.NextShoot or 0
 	if ( vehicle.NextShoot > curtime ) then return end
 	
-	vehicle.NextShoot = curtime + 0.4
+	vehicle.NextShoot = curtime + 0.2
 	
 	vehicle:EmitSound("simulated_vehicles/weapons/apc_fire"..math.Round(math.random(1,4),0)..".wav")
 	
@@ -298,7 +548,7 @@ local function HandleAPCWeapons( vehicle )
 		bullet.Dir 			= Aimang:Forward()
 		bullet.Spread 		= Vector(0.03,0.03,0)
 		bullet.Tracer		= 0
-		bullet.Force		= 10
+		bullet.Force		= 50
 		bullet.Damage		= 80
 		bullet.HullSize		= 20
 		bullet.Callback = function(att, tr, dmginfo)
@@ -320,7 +570,7 @@ local function HandleAPCWeapons( vehicle )
 	else
 		vehicle.swapMuzzle = true
 	end
-	local s_Pos = vehicle.swapMuzzle and -2 or 2
+	local s_Pos = vehicle.swapMuzzle and -2 or 3
 	
 	local effectdata = EffectData()
 		effectdata:SetOrigin( shootOrigin + a_up * s_Pos )
@@ -338,6 +588,15 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 				HandleAPCWeapons( v )
 			else
 				armedAPCSTable[k] = nil
+			end
+		end
+	end
+	if (armedJEEPSTable) then
+		for k, v in pairs(armedJEEPSTable) do
+			if (IsValid(v)) then
+				HandleJEEPWeapons( v )
+			else
+				armedJEEPSTable[k] = nil
 			end
 		end
 	end
