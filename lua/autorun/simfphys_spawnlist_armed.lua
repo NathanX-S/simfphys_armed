@@ -48,8 +48,8 @@ local V = {
 		
 		PassengerSeats = {
 			{
-			pos = Vector(16,-35,21),
-			ang = Angle(0,0,9)
+			pos = Vector(16,-35,16),
+			ang = Angle(0,0,0)
 			}
 		},
 		
@@ -355,57 +355,7 @@ hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle
 	end
 end)
 
-local function HandleJEEPWeapons( vehicle )
-	local curtime = CurTime()
-	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
-	
-	local pod = vehicle.pSeat[1]
-	
-	if (!vehicle.pViewLimited) then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
-	end
-	
-	local ply = pod:GetDriver()
-	
-	if (!IsValid(ply)) then return end
-
-	local tr = util.TraceLine( {
-		start = ply:EyePos(),
-		endpos = ply:EyePos() + ply:EyeAngles():Forward() * 10000,
-		filter = {vehicle}
-	} )
-	local Aimpos = tr.HitPos
-	
-	local ID = vehicle:LookupAttachment( "muzzle" )
-	local Attachment = vehicle:GetAttachment( ID )
-	
-	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
-	local deltapos = vehicle:GetPos() - vehicle.wOldPos
-	vehicle.wOldPos = vehicle:GetPos()
-
-	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval() 
-	
-	local Aimang = (Aimpos - shootOrigin):Angle()
-	
-	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
-	Angles:Normalize()
-	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.2) or 0
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
-	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw - 5 )
-	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch - 10 + (math.abs(vehicle.sm_pp_yaw) / 45) * 4 )
-	
-	local fire = ply:KeyDown( IN_ATTACK )
-	
-	if (!fire) then return end
-	
-	vehicle.NextShoot = vehicle.NextShoot or 0
-	if ( vehicle.NextShoot > curtime ) then return end
-	
-	vehicle.NextShoot = curtime + 0.2
-	
+local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 	vehicle:EmitSound("simulated_vehicles/weapons/tau_fire"..math.Round(math.random(1,4),0)..".wav")
 	
 	local bullet = {}
@@ -414,8 +364,8 @@ local function HandleJEEPWeapons( vehicle )
 		bullet.Dir 			= Attachment.Ang:Forward()
 		bullet.Spread 		= Vector(0.01,0.01,0)
 		bullet.Tracer		= 0
-		bullet.Force		= 10
-		bullet.Damage		= 12
+		bullet.Force		= damage
+		bullet.Damage		= damage
 		bullet.HullSize		= 1
 		bullet.Callback = function(att, tr, dmginfo)
 		
@@ -482,7 +432,99 @@ local function HandleJEEPWeapons( vehicle )
 		bullet.Attacker 	= ply
 	vehicle:FireBullets( bullet )
 	
-	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * 10000, shootOrigin ) 
+	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * damage * 1000, shootOrigin ) 
+end
+
+local function HandleJEEPWeapons( vehicle )
+	local curtime = CurTime()
+	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
+	
+	local pod = vehicle.pSeat[1]
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	if (!IsValid(ply)) then 
+		if (vehicle.afire_pressed) then
+			vehicle.afire_pressed = false
+			vehicle.wpn_chr:Stop()
+			vehicle.wpn_chr = nil
+			vehicle.gausscharge = 0
+			vehicle.NextShoot = curtime + 0.6
+		end
+		return
+	end
+
+	local tr = util.TraceLine( {
+		start = ply:EyePos(),
+		endpos = ply:EyePos() + ply:EyeAngles():Forward() * 10000,
+		filter = {vehicle}
+	} )
+	local Aimpos = tr.HitPos
+	
+	local ID = vehicle:LookupAttachment( "muzzle" )
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	local deltapos = vehicle:GetPos() - vehicle.wOldPos
+	vehicle.wOldPos = vehicle:GetPos()
+
+	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval() 
+	
+	local Aimang = (Aimpos - shootOrigin):Angle()
+	
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.2) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch )
+	
+	local fire = ply:KeyDown( IN_ATTACK )
+	local alt_fire = ply:KeyDown( IN_ATTACK2 )
+	
+	vehicle.afire_pressed = vehicle.afire_pressed or false
+	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 100 or 0) - vehicle.gausscharge,-100,1)) or 0
+	
+	if (vehicle.wpn_chr) then
+		vehicle.wpn_chr:ChangePitch(100 + vehicle.gausscharge * 1.5)
+		
+		vehicle.gaus_pp_spin = vehicle.gaus_pp_spin and (vehicle.gaus_pp_spin + vehicle.gausscharge / 3) or 0
+		vehicle:SetPoseParameter("gun_spin", vehicle.gaus_pp_spin)
+	end
+	
+	vehicle.NextShoot = vehicle.NextShoot or 0
+	if (vehicle.NextShoot < curtime) then
+		if (fire) then
+			GaussFire(ply,vehicle,shootOrigin,Attachment,12)
+			vehicle.NextShoot = curtime + 0.2
+		end
+		
+		if (alt_fire != vehicle.afire_pressed) then
+			vehicle.afire_pressed = alt_fire
+			if (alt_fire) then
+				vehicle.wpn_chr = CreateSound( vehicle, "weapons/gauss/chargeloop.wav" )
+				vehicle.wpn_chr:Play()
+				vehicle:CallOnRemove( "stopmesounds", function( vehicle )
+					if (vehicle.wpn_chr) then
+						vehicle.wpn_chr:Stop()
+					end
+				end)
+			else
+				vehicle.wpn_chr:Stop()
+				vehicle.wpn_chr = nil
+				GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 10)
+				
+				vehicle.NextShoot = curtime + 0.6
+			end
+		end
+	end
 end
 
 local function HandleAPCWeapons( vehicle )
