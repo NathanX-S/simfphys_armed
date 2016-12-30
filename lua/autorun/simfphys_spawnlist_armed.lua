@@ -320,6 +320,8 @@ local V = {
 		Sound_ThrottlePitch = 0,
 		Sound_ThrottleVolume = 0,
 		
+		snd_horn = "simulated_vehicles/horn_2.wav",
+		
 		DifferentialGear = 0.27,
 		Gears = {-0.09,0,0.09,0.18,0.28,0.35}
 	}
