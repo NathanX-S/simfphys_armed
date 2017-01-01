@@ -1,3 +1,8 @@
+if (SERVER) then
+	resource.AddWorkshop("831680603")
+end
+
+
 local light_table = {
 	L_HeadLampPos = Vector(20.15,133,21),
 	L_HeadLampAng = Angle(15,90,0),
