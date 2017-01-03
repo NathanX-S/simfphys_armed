@@ -41,7 +41,7 @@ local V = {
 	Category = "Armed Vehicles",
 
 	Members = {
-		Mass = 1200,
+		Mass = 1700,
 		
 		LightsTable = "elitejeep",
 		
@@ -73,14 +73,14 @@ local V = {
 		StrengthenSuspension = true,
 		
 		FrontHeight = 13.5,
-		FrontConstant = 25000,
-		FrontDamping = 1000,
-		FrontRelativeDamping = 1000,
+		FrontConstant = 27000,
+		FrontDamping = 2800,
+		FrontRelativeDamping = 1500, 
 		
 		RearHeight = 13.5,
-		RearConstant = 25000,
-		RearDamping = 1000,
-		RearRelativeDamping = 1000,
+		RearConstant = 32000,
+		RearDamping = 2900,
+		RearRelativeDamping = 1500,
 		
 		FastSteeringAngle = 10,
 		SteeringFadeFastSpeed = 535,
@@ -88,13 +88,13 @@ local V = {
 		TurnSpeed = 8,
 		
 		MaxGrip = 44,
-		Efficiency = 1.1,
+		Efficiency = 1.4,
 		GripOffset = 0,
 		BrakePower = 40,
 		
 		IdleRPM = 750,
 		LimitRPM = 7500,
-		PeakTorque = 185,
+		PeakTorque = 100,
 		PowerbandStart = 2500,
 		PowerbandEnd = 7300,
 		Turbocharged = false,
@@ -117,7 +117,7 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_4.wav",
 		
-		DifferentialGear = 0.52,
+		DifferentialGear = 0.38,
 		Gears = {-0.1,0,0.1,0.18,0.25,0.31,0.40}
 	}
 }
