@@ -391,7 +391,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 			effectdata:SetOrigin( tr.HitPos )
 			effectdata:SetStart( shootOrigin )
 			effectdata:SetAttachment( 1 )
-			effectdata:SetEntity( self )
+			effectdata:SetEntity( vehicle )
 			effectdata:SetScale( 6000 )	
 			effectdata:SetMagnitude( 30 )	
 			util.Effect( "arctaucannon", effectdata )
@@ -410,7 +410,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 			laser1:SetKeyValue("TouchType", "-1")
 			laser1:SetKeyValue("NoiseAmplitude", "2")
 			laser1:Spawn()
-			laser1:Fire("SetParent",self,0)
+			--laser1:Fire("SetParent",self,0)
 			laser1:Fire("TurnOn", "", 0.01)
 			laser1:Fire("kill", "", 0.12)
 			laser1:SetPos(shootOrigin)
@@ -429,7 +429,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 			laser2:SetKeyValue("TouchType", "-1")
 			laser2:SetKeyValue("NoiseAmplitude", "0")
 			laser2:Spawn()
-			laser2:Fire("SetParent",self,0)
+			--laser2:Fire("SetParent",self,0)
 			laser2:Fire("TurnOn", "", 0.01)
 			laser2:Fire("kill", "", 0.12)
 			laser2:SetPos(shootOrigin)
@@ -497,7 +497,7 @@ local function HandleJEEPWeapons( vehicle )
 	local alt_fire = ply:KeyDown( IN_ATTACK2 )
 	
 	vehicle.afire_pressed = vehicle.afire_pressed or false
-	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 100 or 0) - vehicle.gausscharge,-100,1)) or 0
+	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 100 or 0) - vehicle.gausscharge,0,1)) or 0
 	
 	if (vehicle.wpn_chr) then
 		vehicle.wpn_chr:ChangePitch(100 + vehicle.gausscharge * 1.5)
@@ -526,7 +526,8 @@ local function HandleJEEPWeapons( vehicle )
 			else
 				vehicle.wpn_chr:Stop()
 				vehicle.wpn_chr = nil
-				GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 10)
+				GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge)
+				vehicle.gausscharge = 0
 				
 				vehicle.NextShoot = curtime + 0.6
 			end
