@@ -35,6 +35,73 @@ list.Set( "simfphys_lights", "conapc_armed", light_table)
 
 
 local V = {
+	Name = "HL2 Jeep",
+	Model = "models/buggy.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+
+	Members = {
+		Mass = 1700,
+		
+		LightsTable = "jeep",
+		
+		FrontWheelRadius = 18,
+		RearWheelRadius = 20,
+
+		SeatOffset = Vector(0,0,-2),
+		SeatPitch = 0,
+
+		FrontHeight = 13.5,
+		FrontConstant = 27000,
+		FrontDamping = 2800,
+		FrontRelativeDamping = 2800,
+		
+		RearHeight = 13.5,
+		RearConstant = 32000,
+		RearDamping = 2900,
+		RearRelativeDamping = 2900,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 44,
+		Efficiency = 1.337,
+		GripOffset = 0,
+		BrakePower = 40,
+		
+		IdleRPM = 750,
+		LimitRPM = 6500,
+		PeakTorque = 100,
+		PowerbandStart = 2200,
+		PowerbandEnd = 6300,
+		
+		PowerBias = 0.5,
+		
+		EngineSoundPreset = -1,
+		
+		snd_pitch = 1,
+		snd_idle = "simulated_vehicles/jeep/jeep_idle.wav",
+		
+		snd_low = "simulated_vehicles/jeep/jeep_low.wav",
+		snd_low_revdown = "simulated_vehicles/jeep/jeep_revdown.wav",
+		snd_low_pitch = 0.9,
+		
+		snd_mid = "simulated_vehicles/jeep/jeep_mid.wav",
+		snd_mid_gearup = "simulated_vehicles/jeep/jeep_second.wav",
+		snd_mid_pitch = 1,
+		
+		snd_horn = "simulated_vehicles/horn_1.wav",
+		
+		DifferentialGear = 0.3,
+		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_jeep_armed", V )
+
+
+local V = {
 	Name = "Synergy Elite Jeep",
 	Model = "models/vehicles/buggy_elite.mdl",
 	Class = "gmod_sent_vehicle_fphysics_base",
@@ -337,29 +404,34 @@ if (!armedAPCSTable) then -- lets make sure we dont ruin all the spawned vehicle
 	armedAPCSTable = {}
 end
 
-if (!armedJEEPSTable) then -- lets make sure we dont ruin all the spawned vehicles when reloading this luafile
+if (!armedELITEJEEPSTable) then
+	armedELITEJEEPSTable = {}
+end
+
+if (!armedJEEPSTable) then
 	armedJEEPSTable = {}
 end
 
 hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
-	if (vehicle:GetModel( ) == "models/apc/apc.mdl") then
-		timer.Simple( 0.2, function()
-			if (!IsValid(vehicle)) then return end
-			if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base" and vehicle:GetSpawn_List() == "sim_fphys_conscriptapc_armed") then
+	timer.Simple( 0.2, function()
+		if (!IsValid(vehicle)) then return end
+		if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base") then
+
+			if (vehicle:GetSpawn_List() == "sim_fphys_conscriptapc_armed") then
 				table.insert(armedAPCSTable, vehicle)
 			end
-		end)
-	end
-	
-	if (vehicle:GetModel( ) == "models/vehicles/buggy_elite.mdl") then
-		timer.Simple( 0.2, function()
-			if (!IsValid(vehicle)) then return end
-			if (vehicle:GetClass() == "gmod_sent_vehicle_fphysics_base" and vehicle:GetSpawn_List() == "sim_fphys_v8elite_armed") then
+			
+			if (vehicle:GetSpawn_List() == "sim_fphys_v8elite_armed") then
+				table.insert(armedELITEJEEPSTable, vehicle)
+				vehicle:SetBodygroup(1,1)
+			end
+			
+			if (vehicle:GetSpawn_List() == "sim_fphys_jeep_armed") then
 				table.insert(armedJEEPSTable, vehicle)
 				vehicle:SetBodygroup(1,1)
 			end
-		end)
-	end
+		end
+	end)
 end)
 
 local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
@@ -410,10 +482,10 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 			laser1:SetKeyValue("TouchType", "-1")
 			laser1:SetKeyValue("NoiseAmplitude", "2")
 			laser1:Spawn()
-			--laser1:Fire("SetParent",self,0)
+			laser1:SetPos(shootOrigin)
+			laser1:Fire("SetParent",vehicle,0)
 			laser1:Fire("TurnOn", "", 0.01)
 			laser1:Fire("kill", "", 0.12)
-			laser1:SetPos(shootOrigin)
 		
 		local laser2 = ents.Create("env_laser")
 			laser2:SetKeyValue("renderamt", "200")
@@ -429,10 +501,10 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 			laser2:SetKeyValue("TouchType", "-1")
 			laser2:SetKeyValue("NoiseAmplitude", "0")
 			laser2:Spawn()
-			--laser2:Fire("SetParent",self,0)
+			laser2:SetPos(shootOrigin)
+			laser2:Fire("SetParent",vehicle,0)
 			laser2:Fire("TurnOn", "", 0.01)
 			laser2:Fire("kill", "", 0.12)
-			laser2:SetPos(shootOrigin)
 			
 		util.Decal("fadingscorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 		end
@@ -442,18 +514,8 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * damage * 1000, shootOrigin ) 
 end
 
-local function HandleJEEPWeapons( vehicle )
+local function handlegausscannon( ply, pod, vehicle )
 	local curtime = CurTime()
-	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
-	
-	local pod = vehicle.pSeat[1]
-	
-	if (!vehicle.pViewLimited) then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
-	end
-	
-	local ply = pod:GetDriver()
 	
 	if (!IsValid(ply)) then 
 		if (vehicle.afire_pressed) then
@@ -468,7 +530,7 @@ local function HandleJEEPWeapons( vehicle )
 
 	local tr = util.TraceLine( {
 		start = ply:EyePos(),
-		endpos = ply:EyePos() + ply:EyeAngles():Forward() * 10000,
+		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
 		filter = {vehicle}
 	} )
 	local Aimpos = tr.HitPos
@@ -480,7 +542,7 @@ local function HandleJEEPWeapons( vehicle )
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
 	vehicle.wOldPos = vehicle:GetPos()
 
-	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval() 
+	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
 	
 	local Aimang = (Aimpos - shootOrigin):Angle()
 	
@@ -535,6 +597,36 @@ local function HandleJEEPWeapons( vehicle )
 	end
 end
 
+local function HandleJEEPWeapons( vehicle )
+	local pod = vehicle.DriverSeat
+	
+	if !IsValid(pod) then return end
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	handlegausscannon( ply, pod, vehicle )
+end
+
+local function HandleELITEJEEPWeapons( vehicle )
+	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
+	
+	local pod = vehicle.pSeat[1]
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	handlegausscannon( ply, pod, vehicle )
+end
+
 local function HandleAPCWeapons( vehicle )
 	local curtime = CurTime()
 	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
@@ -552,7 +644,7 @@ local function HandleAPCWeapons( vehicle )
 
 	local tr = util.TraceLine( {
 		start = ply:EyePos(),
-		endpos = ply:EyePos() + ply:EyeAngles():Forward() * 10000,
+		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
 		filter = {vehicle}
 	} )
 	local Aimpos = tr.HitPos
@@ -641,8 +733,17 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 			end
 		end
 	end
-	if (armedJEEPSTable) then
-		for k, v in pairs(armedJEEPSTable) do
+	if (armedELITEJEEPSTable ) then
+		for k, v in pairs(armedELITEJEEPSTable ) do
+			if (IsValid(v)) then
+				HandleELITEJEEPWeapons( v )
+			else
+				armedELITEJEEPSTable[k] = nil
+			end
+		end
+	end
+	if (armedJEEPSTable ) then
+		for k, v in pairs(armedJEEPSTable ) do
 			if (IsValid(v)) then
 				HandleJEEPWeapons( v )
 			else
