@@ -70,6 +70,7 @@ local V = {
 		Efficiency = 1.337,
 		GripOffset = 0,
 		BrakePower = 40,
+		BulletProofTires = true,
 		
 		IdleRPM = 750,
 		LimitRPM = 6500,
@@ -158,6 +159,7 @@ local V = {
 		Efficiency = 1.4,
 		GripOffset = 0,
 		BrakePower = 40,
+		BulletProofTires = true,
 		
 		IdleRPM = 750,
 		LimitRPM = 7500,
@@ -360,6 +362,7 @@ local V = {
 		Efficiency = 1.25,
 		GripOffset = -14,
 		BrakePower = 120,
+		BulletProofTires = true,
 		
 		IdleRPM = 750,
 		LimitRPM = 5500,
