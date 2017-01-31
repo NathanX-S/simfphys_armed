@@ -2,7 +2,6 @@ if (SERVER) then
 	resource.AddWorkshop("831680603")
 end
 
-
 local light_table = {
 	L_HeadLampPos = Vector(20.15,133,21),
 	L_HeadLampAng = Angle(15,90,0),
@@ -445,73 +444,16 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Src 			= shootOrigin
 		bullet.Dir 			= Attachment.Ang:Forward()
 		bullet.Spread 		= Vector(0.01,0.01,0)
-		bullet.Tracer		= 0
+		bullet.Tracer		= 1
+		bullet.TracerName 	= "simfphys_gausstracer"
 		bullet.Force		= damage
 		bullet.Damage		= damage
 		bullet.HullSize		= 1
 		bullet.Callback = function(att, tr, dmginfo)
-		
-		local effect = ents.Create("env_spark")
-			effect:SetKeyValue("targetname", "target")
-			effect:SetPos( tr.HitPos + tr.HitNormal * 2 )
-			effect:SetAngles( tr.HitNormal:Angle() )
-			effect:Spawn()
-			effect:SetKeyValue("spawnflags","128")
-			effect:SetKeyValue("Magnitude",5)
-			effect:SetKeyValue("TrailLength",3)
-			effect:Fire( "SparkOnce" )
-			effect:Fire("kill","",0.21)
-			
-		local effectdata = EffectData()
-			effectdata:SetOrigin( tr.HitPos )
-			effectdata:SetStart( shootOrigin )
-			effectdata:SetAttachment( 1 )
-			effectdata:SetEntity( vehicle )
-			effectdata:SetScale( 6000 )	
-			effectdata:SetMagnitude( 30 )	
-			util.Effect( "arctaucannon", effectdata )
-			
-		local laser1 = ents.Create("env_laser")
-			laser1:SetKeyValue("renderamt", "200")
-			laser1:SetKeyValue("rendercolor", "255 255 150")
-			laser1:SetKeyValue("texture", "sprites/laserbeam.spr")
-			laser1:SetKeyValue("TextureScroll", "14")
-			laser1:SetKeyValue("targetname", "laser1" )
-			laser1:SetKeyValue("renderfx", "2")
-			laser1:SetKeyValue("width", "0.5")
-			laser1:SetKeyValue("dissolvetype", "None")
-			laser1:SetKeyValue("EndSprite", "")
-			laser1:SetKeyValue("LaserTarget", "target")
-			laser1:SetKeyValue("TouchType", "-1")
-			laser1:SetKeyValue("NoiseAmplitude", "2")
-			laser1:Spawn()
-			laser1:SetPos(shootOrigin)
-			laser1:Fire("SetParent",vehicle,0)
-			laser1:Fire("TurnOn", "", 0.01)
-			laser1:Fire("kill", "", 0.12)
-		
-		local laser2 = ents.Create("env_laser")
-			laser2:SetKeyValue("renderamt", "200")
-			laser2:SetKeyValue("rendercolor", "255 145 "..math.random(0,16))
-			laser2:SetKeyValue("texture", "sprites/laserbeam.spr")
-			laser2:SetKeyValue("TextureScroll", "14")
-			laser2:SetKeyValue("targetname", "laser2" )
-			laser2:SetKeyValue("renderfx", "2")
-			laser2:SetKeyValue("width", "1")
-			laser2:SetKeyValue("dissolvetype", "None")
-			laser2:SetKeyValue("EndSprite", "")
-			laser2:SetKeyValue("LaserTarget", "target")
-			laser2:SetKeyValue("TouchType", "-1")
-			laser2:SetKeyValue("NoiseAmplitude", "0")
-			laser2:Spawn()
-			laser2:SetPos(shootOrigin)
-			laser2:Fire("SetParent",vehicle,0)
-			laser2:Fire("TurnOn", "", 0.01)
-			laser2:Fire("kill", "", 0.12)
-			
-		util.Decal("fadingscorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
+			util.Decal("fadingscorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 		end
 		bullet.Attacker 	= ply
+		
 	vehicle:FireBullets( bullet )
 	
 	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * damage * 1000, shootOrigin ) 
