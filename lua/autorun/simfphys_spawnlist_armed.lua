@@ -213,7 +213,7 @@ local V = {
 		
 		PassengerSeats = {
 			{
-				pos = Vector(-17,8,40),
+				pos = Vector(-17,0,15),
 				ang = Angle(0,0,0)
 			},
 			{
@@ -450,6 +450,17 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Damage		= damage
 		bullet.HullSize		= 1
 		bullet.Callback = function(att, tr, dmginfo)
+			local effect = ents.Create("env_spark")
+				effect:SetKeyValue("targetname", "target")
+				effect:SetPos( tr.HitPos + tr.HitNormal * 2 )
+				effect:SetAngles( tr.HitNormal:Angle() )
+				effect:Spawn()
+				effect:SetKeyValue("spawnflags","128")
+				effect:SetKeyValue("Magnitude",5)
+				effect:SetKeyValue("TrailLength",3)
+				effect:Fire( "SparkOnce" )
+				effect:Fire("kill","",0.21)
+				
 			util.Decal("fadingscorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 		end
 		bullet.Attacker 	= ply
@@ -462,7 +473,7 @@ end
 local function handlegausscannon( ply, pod, vehicle )
 	local curtime = CurTime()
 	
-	if (!IsValid(ply)) then 
+	if !IsValid(ply) then 
 		if (vehicle.afire_pressed) then
 			vehicle.afire_pressed = false
 			vehicle.wpn_chr:Stop()
@@ -473,6 +484,8 @@ local function handlegausscannon( ply, pod, vehicle )
 		return
 	end
 
+	ply:CrosshairEnable()
+	
 	local tr = util.TraceLine( {
 		start = ply:EyePos(),
 		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
@@ -547,6 +560,10 @@ local function HandleJEEPWeapons( vehicle )
 	
 	if !IsValid(pod) then return end
 	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+	end
+	
 	if (!vehicle.pViewLimited) then
 		pod:SetKeyValue( "limitview", 1)
 		vehicle.pViewLimited = true
@@ -561,6 +578,12 @@ local function HandleELITEJEEPWeapons( vehicle )
 	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
 	
 	local pod = vehicle.pSeat[1]
+	
+	if !IsValid(pod) then return end
+	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+	end
 	
 	if (!vehicle.pViewLimited) then
 		pod:SetKeyValue( "limitview", 1)
@@ -578,15 +601,19 @@ local function HandleAPCWeapons( vehicle )
 	
 	local pod = vehicle.pSeat[1]
 	
-	if (!vehicle.pViewLimited) then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
+	if !IsValid(pod) then return end
+	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+		pod:SetNWBool( "IsAPCSeat", true )
 	end
 	
 	local ply = pod:GetDriver()
 	
-	if (!IsValid(ply)) then return end
+	if !IsValid(ply) then return end
 
+	ply:CrosshairEnable()
+	
 	local tr = util.TraceLine( {
 		start = ply:EyePos(),
 		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
@@ -612,10 +639,9 @@ local function HandleAPCWeapons( vehicle )
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
 	Angles:Normalize()
 	
-	Angles.y = (Angles.y / 180) * 130
+	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (-Angles:Forward() - vehicle.sm_dir) * 0.1) or Vector(0,0,0)
 	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.08) or 0
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_pp_yaw )
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", ((vehicle.sm_dir:Angle().y - 180) / 180) * 119.8 )
 	--vehicle:SetPoseParameter("vehicle_weapon_pitch", Angles.p )
 	
 	local fire = ply:KeyDown( IN_ATTACK )
@@ -697,3 +723,58 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 		end
 	end
 end)
+
+hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
+	if ( !IsValid( ply ) or !ply:Alive() or !ply:InVehicle() or ply:GetViewEntity() != ply ) then return end
+	
+	local Vehicle = ply:GetVehicle()
+	
+	if !IsValid( Vehicle ) then return end
+	if !Vehicle:GetNWBool( "IsGunnerSeat" ) then return end
+	
+	if Vehicle:GetNWBool( "IsAPCSeat" ) then
+		pos = pos + Vehicle:GetUp() * 25
+	end
+	
+	local view = {
+		origin = pos,
+		angles = Vehicle:LocalToWorldAngles( ply:EyeAngles() ),
+		drawviewer = false,
+	}
+	
+	if ( Vehicle.GetThirdPersonMode == nil || ply:GetViewEntity() != ply ) then
+		return
+	end
+	
+	if ( !Vehicle:GetThirdPersonMode() ) then
+		view.origin = view.origin + Vehicle:GetUp() * 5 - Vehicle:GetRight() * 9
+		return view
+	end
+	
+	local mn, mx = Vehicle:GetRenderBounds()
+	local radius = ( mn - mx ):Length()
+	local radius = radius + radius * Vehicle:GetCameraDistance()
+
+	local TargetOrigin = view.origin + ( view.angles:Forward() * -radius )
+	local WallOffset = 4
+
+	local tr = util.TraceHull( {
+		start = view.origin,
+		endpos = TargetOrigin,
+		filter = function( e )
+			local c = e:GetClass() -- Avoid contact with entities that can potentially be attached to the vehicle. Ideally, we should check if "e" is constrained to "Vehicle".
+			return !c:StartWith( "prop_physics" ) &&!c:StartWith( "prop_dynamic" ) && !c:StartWith( "prop_ragdoll" ) && !e:IsVehicle() && !c:StartWith( "gmod_" ) && !c:StartWith( "player" )
+		end,
+		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
+		maxs = Vector( WallOffset, WallOffset, WallOffset ),
+	} )
+
+	view.origin = tr.HitPos
+	view.drawviewer = true
+
+	if ( tr.Hit && !tr.StartSolid) then
+		view.origin = view.origin + tr.HitNormal * WallOffset
+	end
+	
+	return view
+end )
