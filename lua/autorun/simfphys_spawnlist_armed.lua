@@ -2,6 +2,11 @@ if (SERVER) then
 	resource.AddWorkshop("831680603")
 end
 
+local light_table = {	
+	ems_sounds = {"ambient/alarms/apc_alarm_loop1.wav"},
+}
+list.Set( "simfphys_lights", "capc_siren", light_table)
+
 local light_table = {
 	L_HeadLampPos = Vector(20.15,133,21),
 	L_HeadLampAng = Angle(15,90,0),
@@ -32,6 +37,80 @@ local light_table = {
 }
 list.Set( "simfphys_lights", "conapc_armed", light_table)
 
+local V = {
+	Name = "HL2 Combine APC",
+	Model = "models/combine_apc.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+
+	Members = {
+		Mass = 3500,
+		MaxHealth = 6000,
+		
+		LightsTable = "capc_siren",
+		
+		FrontWheelRadius = 28,
+		RearWheelRadius = 28,
+		
+		SeatOffset = Vector(-25,0,104),
+		SeatPitch = 0,
+		
+		PassengerSeats = {
+		},
+		
+		FrontHeight = 10,
+		FrontConstant = 50000,
+		FrontDamping = 3000,
+		FrontRelativeDamping = 3000,
+		
+		RearHeight = 10,
+		RearConstant = 50000,
+		RearDamping = 3000,
+		RearRelativeDamping = 3000,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 70,
+		Efficiency = 1.8,
+		GripOffset = 0,
+		BrakePower = 70,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 6000,
+		PeakTorque = 100,
+		PowerbandStart = 1500,
+		PowerbandEnd = 5800,
+		Turbocharged = false,
+		Supercharged = false,
+		
+		PowerBias = 0,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/c_apc/apc_idle.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/c_apc/apc_mid.wav",
+		Sound_MidPitch = 1,
+		Sound_MidVolume = 1,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
+		
+		Sound_High = "",
+		
+		Sound_Throttle = "",
+		
+		snd_horn = "ambient/alarms/apc_alarm_pass1.wav",
+		
+		DifferentialGear = 0.3,
+		Gears = {-0.1,0,0.1,0.2,0.3}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_combineapc_armed", V )
 
 local V = {
 	Name = "HL2 Jeep taucannon",
@@ -489,19 +568,6 @@ local V = {
 			}
 		},
 		
-		--LimitView = true,
-		--[[
-		Weapons = {
-			{
-				weaponname = "simfphys_apcturret",
-				pos = Vector(5,-35,0),
-				ang = Angle(0,0,0),
-				follow_eyeangles = false,
-				attachment = "muzzle",
-			}
-		},
-		]]--
-		
 		FrontHeight = 22,
 		FrontConstant = 50000,
 		FrontDamping = 4000,
@@ -566,6 +632,10 @@ if (!armedAPCSTable) then -- lets make sure we dont ruin all the spawned vehicle
 	armedAPCSTable = {}
 end
 
+if (!armedCombineAPCSTable) then
+	armedCombineAPCSTable = {}
+end
+
 if (!armedELITEJEEPSTable) then
 	armedELITEJEEPSTable = {}
 end
@@ -599,6 +669,10 @@ hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle
 			if (vehicle:GetSpawn_List() == "sim_fphys_jeep_armed") then
 				table.insert(armedJEEPSTable, vehicle)
 				vehicle:SetBodygroup(1,1)
+			end
+			
+			if (vehicle:GetSpawn_List() == "sim_fphys_combineapc_armed") then
+				table.insert(armedCombineAPCSTable, vehicle)
 			end
 			
 			if (vehicle:GetSpawn_List() == "sim_fphys_jeep_armed2") then
@@ -765,7 +839,7 @@ local function AirboatFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin
 		bullet.Dir 			= Attachment.Ang:Forward()
-		bullet.Spread 		= Vector(0.05,0.05,0)
+		bullet.Spread 		= Vector(0.04,0.04,0)
 		bullet.Tracer		= 1
 		bullet.TracerName 	= (damage > 10 and "AirboatGunHeavyTracer" or "AirboatGunTracer")
 		bullet.Force		= damage
@@ -782,7 +856,6 @@ local function AirboatFire(ply,vehicle,shootOrigin,Attachment,damage)
 		
 	vehicle:FireBullets( bullet )
 end
-
 
 local function handleairboatcannon( ply, pod, vehicle )
 	local curtime = CurTime()
@@ -829,7 +902,7 @@ local function handleairboatcannon( ply, pod, vehicle )
 	local fire = ply:KeyDown( IN_ATTACK ) and vehicle.charge > 0
 	
 	if !fire then
-		vehicle.charge = math.min(vehicle.charge + 0.1,100)
+		vehicle.charge = math.min(vehicle.charge + 0.3,100)
 	end
 	
 	vehicle.OldFire = vehicle.OldFire or false
@@ -864,7 +937,7 @@ local function handleairboatcannon( ply, pod, vehicle )
 				if vehicle.charge > -1 then
 					vehicle:EmitSound("weapons/airboat/airboat_gun_energy"..math.Round(math.random(1,2),0)..".wav")
 				end
-				vehicle.charge = -10
+				vehicle.charge = -50
 			end
 			
 			vehicle.NextShoot = curtime + 0.05
@@ -1019,14 +1092,14 @@ local function HandleAPCWeapons( vehicle )
 		bullet.Spread 		= Vector(0.03,0.03,0)
 		bullet.Tracer		= 0
 		bullet.Force		= 50
-		bullet.Damage		= 40
+		bullet.Damage		= 50
 		bullet.HullSize		= 20
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
 				effectdata:SetOrigin( tr.HitPos )
 				util.Effect( "helicoptermegabomb", effectdata, true, true )
 				
-			util.BlastDamage( vehicle, ply, tr.HitPos, 150,20)
+			util.BlastDamage( vehicle, ply, tr.HitPos, 150,50)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
@@ -1051,7 +1124,150 @@ local function HandleAPCWeapons( vehicle )
 	vehicle:GetPhysicsObject():ApplyForceOffset( -Aimang:Forward() * 120000, shootOrigin ) 
 end
 
+local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)	
+	local bullet = {}
+		bullet.Num 			= 1
+		bullet.Src 			= shootOrigin
+		bullet.Dir 			= Attachment.Ang:Forward()
+		bullet.Spread 		= Vector(0.015,0.015,0)
+		bullet.Tracer		= 0
+		bullet.TracerName 	= "none"
+		bullet.Force		= damage
+		bullet.Damage		= damage
+		bullet.HullSize		= 1
+		bullet.Callback = function(att, tr, dmginfo)
+			local effectdata = EffectData()
+				effectdata:SetStart( shootOrigin )
+				effectdata:SetOrigin( tr.HitPos )
+				util.Effect("AR2Tracer", effectdata )
+		
+			local effectdata = EffectData()
+				effectdata:SetOrigin(  tr.HitPos + tr.HitNormal )
+				effectdata:SetNormal( tr.HitNormal )
+			util.Effect( "AR2Impact", effectdata, true, true )
+		end
+		bullet.Attacker 	= ply
+		
+	vehicle:FireBullets( bullet )
+end
+
+local function handlecAPCcannon( ply, pod, vehicle )
+	local curtime = CurTime()
+	
+	if !IsValid(ply) then 
+		if vehicle.wpn then
+			vehicle.wpn:Stop()
+			vehicle.wpn = nil
+		end
+		return
+	end
+
+	ply:CrosshairEnable()
+	
+	local tr = util.TraceLine( {
+		start = ply:EyePos(),
+		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
+		filter = {vehicle}
+	} )
+	local Aimpos = tr.HitPos
+	
+	local ID = vehicle:LookupAttachment( "muzzle" )
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	local deltapos = vehicle:GetPos() - vehicle.wOldPos
+	vehicle.wOldPos = vehicle:GetPos()
+
+	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
+	
+	local Aimang = (Aimpos - shootOrigin):Angle()
+	
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
+	
+	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (-Angles:Forward() - vehicle.sm_dir) * 0.1) or Vector(0,0,0)
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_dir:Angle().y - 180 )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", vehicle.sm_pp_pitch )
+	
+	vehicle.charge = vehicle.charge or 100
+	
+	local fire = ply:KeyDown( IN_ATTACK ) and vehicle.charge > 0
+	local alt_fire = ply:KeyDown( IN_ATTACK2 )
+	
+	if !fire then
+		vehicle.charge = math.min(vehicle.charge + 0.4,100)
+	end
+	
+	vehicle.NextSecondaryShoot = vehicle.NextSecondaryShoot or 0
+	if (alt_fire != vehicle.afire_pressed) then
+		vehicle.afire_pressed = alt_fire
+		if (alt_fire) then
+			if (vehicle.NextSecondaryShoot < curtime) then
+				if !IsValid(vehicle.missle) then
+					vehicle:EmitSound("PropAPC.FireCannon")
+					
+					local attch = vehicle:GetAttachment( vehicle:LookupAttachment( "cannon_muzzle" ) )
+					
+					vehicle.missle = ents.Create( "rpg_missile" ) -- need to make my own projectile entity at some point
+					vehicle.missle:SetPos( attch.Pos )
+					vehicle.missle:SetAngles( attch.Ang + Angle(math.Clamp(vehicle.sm_pp_pitch,-10,10),0,0) )
+					vehicle.missle:SetOwner( vehicle )
+					vehicle.missle:SetSaveValue( "m_flDamage", 150 )
+					vehicle.missle:Spawn()
+					vehicle.missle:Activate()
+					
+					vehicle.NextSecondaryShoot = curtime + 2
+				end
+			end
+		end
+	end
+	
+	vehicle.NextShoot = vehicle.NextShoot or 0
+	if (vehicle.NextShoot < curtime) then
+		if (fire) then
+			cAPCFire(ply,vehicle,shootOrigin,Attachment,25,ID)
+			vehicle:EmitSound("Weapon_AR2.Single")
+			
+			vehicle.charge = vehicle.charge - 3
+			
+			if vehicle.charge <= 0 then
+				if vehicle.charge >= -6 then
+					vehicle:EmitSound("weapons/airboat/airboat_gun_energy"..math.Round(math.random(1,2),0)..".wav")
+				end
+				vehicle.charge = -25
+			end
+			
+			vehicle.NextShoot = curtime + 0.12
+		end
+	end
+end
+
+local function HandleCombineAPCWeapons( vehicle )
+	local pod = vehicle.DriverSeat
+	
+	if !IsValid(pod) then return end
+	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+	end
+	
+	local ply = pod:GetDriver()
+	
+	handlecAPCcannon( ply, pod, vehicle )
+end
+
 hook.Add("Think", "simfphys_weaponhandler", function()
+	if (armedCombineAPCSTable) then
+		for k, v in pairs(armedCombineAPCSTable) do
+			if (IsValid(v)) then
+				HandleCombineAPCWeapons( v )
+			else
+				armedCombineAPCSTable[k] = nil
+			end
+		end
+	end
 	if (armedAPCSTable) then
 		for k, v in pairs(armedAPCSTable) do
 			if (IsValid(v)) then
