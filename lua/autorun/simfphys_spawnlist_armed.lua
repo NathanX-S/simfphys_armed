@@ -1139,6 +1139,7 @@ local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)
 			local effectdata = EffectData()
 				effectdata:SetStart( shootOrigin )
 				effectdata:SetOrigin( tr.HitPos )
+				effectdata:SetScale( 6000 )
 				util.Effect("AR2Tracer", effectdata )
 		
 			local effectdata = EffectData()
@@ -1230,7 +1231,7 @@ local function handlecAPCcannon( ply, pod, vehicle )
 			cAPCFire(ply,vehicle,shootOrigin,Attachment,25,ID)
 			vehicle:EmitSound("Weapon_AR2.Single")
 			
-			vehicle.charge = vehicle.charge - 3
+			vehicle.charge = vehicle.charge - 2.5
 			
 			if vehicle.charge <= 0 then
 				if vehicle.charge >= -6 then
