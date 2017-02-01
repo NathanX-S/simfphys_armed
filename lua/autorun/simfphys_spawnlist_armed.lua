@@ -34,7 +34,7 @@ list.Set( "simfphys_lights", "conapc_armed", light_table)
 
 
 local V = {
-	Name = "HL2 Jeep",
+	Name = "HL2 Jeep taucannon",
 	Model = "models/buggy.mdl",
 	Class = "gmod_sent_vehicle_fphysics_base",
 	Category = "Armed Vehicles",
@@ -102,7 +102,74 @@ list.Set( "simfphys_vehicles", "sim_fphys_jeep_armed", V )
 
 
 local V = {
-	Name = "Synergy Elite Jeep",
+	Name = "HL2 Jeep airboatgun",
+	Model = "models/buggy.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+
+	Members = {
+		Mass = 1700,
+		
+		LightsTable = "jeep",
+		
+		FrontWheelRadius = 18,
+		RearWheelRadius = 20,
+
+		SeatOffset = Vector(0,0,-2),
+		SeatPitch = 0,
+
+		FrontHeight = 13.5,
+		FrontConstant = 27000,
+		FrontDamping = 2800,
+		FrontRelativeDamping = 2800,
+		
+		RearHeight = 13.5,
+		RearConstant = 32000,
+		RearDamping = 2900,
+		RearRelativeDamping = 2900,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 44,
+		Efficiency = 1.337,
+		GripOffset = 0,
+		BrakePower = 40,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 6500,
+		PeakTorque = 100,
+		PowerbandStart = 2200,
+		PowerbandEnd = 6300,
+		
+		PowerBias = 0.5,
+		
+		EngineSoundPreset = -1,
+		
+		snd_pitch = 1,
+		snd_idle = "simulated_vehicles/jeep/jeep_idle.wav",
+		
+		snd_low = "simulated_vehicles/jeep/jeep_low.wav",
+		snd_low_revdown = "simulated_vehicles/jeep/jeep_revdown.wav",
+		snd_low_pitch = 0.9,
+		
+		snd_mid = "simulated_vehicles/jeep/jeep_mid.wav",
+		snd_mid_gearup = "simulated_vehicles/jeep/jeep_second.wav",
+		snd_mid_pitch = 1,
+		
+		snd_horn = "simulated_vehicles/horn_1.wav",
+		
+		DifferentialGear = 0.3,
+		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_jeep_armed2", V )
+
+local V = {
+	Name = "Synergy Elite Jeep taucannon",
 	Model = "models/vehicles/buggy_elite.mdl",
 	Class = "gmod_sent_vehicle_fphysics_base",
 	Category = "Armed Vehicles",
@@ -191,6 +258,97 @@ local V = {
 }
 list.Set( "simfphys_vehicles", "sim_fphys_v8elite_armed", V )
 
+
+local V = {
+	Name = "Synergy Elite Jeep airboatgun",
+	Model = "models/vehicles/buggy_elite.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+
+	Members = {
+		Mass = 1700,
+		
+		LightsTable = "elitejeep",
+		
+		FrontWheelRadius = 18,
+		RearWheelRadius = 20,
+		
+		SeatOffset = Vector(0,0,-3),
+		SeatPitch = 0,
+		
+		PassengerSeats = {
+			{
+			pos = Vector(16,-35,16),
+			ang = Angle(0,0,0)
+			}
+		},
+		
+		Backfire = true,
+		ExhaustPositions = {
+			{
+				pos = Vector(-15.69,-105.94,14.94),
+				ang = Angle(90,-90,0)
+			},
+			{
+				pos = Vector(16.78,-105.46,14.35),
+				ang = Angle(90,-90,0)
+			}
+		},
+		
+		StrengthenSuspension = true,
+		
+		FrontHeight = 13.5,
+		FrontConstant = 27000,
+		FrontDamping = 2200,
+		FrontRelativeDamping = 1500, 
+		
+		RearHeight = 13.5,
+		RearConstant = 32000,
+		RearDamping = 2200,
+		RearRelativeDamping = 1500,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 44,
+		Efficiency = 1.4,
+		GripOffset = 0,
+		BrakePower = 40,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 7500,
+		PeakTorque = 100,
+		PowerbandStart = 2500,
+		PowerbandEnd = 7300,
+		Turbocharged = false,
+		Supercharged = false,
+		
+		PowerBias = 0.6,
+		
+		EngineSoundPreset = -1,
+		
+		snd_pitch = 1,
+		snd_idle = "simulated_vehicles/v8elite/v8elite_idle.wav",
+		
+		snd_low = "simulated_vehicles/v8elite/v8elite_low.wav",
+		snd_low_revdown = "simulated_vehicles/v8elite/v8elite_revdown.wav",
+		snd_low_pitch = 0.8,
+		
+		snd_mid = "simulated_vehicles/v8elite/v8elite_mid.wav",
+		snd_mid_gearup = "simulated_vehicles/v8elite/v8elite_second.wav",
+		snd_mid_pitch = 1,
+		
+		snd_horn = "simulated_vehicles/horn_4.wav",
+		
+		DifferentialGear = 0.38,
+		Gears = {-0.1,0,0.1,0.18,0.25,0.31,0.40}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_v8elite_armed2", V )
+
 local V = {
 	Name = "HL2 APC",
 	Model = "models/apc/apc.mdl",
@@ -200,6 +358,8 @@ local V = {
 
 	Members = {
 		Mass = 4800,
+		
+		MaxHealth = 4500,
 		
 		LightsTable = "conapc_armed",
 		
@@ -410,8 +570,16 @@ if (!armedELITEJEEPSTable) then
 	armedELITEJEEPSTable = {}
 end
 
+if (!armedELITEJEEPSTable2) then
+	armedELITEJEEPSTable2 = {}
+end
+
 if (!armedJEEPSTable) then
 	armedJEEPSTable = {}
+end
+
+if (!armedJEEPSTable2) then
+	armedJEEPSTable2 = {}
 end
 
 hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
@@ -431,6 +599,42 @@ hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle
 			if (vehicle:GetSpawn_List() == "sim_fphys_jeep_armed") then
 				table.insert(armedJEEPSTable, vehicle)
 				vehicle:SetBodygroup(1,1)
+			end
+			
+			if (vehicle:GetSpawn_List() == "sim_fphys_jeep_armed2") then
+				table.insert(armedJEEPSTable2, vehicle)
+				
+				local ID = vehicle:LookupAttachment( "gun_ref" )
+				local attachmentdata = vehicle:GetAttachment( ID )
+			
+				local prop = ents.Create( "gmod_sent_vehicle_fphysics_attachment" )
+				prop:SetModel( "models/airboatgun.mdl" )			
+				prop:SetPos( attachmentdata.Pos )
+				prop:SetAngles( attachmentdata.Ang )
+				prop:SetOwner( self )
+				prop:Spawn()
+				prop:Activate()
+				prop:SetNotSolid( true )
+				prop:SetParent( vehicle, ID )
+				prop.DoNotDuplicate = true
+			end
+			
+			if (vehicle:GetSpawn_List() == "sim_fphys_v8elite_armed2") then
+				table.insert(armedELITEJEEPSTable2, vehicle)
+				
+				local ID = vehicle:LookupAttachment( "gun_ref" )
+				local attachmentdata = vehicle:GetAttachment( ID )
+			
+				local prop = ents.Create( "gmod_sent_vehicle_fphysics_attachment" )
+				prop:SetModel( "models/airboatgun.mdl" )			
+				prop:SetPos( attachmentdata.Pos )
+				prop:SetAngles( attachmentdata.Ang )
+				prop:SetOwner( self )
+				prop:Spawn()
+				prop:Activate()
+				prop:SetNotSolid( true )
+				prop:SetParent( vehicle, ID )
+				prop.DoNotDuplicate = true
 			end
 		end
 	end)
@@ -555,6 +759,119 @@ local function handlegausscannon( ply, pod, vehicle )
 	end
 end
 
+
+local function AirboatFire(ply,vehicle,shootOrigin,Attachment,damage)
+	local bullet = {}
+		bullet.Num 			= 1
+		bullet.Src 			= shootOrigin
+		bullet.Dir 			= Attachment.Ang:Forward()
+		bullet.Spread 		= Vector(0.05,0.05,0)
+		bullet.Tracer		= 1
+		bullet.TracerName 	= (damage > 10 and "AirboatGunHeavyTracer" or "AirboatGunTracer")
+		bullet.Force		= damage
+		bullet.Damage		= damage
+		bullet.HullSize		= 1
+		bullet.Callback = function(att, tr, dmginfo)
+			local effectdata = EffectData()
+				effectdata:SetOrigin(  tr.HitPos + tr.HitNormal )
+				effectdata:SetNormal( tr.HitNormal )
+				effectdata:SetRadius( (damage > 1) and 8 or 3 )
+			util.Effect( "cball_bounce", effectdata, true, true )
+		end
+		bullet.Attacker 	= ply
+		
+	vehicle:FireBullets( bullet )
+end
+
+
+local function handleairboatcannon( ply, pod, vehicle )
+	local curtime = CurTime()
+	
+	if !IsValid(ply) then 
+		if vehicle.wpn then
+			vehicle.wpn:Stop()
+			vehicle.wpn = nil
+		end
+		return
+	end
+
+	ply:CrosshairEnable()
+	
+	local tr = util.TraceLine( {
+		start = ply:EyePos(),
+		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
+		filter = {vehicle}
+	} )
+	local Aimpos = tr.HitPos
+	
+	local ID = vehicle:LookupAttachment( "muzzle" )
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	local deltapos = vehicle:GetPos() - vehicle.wOldPos
+	vehicle.wOldPos = vehicle:GetPos()
+
+	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
+	
+	local Aimang = (Aimpos - shootOrigin):Angle()
+	
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.2) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch )
+	
+	vehicle.charge = vehicle.charge or 100
+	
+	local fire = ply:KeyDown( IN_ATTACK ) and vehicle.charge > 0
+	
+	if !fire then
+		vehicle.charge = math.min(vehicle.charge + 0.1,100)
+	end
+	
+	vehicle.OldFire = vehicle.OldFire or false
+	if vehicle.OldFire != fire then
+		vehicle.OldFire = fire
+		if fire then
+			vehicle.wpn = CreateSound( vehicle, "weapons/airboat/airboat_gun_loop2.wav" )
+			vehicle.wpn:Play()
+			vehicle:CallOnRemove( "stopmesounds", function( vehicle )
+				if vehicle.wpn then
+					vehicle.wpn:Stop()
+				end
+			end)
+		else
+			if vehicle.wpn then
+				vehicle.wpn:Stop()
+				vehicle.wpn = nil
+			end
+
+			vehicle:EmitSound("weapons/airboat/airboat_gun_lastshot"..math.Round(math.random(1,2),0)..".wav")
+		end
+	end
+	
+	vehicle.NextShoot = vehicle.NextShoot or 0
+	if (vehicle.NextShoot < curtime) then
+		if (fire) then
+			AirboatFire(ply,vehicle,shootOrigin,Attachment,(vehicle.charge / 5))
+			
+			vehicle.charge = vehicle.charge - 0.5
+			
+			if vehicle.charge <= 0 then
+				if vehicle.charge > -1 then
+					vehicle:EmitSound("weapons/airboat/airboat_gun_energy"..math.Round(math.random(1,2),0)..".wav")
+				end
+				vehicle.charge = -10
+			end
+			
+			vehicle.NextShoot = curtime + 0.05
+		end
+	end
+end
+
 local function HandleJEEPWeapons( vehicle )
 	local pod = vehicle.DriverSeat
 	
@@ -572,6 +889,25 @@ local function HandleJEEPWeapons( vehicle )
 	local ply = pod:GetDriver()
 	
 	handlegausscannon( ply, pod, vehicle )
+end
+
+local function HandleJEEPWeapons2( vehicle )
+	local pod = vehicle.DriverSeat
+	
+	if !IsValid(pod) then return end
+	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+	end
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	handleairboatcannon( ply, pod, vehicle )
 end
 
 local function HandleELITEJEEPWeapons( vehicle )
@@ -593,6 +929,27 @@ local function HandleELITEJEEPWeapons( vehicle )
 	local ply = pod:GetDriver()
 	
 	handlegausscannon( ply, pod, vehicle )
+end
+
+local function HandleELITEJEEPWeapons2( vehicle )
+	if (!vehicle.PassengerSeats or !vehicle.pSeat) then return end
+	
+	local pod = vehicle.pSeat[1]
+	
+	if !IsValid(pod) then return end
+	
+	if !pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+	end
+	
+	if (!vehicle.pViewLimited) then
+		pod:SetKeyValue( "limitview", 1)
+		vehicle.pViewLimited = true
+	end
+	
+	local ply = pod:GetDriver()
+	
+	handleairboatcannon( ply, pod, vehicle )
 end
 
 local function HandleAPCWeapons( vehicle )
@@ -662,14 +1019,14 @@ local function HandleAPCWeapons( vehicle )
 		bullet.Spread 		= Vector(0.03,0.03,0)
 		bullet.Tracer		= 0
 		bullet.Force		= 50
-		bullet.Damage		= 80
+		bullet.Damage		= 40
 		bullet.HullSize		= 20
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
 				effectdata:SetOrigin( tr.HitPos )
 				util.Effect( "helicoptermegabomb", effectdata, true, true )
 				
-			util.BlastDamage( vehicle, ply, tr.HitPos, 150,80 )
+			util.BlastDamage( vehicle, ply, tr.HitPos, 150,20)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
@@ -704,7 +1061,7 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 			end
 		end
 	end
-	if (armedELITEJEEPSTable ) then
+	if (armedELITEJEEPSTable) then
 		for k, v in pairs(armedELITEJEEPSTable ) do
 			if (IsValid(v)) then
 				HandleELITEJEEPWeapons( v )
@@ -713,12 +1070,30 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 			end
 		end
 	end
-	if (armedJEEPSTable ) then
+	if (armedJEEPSTable) then
 		for k, v in pairs(armedJEEPSTable ) do
 			if (IsValid(v)) then
 				HandleJEEPWeapons( v )
 			else
 				armedJEEPSTable[k] = nil
+			end
+		end
+	end
+	if (armedJEEPSTable2) then
+		for k, v in pairs(armedJEEPSTable2) do
+			if (IsValid(v)) then
+				HandleJEEPWeapons2( v )
+			else
+				armedJEEPSTable2[k] = nil
+			end
+		end
+	end
+	if (armedELITEJEEPSTable2) then
+		for k, v in pairs(armedELITEJEEPSTable2 ) do
+			if (IsValid(v)) then
+				HandleELITEJEEPWeapons2( v )
+			else
+				armedELITEJEEPSTable2[k] = nil
 			end
 		end
 	end
