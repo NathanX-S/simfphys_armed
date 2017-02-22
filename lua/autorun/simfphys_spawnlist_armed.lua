@@ -732,7 +732,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Tracer		= 1
 		bullet.TracerName 	= "simfphys_gausstracer"
 		bullet.Force		= damage
-		bullet.Damage		= damage
+		bullet.Damage		= damage * 1.5
 		bullet.HullSize		= 1
 		bullet.Callback = function(att, tr, dmginfo)
 			local effect = ents.Create("env_spark")
