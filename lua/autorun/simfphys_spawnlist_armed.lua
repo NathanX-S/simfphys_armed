@@ -1316,6 +1316,39 @@ hook.Add("Think", "simfphys_weaponhandler", function()
 	end
 end)
 
+local function simfphyslerpView( ply, view )
+	
+	ply.simfphys_smooth_in = ply.simfphys_smooth_in or 1
+	ply.simfphys_smooth_out = ply.simfphys_smooth_out or 1
+	
+	if ply:InVehicle() then
+		if ply.simfphys_smooth_in < 0.999 then
+			ply.simfphys_smooth_in = ply.simfphys_smooth_in + (1 - ply.simfphys_smooth_in) * FrameTime() * 3
+			
+			view.origin = LerpVector(ply.simfphys_smooth_in, ply.simfphys_eyepos_in, view.origin )
+			view.angles = LerpAngle(ply.simfphys_smooth_in, ply.simfphys_eyeang_in, view.angles )
+		end
+		
+		local vehicle = ply:GetVehicle()
+		if IsValid(vehicle) then
+			ply.simfphys_eyeang_out = view.angles
+			ply.simfphys_eyepos_out = view.origin
+		end
+	else
+		if ply.simfphys_smooth_out < 0.999 then
+			ply.simfphys_smooth_out = ply.simfphys_smooth_out + (1 - ply.simfphys_smooth_out) * FrameTime() * 3
+			
+			view.origin = LerpVector(ply.simfphys_smooth_out, ply.simfphys_eyepos_out, ply:GetShootPos() )
+			view.angles = LerpAngle(ply.simfphys_smooth_out, ply.simfphys_eyeang_out, ply:EyeAngles() )
+		end
+		
+		ply.simfphys_eyeang_in = view.angles
+		ply.simfphys_eyepos_in = view.origin
+	end
+	
+	return view
+end
+
 hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	if ( !IsValid( ply ) or !ply:Alive() or !ply:InVehicle() or ply:GetViewEntity() != ply ) then return end
 	
@@ -1338,9 +1371,11 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 		return
 	end
 	
+	ply.simfphys_smooth_out = 0
+	
 	if ( !Vehicle:GetThirdPersonMode() ) then
 		view.origin = view.origin + Vehicle:GetUp() * 5 - Vehicle:GetRight() * 9
-		return view
+		return simfphyslerpView( ply, view )
 	end
 	
 	local mn, mx = Vehicle:GetRenderBounds()
@@ -1368,5 +1403,5 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 		view.origin = view.origin + tr.HitNormal * WallOffset
 	end
 	
-	return view
+	return simfphyslerpView( ply, view )
 end )
