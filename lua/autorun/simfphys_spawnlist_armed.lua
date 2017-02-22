@@ -7,6 +7,9 @@ local light_table = {
 }
 list.Set( "simfphys_lights", "capc_siren", light_table)
 
+local AUTOMATIC = 1
+local MANUAL = 2
+
 local light_table = {
 	L_HeadLampPos = Vector(20.15,133,21),
 	L_HeadLampAng = Angle(15,90,0),
@@ -79,6 +82,7 @@ local V = {
 		BrakePower = 70,
 		BulletProofTires = true,
 		
+		
 		IdleRPM = 750,
 		LimitRPM = 6000,
 		PeakTorque = 100,
@@ -106,6 +110,7 @@ local V = {
 		
 		snd_horn = "ambient/alarms/apc_alarm_pass1.wav",
 		
+		ForceTransmission = AUTOMATIC,
 		DifferentialGear = 0.3,
 		Gears = {-0.1,0,0.1,0.2,0.3}
 	}
@@ -173,6 +178,7 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_1.wav",
 		
+		ForceTransmission = AUTOMATIC,
 		DifferentialGear = 0.3,
 		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
 	}
@@ -241,6 +247,7 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_1.wav",
 		
+		ForceTransmission = AUTOMATIC,
 		DifferentialGear = 0.3,
 		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
 	}
