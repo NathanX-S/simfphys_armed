@@ -52,6 +52,8 @@ function EFFECT:Think()
 end
 
 function EFFECT:RenderGauss(dir,dist)
+	if !IsValid(self.parentent) then return end
+	
 	local origin = self.parentent:GetAttachment( 1 ).Pos
 	
 	render.SetMaterial( self.Mat )
