@@ -807,7 +807,7 @@ local function handlegausscannon( ply, pod, vehicle )
 	if (vehicle.wpn_chr) then
 		vehicle.wpn_chr:ChangePitch(100 + vehicle.gausscharge * 1.5)
 		
-		vehicle.gaus_pp_spin = vehicle.gaus_pp_spin and (vehicle.gaus_pp_spin + vehicle.gausscharge / 3) or 0
+		vehicle.gaus_pp_spin = vehicle.gaus_pp_spin and (vehicle.gaus_pp_spin + vehicle.gausscharge / 2) or 0
 		vehicle:SetPoseParameter("gun_spin", vehicle.gaus_pp_spin)
 	end
 	
@@ -831,7 +831,7 @@ local function handlegausscannon( ply, pod, vehicle )
 			else
 				vehicle.wpn_chr:Stop()
 				vehicle.wpn_chr = nil
-				GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge)
+				GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 2)
 				vehicle.gausscharge = 0
 				
 				vehicle.NextShoot = curtime + 0.6
