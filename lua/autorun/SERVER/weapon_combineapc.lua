@@ -111,7 +111,7 @@ function simWeapons.combineAPC( ply, pod, vehicle )
 			
 			vehicle.missle.DirVector = vehicle.missle.DirVector + (targetdir - vehicle.missle.DirVector) * 0.1
 			
-			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 1000
+			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 1500
 			
 			vehicle.missle:SetVelocity( vel )
 			vehicle.missle:SetAngles( vehicle.missle.DirVector:Angle() )
