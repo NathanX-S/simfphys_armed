@@ -81,11 +81,6 @@ local function HandleJEEPWeapons( vehicle )
 		pod:SetNWBool( "IsGunnerSeat", true )
 	end
 	
-	if not vehicle.pViewLimited then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
-	end
-	
 	local ply = pod:GetDriver()
 	
 	simWeapons.taucannon( ply, pod, vehicle )
@@ -98,11 +93,6 @@ local function HandleJEEPWeapons2( vehicle )
 	
 	if not pod:GetNWBool( "IsGunnerSeat" ) then
 		pod:SetNWBool( "IsGunnerSeat", true )
-	end
-	
-	if not vehicle.pViewLimited then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
 	end
 	
 	local ply = pod:GetDriver()
@@ -121,11 +111,6 @@ local function HandleELITEJEEPWeapons( vehicle )
 		pod:SetNWBool( "IsGunnerSeat", true )
 	end
 	
-	if not vehicle.pViewLimited then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
-	end
-	
 	local ply = pod:GetDriver()
 	
 	simWeapons.taucannon( ply, pod, vehicle )
@@ -140,11 +125,6 @@ local function HandleELITEJEEPWeapons2( vehicle )
 	
 	if not pod:GetNWBool( "IsGunnerSeat" ) then
 		pod:SetNWBool( "IsGunnerSeat", true )
-	end
-	
-	if not vehicle.pViewLimited then
-		pod:SetKeyValue( "limitview", 1)
-		vehicle.pViewLimited = true
 	end
 	
 	local ply = pod:GetDriver()
