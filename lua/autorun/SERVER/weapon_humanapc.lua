@@ -1,9 +1,13 @@
 simWeapons = simWeapons or {}
 
+local cvar_damage = CreateConVar( "simfphysarmed_apc_bulletdamage", "50", {FCVAR_REPLICATED , FCVAR_ARCHIVE} )
+local cvar_expdamage = CreateConVar( "simfphysarmed_apc_blastdamage", "150", {FCVAR_REPLICATED , FCVAR_ARCHIVE} )
+local cvar_expradius = CreateConVar( "simfphysarmed_apc_blastradius", "50", {FCVAR_REPLICATED , FCVAR_ARCHIVE} )
+
 function simWeapons.humanAPC( ply, pod, vehicle )
 	local curtime = CurTime()
 	
-	if !IsValid(ply) then return end
+	if not IsValid(ply) then return end
 
 	ply:CrosshairEnable()
 	
@@ -55,14 +59,14 @@ function simWeapons.humanAPC( ply, pod, vehicle )
 		bullet.Spread 		= Vector(0.03,0.03,0)
 		bullet.Tracer		= 0
 		bullet.Force		= 50
-		bullet.Damage		= 50
+		bullet.Damage		= cvar_damage:GetFloat()
 		bullet.HullSize		= 20
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
 				effectdata:SetOrigin( tr.HitPos )
 				util.Effect( "helicoptermegabomb", effectdata, true, true )
 				
-			util.BlastDamage( vehicle, ply, tr.HitPos, 150,50)
+			util.BlastDamage( vehicle, ply, tr.HitPos, cvar_expradius:GetFloat(),cvar_expdamage:GetFloat())
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
