@@ -24,7 +24,8 @@ hook.Add( "HUDPaint", "simfphys_crosshair", function()
 	if not IsValid( vehicle ) then return end
 	
 	if ply:GetViewEntity() ~= ply then return end
-	if vehicle:GetSpawn_List() == "sim_fphys_conscriptapc_armed" then return end
+	local class = vehicle:GetSpawn_List()
+	if class == "sim_fphys_conscriptapc_armed" or class == "sim_fphys_conscriptapc_armed2" then return end
 
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
