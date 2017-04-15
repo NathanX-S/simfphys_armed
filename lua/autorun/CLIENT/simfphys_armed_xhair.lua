@@ -1,6 +1,17 @@
+CreateClientConVar( "cl_simfphys_crosshair", "1", true, false )
+
+
+local show_crosshair = false
+cvars.AddChangeCallback( "cl_simfphys_crosshair", function( convar, oldValue, newValue ) show_crosshair = tonumber( newValue )~=0 end)
+show_crosshair = GetConVar( "cl_simfphys_crosshair" ):GetBool()
+
+
+
 local xhair = Material( "sprites/hud/v_crosshair1" )
 
 hook.Add( "HUDPaint", "simfphys_crosshair", function()
+	if not show_crosshair then return end
+	
 	local ply = LocalPlayer()
 	local veh = ply:GetVehicle()
 	if not IsValid( veh ) then return end
