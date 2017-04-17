@@ -1,0 +1,19 @@
+"vertexlitgeneric"
+{
+	"$baseTexture" "models/hedgehog/hedgehog_red"
+	"$bumpmap" "models/hedgehog/hedgehog_normal"	
+
+	"$selfillum" "1"
+	"$selfillumtint" "[3 3 3]"
+	
+	"$selfillummask" 	"models/Hedgehog/hedgehog_red_ilumination"
+	
+	"$phong" "1"
+	"$phongexponent" "20"
+
+	"$phongboost" "2.5"	
+	"$lightwarptexture" "models/hedgehog/hedgehog_red_lightwarp"
+
+	"$phongfresnelranges"	"[.05 3 1]"
+	"$halflambert" "1"
+}

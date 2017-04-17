@@ -139,6 +139,7 @@ function simWeapons.humanAPC2( ply, pod, vehicle )
 		vehicle:EmitSound("vehicles/tank_readyfire1.wav")
 		vehicle.clip = maxclip
 		vehicle.NextShoot = curtime + 2
+		vehicle:SetIsCruiseModeOn( false )
 	end
 	
 	if not fire then return end

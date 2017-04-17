@@ -2,6 +2,7 @@ resource.AddWorkshop("831680603")
 
 simWeapons = simWeapons or {}
 
+if not istable( armeddipripvehicles ) then armeddipripvehicles = {} end
 if not istable( armedAPCSTable ) then armedAPCSTable = {} end
 if not istable( armedAPCSTable2 ) then armedAPCSTable2 = {} end
 if not istable( armedCombineAPCSTable ) then armedCombineAPCSTable = {} end
@@ -15,6 +16,10 @@ hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle
 		if not IsValid( vehicle ) then return end
 		if simfphys.IsCar( vehicle ) then
 			local class = vehicle:GetSpawn_List()
+			
+			if class == "sim_fphys_ratmobile" or class == "sim_fphys_hedgehog" or class == "sim_fphys_chaos126p" then
+				table.insert(armeddipripvehicles, vehicle)
+			end
 			
 			if class == "sim_fphys_conscriptapc_armed" then
 				table.insert(armedAPCSTable, vehicle)
@@ -187,7 +192,34 @@ local function HandleAPCWeapons2( vehicle )
 	simWeapons.humanAPC2( ply, pod, vehicle )
 end
 
+local function HandleDIPRIPWeapons( vehicle )
+	local pod = vehicle.DriverSeat
+	
+	if not IsValid(pod) then return end
+	
+	if not pod:GetNWBool( "IsGunnerSeat" ) then
+		pod:SetNWBool( "IsGunnerSeat", true )
+		pod:SetNWBool( "IsAPCSeat", true )
+	end
+	
+	local ply = pod:GetDriver()
+	
+	vehicle.VehicleData["steerangle"] = 45
+	
+	simWeapons.dipripweaponset( ply, pod, vehicle )
+end
+
 hook.Add("Think", "simfphys_weaponhandler", function()
+	if armeddipripvehicles then
+		for k, v in pairs( armeddipripvehicles ) do
+			if IsValid( v ) then
+				HandleDIPRIPWeapons( v )
+			else
+				armeddipripvehicles[k] = nil
+			end
+		end
+	end
+
 	if armedCombineAPCSTable then
 		for k, v in pairs( armedCombineAPCSTable ) do
 			if IsValid( v ) then
