@@ -127,22 +127,20 @@ local V = {
 		
 		EngineSoundPreset = 0,
 		
-		Sound_Idle = "simulated_vehicles/misc/Nanjing_loop.wav",
+		Sound_Idle = "simulated_vehicles/ratmobile/idle.wav",
 		Sound_IdlePitch = 1,
 		
-		Sound_Mid = "simulated_vehicles/misc/m50.wav",
-		Sound_MidPitch = 1,
+		Sound_Mid = "simulated_vehicles/ratmobile/loop.wav",
+		Sound_MidPitch = 0.9,
 		Sound_MidVolume = 1,
-		Sound_MidFadeOutRPMpercent = 58,
-		Sound_MidFadeOutRate = 0.476,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
 		
-		Sound_High = "simulated_vehicles/misc/v8high2.wav",
-		Sound_HighPitch = 1,
-		Sound_HighVolume = 0.75,
-		Sound_HighFadeInRPMpercent = 58,
-		Sound_HighFadeInRate = 0.19,
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
 		
-		Sound_Throttle = "",
 		Sound_ThrottlePitch = 0,
 		Sound_ThrottleVolume = 0,
 		
@@ -176,7 +174,7 @@ local V = {
 		FrontWheelRadius = 22,
 		RearWheelRadius = 23.5,
 		
-		SeatOffset = Vector(-6,0,25),
+		SeatOffset = Vector(-6,0,23),
 		SeatPitch = 0,
 		
 		CustomMassCenter = Vector(0,0,0),
@@ -253,22 +251,20 @@ local V = {
 		
 		EngineSoundPreset = 0,
 		
-		Sound_Idle = "simulated_vehicles/misc/Nanjing_loop.wav",
+		Sound_Idle = "simulated_vehicles/4banger/4banger_idle.wav",
 		Sound_IdlePitch = 1,
 		
-		Sound_Mid = "simulated_vehicles/misc/m50.wav",
-		Sound_MidPitch = 1,
+		Sound_Mid = "simulated_vehicles/4banger/4banger_mid.wav",
+		Sound_MidPitch = 0.85,
 		Sound_MidVolume = 1,
-		Sound_MidFadeOutRPMpercent = 58,
-		Sound_MidFadeOutRate = 0.476,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
 		
-		Sound_High = "simulated_vehicles/misc/v8high2.wav",
-		Sound_HighPitch = 1,
-		Sound_HighVolume = 0.75,
-		Sound_HighFadeInRPMpercent = 58,
-		Sound_HighFadeInRate = 0.19,
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
 		
-		Sound_Throttle = "",
 		Sound_ThrottlePitch = 0,
 		Sound_ThrottleVolume = 0,
 		
@@ -378,22 +374,20 @@ local V = {
 		
 		EngineSoundPreset = 0,
 		
-		Sound_Idle = "simulated_vehicles/misc/Nanjing_loop.wav",
+		Sound_Idle = "simulated_vehicles/hedgehog/idle.wav",
 		Sound_IdlePitch = 1,
 		
-		Sound_Mid = "simulated_vehicles/misc/m50.wav",
-		Sound_MidPitch = 1,
+		Sound_Mid = "simulated_vehicles/hedgehog/loop.wav",
+		Sound_MidPitch = 0.8,
 		Sound_MidVolume = 1,
-		Sound_MidFadeOutRPMpercent = 58,
-		Sound_MidFadeOutRate = 0.476,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
 		
-		Sound_High = "simulated_vehicles/misc/v8high2.wav",
-		Sound_HighPitch = 1,
-		Sound_HighVolume = 0.75,
-		Sound_HighFadeInRPMpercent = 58,
-		Sound_HighFadeInRate = 0.19,
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
 		
-		Sound_Throttle = "",
 		Sound_ThrottlePitch = 0,
 		Sound_ThrottleVolume = 0,
 		
