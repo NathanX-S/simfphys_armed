@@ -116,7 +116,7 @@ local V = {
 		
 		IdleRPM = 750,
 		LimitRPM = 7500,
-		PeakTorque = 300,
+		PeakTorque = 320,
 		PowerbandStart = 1500,
 		PowerbandEnd = 6500,
 		Turbocharged = false,
@@ -240,7 +240,7 @@ local V = {
 		
 		IdleRPM = 750,
 		LimitRPM = 7500,
-		PeakTorque = 300,
+		PeakTorque = 280,
 		PowerbandStart = 1500,
 		PowerbandEnd = 6500,
 		Turbocharged = false,
@@ -272,7 +272,7 @@ local V = {
 		
 		ForceTransmission = AUTOMATIC,
 		
-		DifferentialGear = 0.28,
+		DifferentialGear = 0.25,
 		Gears = {-0.1,0,0.1,0.2,0.3,0.4,0.5}
 	}
 }
@@ -395,7 +395,7 @@ local V = {
 		
 		ForceTransmission = AUTOMATIC,
 		
-		DifferentialGear = 0.28,
+		DifferentialGear = 0.32,
 		Gears = {-0.1,0,0.1,0.2,0.3,0.4,0.5}
 	}
 }
