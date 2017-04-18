@@ -44,6 +44,8 @@ local V = {
 		
 		LightsTable = "driprip_ratmobile",
 		
+		IsArmored = true,
+		
 		EnginePos = Vector(20,0,0),
 		
 		MaxHealth = 5000,
@@ -167,7 +169,9 @@ local V = {
 		
 		--LightsTable = "driprip_ratmobile",
 		
-		EnginePos = Vector(20,0,0),
+		IsArmored = true,
+		
+		EnginePos = Vector(49.98,0,14.16),
 		
 		MaxHealth = 5000,
 		
@@ -291,7 +295,9 @@ local V = {
 		
 		--LightsTable = "driprip_ratmobile",
 		
-		EnginePos = Vector(20,0,0),
+		IsArmored = true,
+		
+		EnginePos = Vector(-83.52,0,30.16),
 		
 		MaxHealth = 5000,
 		

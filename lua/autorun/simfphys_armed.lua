@@ -48,6 +48,8 @@ local V = {
 		
 		LightsTable = "capc_siren",
 		
+		IsArmored = true,
+		
 		FrontWheelRadius = 28,
 		RearWheelRadius = 28,
 		
@@ -443,6 +445,8 @@ local V = {
 		
 		MaxHealth = 4500,
 		
+		IsArmored = true,
+		
 		LightsTable = "conapc_armed",
 		
 		FrontWheelRadius = 32,
@@ -643,6 +647,8 @@ local V = {
 		Mass = 4800,
 		
 		MaxHealth = 4500,
+		
+		IsArmored = true,
 		
 		LightsTable = "conapc_armed",
 		

@@ -13,6 +13,8 @@ local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)
 		bullet.HullSize		= 1
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
+				effectdata:SetEntity( vehicle )
+				effectdata:SetAttachment( ID )
 				effectdata:SetStart( shootOrigin )
 				effectdata:SetOrigin( tr.HitPos )
 				effectdata:SetScale( 6000 )
@@ -31,7 +33,7 @@ end
 function simWeapons.combineAPC( ply, pod, vehicle )
 	local curtime = CurTime()
 	
-	if !IsValid(ply) then 
+	if not IsValid( ply ) then 
 		if vehicle.wpn then
 			vehicle.wpn:Stop()
 			vehicle.wpn = nil
@@ -73,15 +75,15 @@ function simWeapons.combineAPC( ply, pod, vehicle )
 	local fire = ply:KeyDown( IN_ATTACK ) and vehicle.charge > 0
 	local alt_fire = ply:KeyDown( IN_ATTACK2 )
 	
-	if !fire then
+	if not fire then
 		vehicle.charge = math.min(vehicle.charge + 0.4,100)
 	end
 	
 	vehicle.NextSecondaryShoot = vehicle.NextSecondaryShoot or 0
-	if (alt_fire != vehicle.afire_pressed) then
+	if alt_fire ~= vehicle.afire_pressed then
 		vehicle.afire_pressed = alt_fire
-		if (alt_fire) then
-			if (vehicle.NextSecondaryShoot < curtime) then
+		if alt_fire then
+			if vehicle.NextSecondaryShoot < curtime then
 				if not IsValid(vehicle.missle) then
 					vehicle:EmitSound("PropAPC.FireCannon")
 					
@@ -104,14 +106,14 @@ function simWeapons.combineAPC( ply, pod, vehicle )
 		end
 	end
 	
-	if IsValid(vehicle.missle) then
+	if IsValid( vehicle.missle ) then
 		if vehicle.UnlockMissle < curtime then
 			local targetdir = Aimpos - vehicle.missle:GetPos()
 			targetdir:Normalize()
 			
 			vehicle.missle.DirVector = vehicle.missle.DirVector + (targetdir - vehicle.missle.DirVector) * 0.1
 			
-			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 1500
+			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 1500 + vehicle:GetVelocity()
 			
 			vehicle.missle:SetVelocity( vel )
 			vehicle.missle:SetAngles( vehicle.missle.DirVector:Angle() )
