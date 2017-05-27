@@ -40,13 +40,7 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	local Vehicle = ply:GetVehicle()
 	
 	if not IsValid( Vehicle ) then return end
-	if not Vehicle:GetNWBool( "IsGunnerSeat" ) then return end
-	
-	if Vehicle:GetNWBool( "IsAPCSeat" ) then
-		pos = pos + Vehicle:GetUp() * 25
-	elseif Vehicle:GetNWBool( "IsTankSeat" ) then
-		pos = pos + Vehicle:GetUp() * 50
-	end
+	if not Vehicle:GetNWBool( "simfphys_SpecialCam" ) then return end
 	
 	local view = {
 		origin = pos,
@@ -54,16 +48,23 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 		drawviewer = false,
 	}
 	
-	if ( Vehicle.GetThirdPersonMode == nil || ply:GetViewEntity() != ply ) then
+	if Vehicle.GetThirdPersonMode == nil or ply:GetViewEntity() ~= ply then
 		return
 	end
 	
 	ply.simfphys_smooth_out = 0
 	
-	if ( !Vehicle:GetThirdPersonMode() ) then
-		view.origin = view.origin + Vehicle:GetUp() * 5 - Vehicle:GetRight() * 9
+	local offset = Vehicle:GetNWVector( "SpecialCam_Thirdperson" )
+	
+	if not Vehicle:GetThirdPersonMode() then
+		local offset = Vehicle:GetNWVector( "SpecialCam_Firstperson" )
+		
+		view.origin = view.origin + Vehicle:GetForward() * offset.x + Vehicle:GetRight() * offset.y + Vehicle:GetUp() * offset.z
+		
 		return simfphyslerpView( ply, view )
 	end
+	
+	view.origin = view.origin + Vehicle:GetForward() * offset.x + Vehicle:GetRight() * offset.y + Vehicle:GetUp() * offset.z
 	
 	local mn, mx = Vehicle:GetRenderBounds()
 	local radius = ( mn - mx ):Length()
@@ -77,7 +78,8 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 		endpos = TargetOrigin,
 		filter = function( e )
 			local c = e:GetClass()
-			return !c:StartWith( "prop_physics" ) &&!c:StartWith( "prop_dynamic" ) && !c:StartWith( "prop_ragdoll" ) && !e:IsVehicle() && !c:StartWith( "gmod_" ) && !c:StartWith( "player" )
+			local collide = not c:StartWith( "prop_physics" ) and not c:StartWith( "prop_dynamic" ) and not c:StartWith( "prop_ragdoll" ) and not e:IsVehicle() and not c:StartWith( "gmod_" ) and not c:StartWith( "player" )
+			return collide
 		end,
 		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
 		maxs = Vector( WallOffset, WallOffset, WallOffset ),
@@ -86,7 +88,7 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	view.origin = tr.HitPos
 	view.drawviewer = true
 
-	if ( tr.Hit && !tr.StartSolid) then
+	if tr.Hit and not tr.StartSolid then
 		view.origin = view.origin + tr.HitNormal * WallOffset
 	end
 	

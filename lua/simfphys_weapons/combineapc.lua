@@ -40,15 +40,32 @@ end
 function simfphys.weapon:Initialize( vehicle )
 	local pod = vehicle.DriverSeat
 	
-	if not IsValid( pod ) then return end
+	simfphys.RegisterCrosshair( pod )
+end
+
+function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
+	local Aimang = ply:EyeAngles() + ( pod:GetThirdPersonMode() and Angle(-13,0,0) or Angle(0,0,0) )
 	
-	pod:SetNWBool( "IsGunnerSeat", true )
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
+	Angles:Normalize()
+	
+	local Rate = 3
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + math.Clamp(Angles.y - vehicle.sm_pp_yaw,-Rate,Rate) ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and ( vehicle.sm_pp_pitch + math.Clamp(Angles.p - vehicle.sm_pp_pitch,-Rate,Rate) ) or 0
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_pp_yaw )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", vehicle.sm_pp_pitch )
+	
+	return Aimang
 end
 
 function simfphys.weapon:Think( vehicle )
-	if not IsValid( vehicle.DriverSeat ) then return end
+	local pod =  vehicle.DriverSeat
 	
-	local ply = vehicle.DriverSeat:GetDriver()
+	if not IsValid( pod ) then return end
+	
+	local ply = pod:GetDriver()
 	
 	local curtime = CurTime()
 	
@@ -60,32 +77,23 @@ function simfphys.weapon:Think( vehicle )
 		return
 	end
 	
+	local ID = vehicle:LookupAttachment( "muzzle" )
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	local Aimang = self:AimWeapon( ply, vehicle, pod )
+	
 	local tr = util.TraceLine( {
-		start = ply:EyePos(),
-		endpos = ply:EyePos() + ply:GetAimVector() * 10000,
+		start = Attachment.Pos,
+		endpos = Attachment.Pos + Aimang:Forward() * 10000,
 		filter = {vehicle}
 	} )
 	local Aimpos = tr.HitPos
-	
-	local ID = vehicle:LookupAttachment( "muzzle" )
-	local Attachment = vehicle:GetAttachment( ID )
 	
 	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
 	vehicle.wOldPos = vehicle:GetPos()
 
 	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
-	
-	local Aimang = (Aimpos - shootOrigin):Angle()
-	
-	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
-	Angles:Normalize()
-	
-	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (-Angles:Forward() - vehicle.sm_dir) * 0.1) or Vector(0,0,0)
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
-	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_dir:Angle().y - 180 )
-	vehicle:SetPoseParameter("vehicle_weapon_pitch", vehicle.sm_pp_pitch )
 	
 	vehicle.charge = vehicle.charge or 100
 	
@@ -138,8 +146,8 @@ function simfphys.weapon:Think( vehicle )
 	end
 	
 	vehicle.NextShoot = vehicle.NextShoot or 0
-	if (vehicle.NextShoot < curtime) then
-		if (fire) then
+	if vehicle.NextShoot < curtime then
+		if fire then
 			cAPCFire(ply,vehicle,shootOrigin,Attachment,25,ID)
 			vehicle:EmitSound("Weapon_AR2.Single")
 			

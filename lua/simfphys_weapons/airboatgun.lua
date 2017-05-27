@@ -36,13 +36,11 @@ function simfphys.weapon:Initialize( vehicle )
 	
 	local pod = vehicle.DriverSeat
 	
-	if not IsValid(pod) then return end
-	
-	pod:SetNWBool( "IsGunnerSeat", true )
+	simfphys.RegisterCrosshair( pod )
 end
 
-function simfphys.weapon:AimWeapon( ply, vehicle )
-	local Aimang = ply:EyeAngles()
+function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
+	local Aimang = ply:EyeAngles() + ( pod:GetThirdPersonMode() and Angle(-13,0,0) or Angle(0,0,0) )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
 	Angles:Normalize()
@@ -57,9 +55,10 @@ function simfphys.weapon:AimWeapon( ply, vehicle )
 end
 
 function simfphys.weapon:Think( vehicle )
-	if not IsValid( vehicle.DriverSeat ) then return end
+	local pod =  vehicle.DriverSeat
+	if not IsValid( pod ) then return end
 	
-	local ply = vehicle.DriverSeat:GetDriver()
+	local ply = pod:GetDriver()
 	
 	local curtime = CurTime()
 	
@@ -75,7 +74,7 @@ function simfphys.weapon:Think( vehicle )
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
-	self:AimWeapon( ply, vehicle )
+	self:AimWeapon( ply, vehicle, pod )
 	
 	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos

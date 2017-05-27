@@ -26,54 +26,69 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle )
 	end
 end
 
+local function MixDirection( ang, direction )
+
+	local Dir = ang:Forward()
+	
+	if direction.x == -1 then
+		Dir = -ang:Forward()
+		
+	elseif direction.y == 1 then
+		Dir = ang:Right()
+		
+	elseif direction.y == -1 then
+		Dir = -ang:Right()
+		
+	elseif direction.z == 1 then
+		Dir = ang:Up()
+		
+	elseif direction.z == -1 then
+		Dir = -ang:Up()
+	end
+	
+	return Dir
+end
+
 hook.Add( "HUDPaint", "simfphys_crosshair", function()
 	if not show_crosshair then return end
 	
 	local ply = LocalPlayer()
 	local veh = ply:GetVehicle()
+	
 	if not IsValid( veh ) then return end
 	
-	local isgunner = veh:GetNWBool( "IsGunnerSeat" ) 
+	local HasCrosshair = veh:GetNWBool( "HasCrosshair" ) 
 	
-	if not isgunner then return end
+	if not HasCrosshair then return end
 	
 	local vehicle = veh.vehiclebase
+	
 	if not IsValid( vehicle ) then return end
 	
 	if ply:GetViewEntity() ~= ply then return end
 	
-	if veh:GetNWBool( "IsAPCSeat" ) then
-		local attach_l = vehicle:LookupAttachment( "machinegun_barell_left" )
-		local attach_r = vehicle:LookupAttachment( "machinegun_barell_right" )
-		local attach_ref = vehicle:LookupAttachment( "machinegun_ref" )
-		if attach_l > 0 and attach_r > 0 and attach_ref > 0 then
+	local ID = vehicle:LookupAttachment( veh:GetNWString( "Attachment" ) )
+	if ID == 0 then return end
+	
+	local Attachment = vehicle:GetAttachment( ID )
+	
+	local startpos = Attachment.Pos
+	local endpos = startpos + MixDirection( Attachment.Ang, veh:GetNWVector( "Direction" ) ) * 999999
+	
+	if veh:GetNWBool( "CalcCenterPos" ) then
+		local attach_l = vehicle:LookupAttachment( veh:GetNWString( "Start_Left" ) )
+		local attach_r = vehicle:LookupAttachment( veh:GetNWString( "Start_Right" ) )
+		
+		if attach_l > 0 and attach_r > 0 then
 			local pos1 = vehicle:GetAttachment( attach_l ).Pos
 			local pos2 = vehicle:GetAttachment( attach_r ).Pos
 			
-			local startpos = (pos1 + pos2) * 0.5
-			local endpos = startpos + vehicle:GetAttachment( attach_ref ).Ang:Forward() * 999999
+			startpos = (pos1 + pos2) / 2
 			
 			traceAndDrawCrosshair( startpos, endpos, vehicle )
 		end
 		return
 	end
-	
-	if veh:GetNWBool( "IsTankSeat" ) then
-		local ID = vehicle:LookupAttachment( "muzzle" )
-		local Attachment = vehicle:GetAttachment( ID )
-		
-		local startpos = Attachment.Pos
-		local endpos = startpos + Attachment.Ang:Up() * 999999
-		
-		traceAndDrawCrosshair( startpos, endpos, vehicle )
-		return
-	end
-	
-	local ID = vehicle:LookupAttachment( "muzzle" )
-	local Attachment = vehicle:GetAttachment( ID )
-	
-	local startpos = Attachment.Pos
-	local endpos = startpos + Attachment.Ang:Forward() * 999999
 	
 	traceAndDrawCrosshair( startpos, endpos, vehicle )
 end )

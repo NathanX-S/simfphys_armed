@@ -6,6 +6,81 @@ simfphys.ManagedVehicles = istable( simfphys.ManagedVehicles ) and simfphys.Mana
 simfphys.Weapons = istable( simfphys.Weapons ) and simfphys.Weapons or {}
 simfphys.weapon = {}
 
+sound.Add( {
+	name = "apc_fire",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 110,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/apc_fire.wav"
+} )
+
+sound.Add( {
+	name = "tiger_fire",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 140,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/88_fire.wav"
+} )
+
+sound.Add( {
+	name = "tiger_fire_mg",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 110,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/7_62_fire.wav"
+} )
+
+sound.Add( {
+	name = "tiger_reload",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 70,
+	pitch = { 90, 110 },
+	sound = "simulated_vehicles/weapons/88_reload.wav"
+} )
+
+sound.Add( {
+	name = "taucannon_fire",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 80,
+	pitch = { 95, 105 },
+	sound = "weapons/gauss/fire1.wav"
+} )
+
+function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson )
+	if not IsValid( ent ) then return end
+	
+	offset_firstperson = isvector( offset_firstperson ) and offset_firstperson or Vector(0,0,0)
+	offset_thirdperson = isvector( offset_thirdperson ) and offset_thirdperson or Vector(0,0,0)
+	
+	ent:SetNWBool( "simfphys_SpecialCam", true )
+	ent:SetNWVector( "SpecialCam_Firstperson", offset_firstperson )
+	ent:SetNWVector( "SpecialCam_Thirdperson", offset_thirdperson )
+end
+
+function simfphys.RegisterCrosshair( ent, data )
+	if not IsValid( ent ) then return end
+	
+	local data = istable( data ) and data or {}
+	
+	local Base = data.Attachment or "muzzle"
+	local Dir = data.Direction or Vector(1,0,0)
+	
+	ent:SetNWBool( "HasCrosshair", true )
+	ent:SetNWString( "Attachment", Base )
+	ent:SetNWVector( "Direction", Dir )
+	
+	if data.Attach_Start_Left and data.Attach_Start_Right then
+		ent:SetNWBool( "CalcCenterPos", true )
+		ent:SetNWString( "Start_Left", data.Attach_Start_Left )
+		ent:SetNWString( "Start_Right", data.Attach_Start_Right )
+	end
+end
+
 function simfphys.WeaponsGetAll()
 	local weapons = file.Find("simfphys_weapons/*.lua", "LUA")
 	
