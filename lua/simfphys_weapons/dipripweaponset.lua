@@ -1,5 +1,3 @@
-simWeapons = simWeapons or {}
-
 local function hmgfire(ply,vehicle,shootOrigin,shootDirection)
 	local bullet = {}
 		bullet.Num 			= 1
@@ -12,6 +10,19 @@ local function hmgfire(ply,vehicle,shootOrigin,shootDirection)
 		bullet.Damage		= 30
 		bullet.HullSize		= 5
 		bullet.Attacker 	= ply
+		bullet.Callback = function(att, tr, dmginfo)
+			if tr.Entity ~= Entity(0) then
+				if simfphys.IsCar( tr.Entity ) then
+					local effectdata = EffectData()
+						effectdata:SetOrigin( tr.HitPos, tr.HitNormal )
+						effectdata:SetNormal( tr.HitNormal )
+						effectdata:SetRadius( 3 )
+					util.Effect( "cball_bounce", effectdata, true, true )
+					
+					sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
+				end
+			end
+		end
 		
 	vehicle:FireBullets( bullet )
 end
@@ -28,14 +39,54 @@ local function minigunfire(ply,vehicle,shootOrigin,shootDirection)
 		bullet.Damage		= 25
 		bullet.HullSize		= 10
 		bullet.Attacker 	= ply
+		bullet.Callback = function(att, tr, dmginfo)
+			if tr.Entity ~= Entity(0) then
+				if simfphys.IsCar( tr.Entity ) then
+					local effectdata = EffectData()
+						effectdata:SetOrigin( tr.HitPos, tr.HitNormal )
+						effectdata:SetNormal( tr.HitNormal )
+						effectdata:SetRadius( 3 )
+					util.Effect( "cball_bounce", effectdata, true, true )
+					
+					sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
+				end
+			end
+		end
 		
 	vehicle:FireBullets( bullet )
 end
 
-function simWeapons.dipripweaponset( ply, pod, vehicle )
+function simfphys.weapon:ValidClasses()
+	
+	local classes = {
+		"sim_fphys_ratmobile",
+		"sim_fphys_hedgehog",
+		"sim_fphys_chaos126p"
+	}
+	
+	return classes
+end
+
+function simfphys.weapon:Initialize( vehicle )
+	local class = vehicle:GetSpawn_List()
+	vehicle.neg = class == "sim_fphys_ratmobile" and 1 or -1
+	
+	vehicle.VehicleData["steerangle"] = 45
+	
+	local pod = vehicle.DriverSeat
+	
+	if not IsValid(pod) then return end
+	
+	pod:SetNWBool( "IsAPCSeat", true )
+	pod:SetNWBool( "IsGunnerSeat", true ) 
+end
+
+function simfphys.weapon:Think( vehicle )
 	local curtime = CurTime()
 	
-	if not IsValid( vehicle ) then return end
+	if not IsValid( vehicle.DriverSeat ) then return end
+	
+	local ply = vehicle.DriverSeat:GetDriver()
 	
 	if not IsValid(ply) then
 		if vehicle.wpn then
@@ -49,8 +100,6 @@ function simWeapons.dipripweaponset( ply, pod, vehicle )
 		end
 		return
 	end
-
-	ply:CrosshairEnable()
 	
 	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
@@ -64,6 +113,7 @@ function simWeapons.dipripweaponset( ply, pod, vehicle )
 	
 	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + (Angles.y - vehicle.sm_pp_yaw) * 0.2) or 0
 	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	
 	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_pp_yaw )
 	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch )
 	
@@ -80,11 +130,8 @@ function simWeapons.dipripweaponset( ply, pod, vehicle )
 	Angles:Normalize()
 	
 	vehicle:SetPoseParameter("vehicle_minigun_yaw", Angles.y )
-	
-	local class = vehicle:GetSpawn_List()
-	local neg = class == "sim_fphys_ratmobile" and 1 or -1
 
-	vehicle:SetPoseParameter("vehicle_minigun_pitch", Angles.p * neg )
+	vehicle:SetPoseParameter("vehicle_minigun_pitch", Angles.p * vehicle.neg )
 	
 	vehicle.missle_ammo = vehicle.missle_ammo or 6
 	vehicle.mg_ammo = vehicle.mg_ammo or 600

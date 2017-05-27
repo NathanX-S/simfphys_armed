@@ -1,5 +1,3 @@
-simWeapons = simWeapons or {}
-
 local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)	
 	local bullet = {}
 		bullet.Num 			= 1
@@ -30,7 +28,28 @@ local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)
 	vehicle:FireBullets( bullet )
 end
 
-function simWeapons.combineAPC( ply, pod, vehicle )
+function simfphys.weapon:ValidClasses()
+	
+	local classes = {
+		"sim_fphys_combineapc_armed"
+	}
+	
+	return classes
+end
+
+function simfphys.weapon:Initialize( vehicle )
+	local pod = vehicle.DriverSeat
+	
+	if not IsValid( pod ) then return end
+	
+	pod:SetNWBool( "IsGunnerSeat", true )
+end
+
+function simfphys.weapon:Think( vehicle )
+	if not IsValid( vehicle.DriverSeat ) then return end
+	
+	local ply = vehicle.DriverSeat:GetDriver()
+	
 	local curtime = CurTime()
 	
 	if not IsValid( ply ) then 
@@ -40,8 +59,6 @@ function simWeapons.combineAPC( ply, pod, vehicle )
 		end
 		return
 	end
-
-	ply:CrosshairEnable()
 	
 	local tr = util.TraceLine( {
 		start = ply:EyePos(),

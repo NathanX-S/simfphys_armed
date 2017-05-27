@@ -1,10 +1,13 @@
-local AUTOMATIC = 1
-local MANUAL = 2
+if SERVER then
+	AddCSLuaFile( "simfphys/specialcam.lua" )
+end
+include( "simfphys/specialcam.lua" ) 
 
 local light_table = {	
 	ems_sounds = {"ambient/alarms/apc_alarm_loop1.wav"},
 }
 list.Set( "simfphys_lights", "capc_siren", light_table)
+
 
 local light_table = {
 	L_HeadLampPos = Vector(20.15,133,21),
@@ -35,6 +38,38 @@ local light_table = {
 	}
 }
 list.Set( "simfphys_lights", "conapc_armed", light_table)
+
+
+local light_table = {
+	L_HeadLampPos = Vector(71.9,32.85,-5.59),
+	L_HeadLampAng = Angle(15,0,0),
+	R_HeadLampPos = Vector(71.9,-32.85,-5.59),
+	R_HeadLampAng = Angle(15,0,0),
+
+	L_RearLampPos =Vector(-94,29.08,3.7),
+	L_RearLampAng = Angle(40,180,0),
+	R_RearLampPos = Vector(-94,-29.08,3.7),
+	R_RearLampAng = Angle(40,180,0),
+	
+	Headlight_sprites = { 
+		Vector(71.9,32.85,-5.59),
+		Vector(71.9,-32.85,-5.59)
+	},
+	Headlamp_sprites = { 
+		Vector(76.36,26.72,-5.79),
+		Vector(76.36,-26.72,-5.79)
+	},
+	Rearlight_sprites = {
+		Vector(-94,34.39,3.7),
+		Vector(-94,-34.39,3.7)
+	},
+	Brakelight_sprites = {
+		Vector(-94,29.08,3.7),
+		Vector(-94,-29.08,3.7)
+	}
+}
+list.Set( "simfphys_lights", "driprip_ratmobile", light_table)
+
 
 local V = {
 	Name = "HL2 Combine APC",
@@ -108,12 +143,13 @@ local V = {
 		
 		snd_horn = "ambient/alarms/apc_alarm_pass1.wav",
 		
-		ForceTransmission = AUTOMATIC,
+		ForceTransmission = 1,
 		DifferentialGear = 0.3,
 		Gears = {-0.1,0,0.1,0.2,0.3}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_combineapc_armed", V )
+
 
 local V = {
 	Name = "HL2 Jeep taucannon",
@@ -176,7 +212,7 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_1.wav",
 		
-		ForceTransmission = AUTOMATIC,
+		ForceTransmission = 1,
 		DifferentialGear = 0.3,
 		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
 	}
@@ -245,12 +281,13 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_1.wav",
 		
-		ForceTransmission = AUTOMATIC,
+		ForceTransmission = 1,
 		DifferentialGear = 0.3,
 		Gears = {-0.15,0,0.15,0.25,0.35,0.45}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_jeep_armed2", V )
+
 
 local V = {
 	Name = "Synergy Elite Jeep taucannon",
@@ -432,6 +469,7 @@ local V = {
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_v8elite_armed2", V )
+
 
 local V = {
 	Name = "HL2 APC",
@@ -838,95 +876,529 @@ local V = {
 }
 list.Set( "simfphys_vehicles", "sim_fphys_conscriptapc_armed2", V )
 
-local function simfphyslerpView( ply, view )
-	
-	ply.simfphys_smooth_in = ply.simfphys_smooth_in or 1
-	ply.simfphys_smooth_out = ply.simfphys_smooth_out or 1
-	
-	if ply:InVehicle() then
-		if ply.simfphys_smooth_in < 0.999 then
-			ply.simfphys_smooth_in = ply.simfphys_smooth_in + (1 - ply.simfphys_smooth_in) * FrameTime() * 5
-			
-			view.origin = LerpVector(ply.simfphys_smooth_in, ply.simfphys_eyepos_in, view.origin )
-			view.angles = LerpAngle(ply.simfphys_smooth_in, ply.simfphys_eyeang_in, view.angles )
-		end
-		
-		local vehicle = ply:GetVehicle()
-		if IsValid(vehicle) then
-			ply.simfphys_eyeang_out = view.angles
-			ply.simfphys_eyepos_out = view.origin
-		end
-	else
-		if ply.simfphys_smooth_out < 0.999 then
-			ply.simfphys_smooth_out = ply.simfphys_smooth_out + (1 - ply.simfphys_smooth_out) * FrameTime() * 5
-			
-			view.origin = LerpVector(ply.simfphys_smooth_out, ply.simfphys_eyepos_out, ply:GetShootPos() )
-			view.angles = LerpAngle(ply.simfphys_smooth_out, ply.simfphys_eyeang_out, ply:EyeAngles() )
-		end
-		
-		ply.simfphys_eyeang_in = view.angles
-		ply.simfphys_eyepos_in = view.origin
-	end
-	
-	ply.shootpos = view.origin
-	ply.shootang = view.angles
-	
-	return view
-end
 
-hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
-	if not IsValid( ply ) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
-	
-	local Vehicle = ply:GetVehicle()
-	
-	if not IsValid( Vehicle ) then return end
-	if not Vehicle:GetNWBool( "IsGunnerSeat" ) then return end
-	
-	if Vehicle:GetNWBool( "IsAPCSeat" ) then
-		pos = pos + Vehicle:GetUp() * 25
-	end
-	
-	local view = {
-		origin = pos,
-		angles = Vehicle:LocalToWorldAngles( ply:EyeAngles() ),
-		drawviewer = false,
+local V = {
+	Name = "DIPRIP - Ratmobile",
+	Model = "models/ratmobile/ratmobile.mdl",
+	Category = "Armed Vehicles",
+	SpawnOffset = Vector(0,0,25),
+
+	Members = {
+		Mass = 4800,
+		FrontWheelMass = 225,
+		RearWheelMass = 225,
+		
+		LightsTable = "driprip_ratmobile",
+		
+		FirstPersonViewPos = Vector(0,0,40),
+		
+		IsArmored = true,
+		
+		EnginePos = Vector(20,0,0),
+		
+		MaxHealth = 5000,
+		
+		FrontWheelRadius = 20,
+		RearWheelRadius = 20,
+		
+		SeatOffset = Vector(-35,0,15),
+		SeatPitch = 0,
+		
+		CustomMassCenter = Vector(0,0,-5),
+
+		ExhaustPositions = {
+			{
+				pos = Vector(6.54,44.25,13.19),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(-1.85,44.15,14.79),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(-9.87,44.49,16.03),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(6.54,-44.25,13.19),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(-1.85,-44.15,14.79),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(-9.87,-44.49,16.03),
+				ang = Angle(-15,0,0)
+			},
+			{
+				pos = Vector(-92.45,20.94,-6.35),
+				ang = Angle(-90,0,0)
+			},
+			{
+				pos = Vector(-92.45,-20.94,-6.35),
+				ang = Angle(-90,0,0)
+			},
+		},
+
+		FrontHeight = 16,
+		FrontConstant = 70000,
+		FrontDamping = 6000,
+		FrontRelativeDamping = 6000,
+		
+		RearHeight = 16.5,
+		RearConstant = 70000,
+		RearDamping = 6000,
+		RearRelativeDamping = 6000,
+		
+		StrengthenSuspension = true,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 140,
+		Efficiency = 1,
+		GripOffset = 5,
+		BrakePower = 120,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 7500,
+		PeakTorque = 320,
+		PowerbandStart = 1500,
+		PowerbandEnd = 6500,
+		Turbocharged = false,
+		Supercharged = false,
+		DoNotStall = true,
+		
+		PowerBias = 0.25,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/ratmobile/idle.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/ratmobile/loop.wav",
+		Sound_MidPitch = 0.9,
+		Sound_MidVolume = 1,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
+		
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
+		
+		Sound_ThrottlePitch = 0,
+		Sound_ThrottleVolume = 0,
+		
+		snd_horn = "common/null.wav",
+		
+		ForceTransmission = 1,
+		
+		DifferentialGear = 0.28,
+		Gears = {-0.1,0,0.1,0.2,0.3,0.4,0.5}
 	}
-	
-	if ( Vehicle.GetThirdPersonMode == nil || ply:GetViewEntity() != ply ) then
-		return
-	end
-	
-	ply.simfphys_smooth_out = 0
-	
-	if ( !Vehicle:GetThirdPersonMode() ) then
-		view.origin = view.origin + Vehicle:GetUp() * 5 - Vehicle:GetRight() * 9
-		return simfphyslerpView( ply, view )
-	end
-	
-	local mn, mx = Vehicle:GetRenderBounds()
-	local radius = ( mn - mx ):Length()
-	local radius = radius + radius * Vehicle:GetCameraDistance()
+}
+list.Set( "simfphys_vehicles", "sim_fphys_ratmobile", V )
 
-	local TargetOrigin = view.origin + ( view.angles:Forward() * -radius )
-	local WallOffset = 4
 
-	local tr = util.TraceHull( {
-		start = view.origin,
-		endpos = TargetOrigin,
-		filter = function( e )
-			local c = e:GetClass()
-			return !c:StartWith( "prop_physics" ) &&!c:StartWith( "prop_dynamic" ) && !c:StartWith( "prop_ragdoll" ) && !e:IsVehicle() && !c:StartWith( "gmod_" ) && !c:StartWith( "player" )
-		end,
-		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
-		maxs = Vector( WallOffset, WallOffset, WallOffset ),
-	} )
+local V = {
+	Name = "DIPRIP - Chaos126p",
+	Model = "models/chaos126p/chaos126p.mdl",
+	Category = "Armed Vehicles",
+	SpawnOffset = Vector(0,0,30),
 
-	view.origin = tr.HitPos
-	view.drawviewer = true
+	Members = {
+		Mass = 4800,
+		FrontWheelMass = 225,
+		RearWheelMass = 225,
+		
+		FirstPersonViewPos = Vector(0,0,40),
+		
+		IsArmored = true,
+		
+		EnginePos = Vector(49.98,0,14.16),
+		
+		MaxHealth = 5000,
+		
+		FrontWheelRadius = 22,
+		RearWheelRadius = 23.5,
+		
+		SeatOffset = Vector(-6,0,23),
+		SeatPitch = 0,
+		
+		CustomMassCenter = Vector(0,0,0),
 
-	if ( tr.Hit && !tr.StartSolid) then
-		view.origin = view.origin + tr.HitNormal * WallOffset
-	end
-	
-	return simfphyslerpView( ply, view )
-end )
+		ExhaustPositions = {
+			{
+				pos = Vector(-73.69,21.88,21.45),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-77.48,23.3,16.93),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-81.22,23.87,12.01),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-75.21,6.14,-13.95),
+				ang = Angle(-90,0,0)
+			},
+			
+			{
+				pos = Vector(-73.69,-21.88,21.45),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-77.48,-23.3,16.93),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-81.22,-23.87,12.01),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(-75.21,-6.14,-13.95),
+				ang = Angle(-90,0,0)
+			},
+		},
+
+		FrontHeight = 17,
+		FrontConstant = 70000,
+		FrontDamping = 8000,
+		FrontRelativeDamping = 8000,
+		
+		RearHeight = 18,
+		RearConstant = 70000,
+		RearDamping = 8000,
+		RearRelativeDamping = 8000,
+		
+		StrengthenSuspension = true,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 140,
+		Efficiency = 1,
+		GripOffset = 5,
+		BrakePower = 120,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 7500,
+		PeakTorque = 280,
+		PowerbandStart = 1500,
+		PowerbandEnd = 6500,
+		Turbocharged = false,
+		Supercharged = false,
+		DoNotStall = true,
+		
+		PowerBias = 0.25,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/4banger/4banger_idle.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/4banger/4banger_mid.wav",
+		Sound_MidPitch = 0.85,
+		Sound_MidVolume = 1,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
+		
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
+		
+		Sound_ThrottlePitch = 0,
+		Sound_ThrottleVolume = 0,
+		
+		snd_horn = "common/null.wav",
+		
+		ForceTransmission = 1,
+		
+		DifferentialGear = 0.25,
+		Gears = {-0.1,0,0.1,0.2,0.3,0.4,0.5}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_chaos126p", V )
+
+
+local V = {
+	Name = "DIPRIP - Hedgehog",
+	Model = "models/hedgehog/hedgehog.mdl",
+	Category = "Armed Vehicles",
+	SpawnOffset = Vector(0,0,25),
+
+	Members = {
+		Mass = 4800,
+		FrontWheelMass = 225,
+		RearWheelMass = 225,
+		
+		FirstPersonViewPos = Vector(0,0,40),
+		
+		IsArmored = true,
+		
+		EnginePos = Vector(-83.52,0,30.16),
+		
+		MaxHealth = 5000,
+		
+		FrontWheelRadius = 16,
+		RearWheelRadius = 16,
+		
+		SeatOffset = Vector(-25,0,37),
+		SeatPitch = 0,
+		
+		CustomMassCenter = Vector(0,0,2),
+
+		ExhaustPositions = {
+			{
+				pos = Vector(-77.06,11.36,43.69),
+				ang = Angle(0,0,15)
+			},
+			{
+				pos = Vector(-82.32,11.36,43.69),
+				ang = Angle(0,0,15)
+			},
+			{
+				pos = Vector(-87.7,11.36,43.69),
+				ang = Angle(0,0,15)
+			},
+			{
+				pos = Vector(-103.14,16.92,-6),
+				ang = Angle(-90,0,0)
+			},
+			{
+				pos = Vector(-77.06,-11.36,43.69),
+				ang = Angle(0,0,-15)
+			},
+			{
+				pos = Vector(-82.32,-11.36,43.69),
+				ang = Angle(0,0,-15)
+			},
+			{
+				pos = Vector(-87.7,-11.36,43.69),
+				ang = Angle(0,0,-15)
+			},
+			{
+				pos = Vector(-103.14,-16.92,-6),
+				ang = Angle(-90,0,0)
+			},
+		},
+
+		FrontHeight = 15,
+		FrontConstant = 70000,
+		FrontDamping = 8500,
+		FrontRelativeDamping = 8500,
+		
+		RearHeight = 15,
+		RearConstant = 70000,
+		RearDamping = 8500,
+		RearRelativeDamping = 8500,
+		
+		StrengthenSuspension = true,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 535,
+		
+		TurnSpeed = 8,
+		
+		MaxGrip = 140,
+		Efficiency = 1,
+		GripOffset = 5,
+		BrakePower = 120,
+		BulletProofTires = true,
+		
+		IdleRPM = 750,
+		LimitRPM = 7500,
+		PeakTorque = 300,
+		PowerbandStart = 1500,
+		PowerbandEnd = 6500,
+		Turbocharged = false,
+		Supercharged = false,
+		DoNotStall = true,
+		
+		PowerBias = 0.25,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/hedgehog/idle.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/hedgehog/loop.wav",
+		Sound_MidPitch = 0.8,
+		Sound_MidVolume = 1,
+		Sound_MidFadeOutRPMpercent = 100,
+		Sound_MidFadeOutRate = 1,
+		
+		Sound_HighPitch = 0,
+		Sound_HighVolume = 0,
+		Sound_HighFadeInRPMpercent = 0,
+		Sound_HighFadeInRate = 0,
+		
+		Sound_ThrottlePitch = 0,
+		Sound_ThrottleVolume = 0,
+		
+		snd_horn = "common/null.wav",
+		
+		ForceTransmission = 1,
+		
+		DifferentialGear = 0.32,
+		Gears = {-0.1,0,0.1,0.2,0.3,0.4,0.5}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_hedgehog", V )
+
+--[[
+local V = {
+	Name = "DOD:S WW2 Tiger Tank",
+	Model = "models/blu/tanks/tiger.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+	SpawnOffset = Vector(0,0,60),
+	SpawnAngleOffset = 90,
+
+	Members = {
+		Mass = 10000,
+
+		MaxHealth = 8000,
+		
+		IsArmored = true,
+		
+		FrontWheelRadius = 45,
+		RearWheelRadius = 45,
+		
+		EnginePos = Vector(-79.66,0,72.21),
+		
+		CustomWheels = true,
+		CustomSuspensionTravel = 10,
+		
+		CustomWheelModel = "models/Items/combine_rifle_ammo01.mdl",
+		
+		CustomWheelPosFL = Vector(110,45,45),
+		CustomWheelPosFR = Vector(110,-45,45),
+		CustomWheelPosML = Vector(5,45,40),
+		CustomWheelPosMR = Vector(5,-45,40),
+		CustomWheelPosRL = Vector(-100,45,45),
+		CustomWheelPosRR = Vector(-100,-45,45),
+		CustomWheelAngleOffset = Angle(0,0,90),
+		
+		CustomMassCenter = Vector(0,0,15),
+		
+		CustomSteerAngle = 60,
+		
+		SeatOffset = Vector(0,0,80),
+		SeatPitch = 0,
+		SeatYaw = 90,
+		
+		ModelInfo = {
+			WheelColor = Color(0,0,0,0),
+		},
+			
+		ExhaustPositions = {
+			{
+				pos = Vector(-118,-16.62,72.6),
+				ang = Angle(115,0,0)
+			},
+			{
+				pos = Vector(-118,-16.62,72.6),
+				ang = Angle(115,60,0)
+			},
+			{
+				pos = Vector(-118,-16.62,72.6),
+				ang = Angle(115,-60,0)
+			},
+			
+			{
+				pos = Vector(-118,16.62,72.6),
+				ang = Angle(115,0,0)
+			},
+			{
+				pos = Vector(-118,16.62,72.6),
+				ang = Angle(115,60,0)
+			},
+			{
+				pos = Vector(-118,16.62,72.6),
+				ang = Angle(115,-60,0)
+			},
+		},
+
+		
+		PassengerSeats = {
+			{
+				pos = Vector(0,-14,-12),
+				ang = Angle(0,-90,0)
+			}
+		},
+		
+		FrontHeight = 23,
+		FrontConstant = 50000,
+		FrontDamping = 6000,
+		FrontRelativeDamping = 6000,
+		
+		RearHeight = 23,
+		RearConstant = 50000,
+		RearDamping = 6000,
+		RearRelativeDamping = 6000,
+		
+		FastSteeringAngle = 10,
+		SteeringFadeFastSpeed = 400,
+		
+		TurnSpeed = 3,
+		
+		MaxGrip = 600,
+		Efficiency = 0.42,
+		GripOffset = 0,
+		BrakePower = 150,
+		BulletProofTires = true,
+		
+		IdleRPM = 600,
+		LimitRPM = 4500,
+		PeakTorque = 270,
+		PowerbandStart = 600,
+		PowerbandEnd = 3500,
+		Turbocharged = false,
+		Supercharged = false,
+		DoNotStall = true,
+		
+		PowerBias = -0.5,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/misc/nanjing_loop.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/misc/m50.wav",
+		Sound_MidPitch = 1,
+		Sound_MidVolume = 1,
+		Sound_MidFadeOutRPMpercent = 58,
+		Sound_MidFadeOutRate = 0.476,
+		
+		Sound_High = "simulated_vehicles/tiger/tiger_high.wav",
+		Sound_HighPitch = 0.75,
+		Sound_HighVolume = 0.75,
+		Sound_HighFadeInRPMpercent = 40,
+		Sound_HighFadeInRate = 0.19,
+		
+		Sound_Throttle = "",
+		Sound_ThrottlePitch = 0,
+		Sound_ThrottleVolume = 0,
+		
+		snd_horn = "common/null.wav",
+		
+		ForceTransmission = 1,
+		
+		DifferentialGear = 0.2,
+		Gears = {-0.1,0,0.05,0.1,0.12,0.16,0.19}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_tank", V )
+]]--

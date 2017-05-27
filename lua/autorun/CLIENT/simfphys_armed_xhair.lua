@@ -1,11 +1,8 @@
 CreateClientConVar( "cl_simfphys_crosshair", "1", true, false )
 
-
 local show_crosshair = false
 cvars.AddChangeCallback( "cl_simfphys_crosshair", function( convar, oldValue, newValue ) show_crosshair = tonumber( newValue )~=0 end)
 show_crosshair = GetConVar( "cl_simfphys_crosshair" ):GetBool()
-
-
 
 local xhair = Material( "sprites/hud/v_crosshair1" )
 
@@ -44,7 +41,7 @@ hook.Add( "HUDPaint", "simfphys_crosshair", function()
 	if not IsValid( vehicle ) then return end
 	
 	if ply:GetViewEntity() ~= ply then return end
-
+	
 	if veh:GetNWBool( "IsAPCSeat" ) then
 		local attach_l = vehicle:LookupAttachment( "machinegun_barell_left" )
 		local attach_r = vehicle:LookupAttachment( "machinegun_barell_right" )
@@ -58,6 +55,17 @@ hook.Add( "HUDPaint", "simfphys_crosshair", function()
 			
 			traceAndDrawCrosshair( startpos, endpos, vehicle )
 		end
+		return
+	end
+	
+	if veh:GetNWBool( "IsTankSeat" ) then
+		local ID = vehicle:LookupAttachment( "muzzle" )
+		local Attachment = vehicle:GetAttachment( ID )
+		
+		local startpos = Attachment.Pos
+		local endpos = startpos + Attachment.Ang:Up() * 999999
+		
+		traceAndDrawCrosshair( startpos, endpos, vehicle )
 		return
 	end
 	
