@@ -12,6 +12,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Force		= damage
 		bullet.Damage		= damage * 1.5
 		bullet.HullSize		= 1
+		bullet.DisableOverride = true
 		bullet.Callback = function(att, tr, dmginfo)
 			local effect = ents.Create("env_spark")
 				effect:SetKeyValue("targetname", "target")

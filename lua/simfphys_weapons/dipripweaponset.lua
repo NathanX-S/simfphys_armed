@@ -4,7 +4,7 @@ local function hmgfire(ply,vehicle,shootOrigin,shootDirection)
 		bullet.Src 			= shootOrigin
 		bullet.Dir 			= shootDirection
 		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 1
+		bullet.Tracer		= 5
 		bullet.TracerName	= "simfphys_tracer"
 		bullet.Force		= 12
 		bullet.Damage		= 30
@@ -114,8 +114,16 @@ function simfphys.weapon:Think( vehicle )
 		filter = {vehicle}
 	} )
 	local Aimpos = tr.HitPos
-	local pos1 = vehicle:GetAttachment( vehicle:LookupAttachment( "machinegun_barell_left" ) ).Pos
-	local pos2 = vehicle:GetAttachment( vehicle:LookupAttachment( "machinegun_barell_right" ) ).Pos
+	
+	local AttachmentID_Left = vehicle:LookupAttachment( "machinegun_barell_left" )
+	local AttachmentID_Right = vehicle:LookupAttachment( "machinegun_barell_right" )
+	
+	local Attachment_Left = vehicle:GetAttachment( AttachmentID_Left )
+	local Attachment_Right = vehicle:GetAttachment( AttachmentID_Right )
+	
+	local pos1 = Attachment_Left.Pos
+	local pos2 = Attachment_Right.Pos
+	
 	local Aimang = (Aimpos - (pos1 + pos2) * 0.5):Angle()
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
@@ -201,15 +209,24 @@ function simfphys.weapon:Think( vehicle )
 				vehicle.swapMuzzle = true
 			end
 		
-			local switchPos = vehicle.swapMuzzle and pos1 or pos2
+			local offset = deltapos * engine.TickInterval()
+		
+			local AttachmentID = vehicle.swapMuzzle and AttachmentID_Left or AttachmentID_Right
+			local Attachment = vehicle:GetAttachment( AttachmentID )
+			
+			local shootOrigin = Attachment.Pos + offset
+			local shootDirection = Attachment.Ang:Forward()
 		
 			local effectdata = EffectData()
-			effectdata:SetOrigin( switchPos )
-			effectdata:SetAngles( Attachment.Ang )
-			effectdata:SetScale( 1 )
-			util.Effect( "MuzzleEffect", effectdata, true, true )
+				effectdata:SetOrigin( shootOrigin )
+				effectdata:SetAngles( Attachment.Ang )
+				effectdata:SetEntity( vehicle )
+				effectdata:SetAttachment( AttachmentID )
+				effectdata:SetScale( 3 )
+			util.Effect( "CS_MuzzleFlash", effectdata, true, true )
 			
-			hmgfire( ply, vehicle, switchPos, Attachment.Ang:Forward() )
+			hmgfire( ply, vehicle, shootOrigin, Attachment.Ang:Forward() )
+			
 			vehicle.NextShoot = curtime + 0.08
 		end
 	end
@@ -221,24 +238,26 @@ function simfphys.weapon:Think( vehicle )
 			
 			local offset = deltapos * engine.TickInterval()
 			
-			local muzzle_1 = vehicle:GetAttachment( vehicle:LookupAttachment( "minigun_barell_right" ) )
-			local muzzle_2 = vehicle:GetAttachment( vehicle:LookupAttachment( "minigun_barell_left" ) )
+			local muzzle_1 = vehicle:LookupAttachment( "minigun_barell_right" )
+			local muzzle_2 = vehicle:LookupAttachment( "minigun_barell_left" )
 			local muzzles = {muzzle_1,muzzle_2}
 			
 			for k, v in pairs( muzzles ) do
-				local projeffectdata = EffectData()
-					projeffectdata:SetEntity( vehicle )
-					projeffectdata:SetScale( 1 )
-					projeffectdata:SetMagnitude( 1 )
-					projeffectdata:SetRadius( 10 )
-					projeffectdata:SetFlags( 3 )
-					projeffectdata:SetStart( v.Pos + offset )
-					projeffectdata:SetOrigin( v.Pos + offset )
-					projeffectdata:SetAngles( v.Ang )
-					projeffectdata:SetNormal( v.Ang:Forward() )
-				util.Effect( "MuzzleFlash", projeffectdata )
+				local AttachmentID = v
+				local Attachment = vehicle:GetAttachment( AttachmentID )
 				
-				minigunfire( ply, vehicle, v.Pos + offset, v.Ang:Forward() )
+				local shootOrigin = Attachment.Pos + offset
+				local shootDirection = Attachment.Ang:Forward()
+				
+				local effectdata = EffectData()
+					effectdata:SetOrigin( shootOrigin )
+					effectdata:SetAngles( Attachment.Ang )
+					effectdata:SetEntity( vehicle )
+					effectdata:SetAttachment( AttachmentID )
+					effectdata:SetScale( 5 )
+				util.Effect( "CS_MuzzleFlash", effectdata, true, true )
+				
+				minigunfire( ply, vehicle, shootOrigin, shootDirection )
 			end
 			
 			vehicle.NextShoot = curtime + 0.03

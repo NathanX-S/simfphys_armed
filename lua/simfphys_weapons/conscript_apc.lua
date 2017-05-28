@@ -2,12 +2,6 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 
 	vehicle:EmitSound("apc_fire")
 	
-	local effectdata = EffectData()
-		effectdata:SetOrigin( shootOrigin )
-		effectdata:SetAngles( shootDirection:Angle() )
-		effectdata:SetScale( 1 )
-		util.Effect( "MuzzleEffect", effectdata, true, true )
-	
 	local bullet = {}
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin
@@ -127,11 +121,21 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply )
 		vehicle.swapMuzzle = true
 	end
 	
-	local Attachment = vehicle.swapMuzzle and vehicle:GetAttachment( vehicle:LookupAttachment( "muzzle_right" ) ) or vehicle:GetAttachment( vehicle:LookupAttachment( "muzzle_left" ) )
+	local AttachmentID = vehicle.swapMuzzle and vehicle:LookupAttachment( "muzzle_right" ) or vehicle:LookupAttachment( "muzzle_left" )
+	local Attachment = vehicle:GetAttachment( AttachmentID )
 	
 	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
+	local shootDirection = Attachment.Ang:Forward()
 	
-	mg_fire( ply, vehicle, shootOrigin, Attachment.Ang:Forward() )
+	local effectdata = EffectData()
+		effectdata:SetOrigin( shootOrigin )
+		effectdata:SetAngles( Attachment.Ang )
+		effectdata:SetEntity( vehicle )
+		effectdata:SetAttachment( AttachmentID )
+		effectdata:SetScale( 4 )
+	util.Effect( "CS_MuzzleFlash", effectdata, true, true )
+	
+	mg_fire( ply, vehicle, shootOrigin, shootDirection )
 	
 	self:SetNextPrimaryFire( vehicle, CurTime() + 0.2 )
 end

@@ -1061,7 +1061,7 @@ local V = {
 		
 		IsArmored = true,
 		
-		FirstPersonViewPos = Vector(0,-40,15),
+		FirstPersonViewPos = Vector(0,-50,15),
 		
 		FrontWheelRadius = 45,
 		RearWheelRadius = 45,
@@ -1085,7 +1085,7 @@ local V = {
 		
 		CustomSteerAngle = 60,
 		
-		SeatOffset = Vector(80,0,55),
+		SeatOffset = Vector(70,0,55),
 		SeatPitch = 0,
 		SeatYaw = 90,
 		

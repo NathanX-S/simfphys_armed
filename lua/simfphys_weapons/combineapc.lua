@@ -1,4 +1,12 @@
 local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)	
+	local effectdata = EffectData()
+		effectdata:SetOrigin( shootOrigin )
+		effectdata:SetAngles( Attachment.Ang )
+		effectdata:SetEntity( vehicle )
+		effectdata:SetAttachment( ID )
+		effectdata:SetScale( 1 )
+	util.Effect( "AirboatMuzzleFlash", effectdata, true, true )
+
 	local bullet = {}
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin
@@ -9,6 +17,7 @@ local function cAPCFire(ply,vehicle,shootOrigin,Attachment,damage,ID)
 		bullet.Force		= damage
 		bullet.Damage		= damage
 		bullet.HullSize		= 1
+		bullet.DisableOverride = true
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
 				effectdata:SetEntity( vehicle )

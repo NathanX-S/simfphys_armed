@@ -19,12 +19,6 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 
 	vehicle:EmitSound("tiger_fire_mg")
 	
-	local effectdata = EffectData()
-		effectdata:SetOrigin( shootOrigin )
-		effectdata:SetAngles( shootDirection:Angle() )
-		effectdata:SetScale( 1.5 )
-	util.Effect( "MuzzleEffect", effectdata, true, true )
-	
 	local bullet = {}
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin + shootDirection * 50
@@ -173,7 +167,7 @@ function simfphys.weapon:ControlMachinegun( vehicle, deltapos )
 	local fire = ply:KeyDown( IN_ATTACK )
 
 	if fire then
-		self:SecondaryAttack( vehicle, ply, shootOrigin, Attachment )
+		self:SecondaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
 	end
 end
 
@@ -216,7 +210,7 @@ function simfphys.weapon:ControlTrackSounds( vehicle, wheelslocked )
 	end
 	
 	if vehicle.track_snd then
-		vehicle.track_snd:ChangePitch( math.Clamp(50 + speed / 5000,150) ) 
+		vehicle.track_snd:ChangePitch( math.Clamp(60 + speed / 80,0,150) ) 
 		vehicle.track_snd:ChangeVolume( math.min( math.max(speed - 20,0) / 600,1) ) 
 	end
 end
@@ -246,9 +240,17 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
 	self:SetNextPrimaryFire( vehicle, CurTime() + 7 )
 end
 
-function simfphys.weapon:SecondaryAttack( vehicle, ply, shootOrigin, Attachment )
+function simfphys.weapon:SecondaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
 	
 	if not self:CanSecondaryAttack( vehicle ) then return end
+	
+	local effectdata = EffectData()
+		effectdata:SetOrigin( shootOrigin )
+		effectdata:SetAngles( Attachment.Ang )
+		effectdata:SetEntity( vehicle )
+		effectdata:SetAttachment( ID )
+		effectdata:SetScale( 4 )
+	util.Effect( "CS_MuzzleFlash", effectdata, true, true )
 	
 	mg_fire( ply, vehicle, shootOrigin, Attachment.Ang:Forward() )
 	

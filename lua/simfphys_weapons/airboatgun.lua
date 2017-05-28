@@ -10,6 +10,7 @@ local function AirboatFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.Force		= damage
 		bullet.Damage		= damage
 		bullet.HullSize		= 1
+		bullet.DisableOverride = true
 		bullet.Callback = function(att, tr, dmginfo)
 			local effectdata = EffectData()
 				effectdata:SetOrigin(  tr.HitPos + tr.HitNormal )
@@ -32,7 +33,22 @@ function simfphys.weapon:ValidClasses()
 end
 
 function simfphys.weapon:Initialize( vehicle )
-	vehicle:SetBodygroup(1,1)
+	--vehicle:SetBodygroup(1,1)
+	
+	local ID = vehicle:LookupAttachment( "gun_ref" )
+	local attachmentdata = vehicle:GetAttachment( ID )
+
+	local prop = ents.Create( "gmod_sent_vehicle_fphysics_attachment" )
+	prop:SetModel( "models/airboatgun.mdl" )			
+	prop:SetPos( attachmentdata.Pos )
+	prop:SetAngles( attachmentdata.Ang )
+	prop:SetModelScale( 0.5 ) 
+	prop:SetOwner( self )
+	prop:Spawn()
+	prop:Activate()
+	prop:SetNotSolid( true )
+	prop:SetParent( vehicle, ID )
+	prop.DoNotDuplicate = true
 	
 	local pod = vehicle.DriverSeat
 	
@@ -87,7 +103,7 @@ function simfphys.weapon:Think( vehicle )
 	local fire = ply:KeyDown( IN_ATTACK ) and vehicle.charge > 0
 	
 	if fire then
-		self:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
+		self:PrimaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
 	else
 		vehicle.charge = math.min(vehicle.charge + 0.3,100)
 	end
@@ -123,8 +139,16 @@ function simfphys.weapon:SetNextPrimaryFire( vehicle, time )
 	vehicle.NextShoot = time
 end
 
-function simfphys.weapon:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
+function simfphys.weapon:PrimaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
 	if not self:CanPrimaryAttack( vehicle ) then return end
+	
+	local effectdata = EffectData()
+		effectdata:SetOrigin( shootOrigin )
+		effectdata:SetAngles( Attachment.Ang )
+		effectdata:SetEntity( vehicle )
+		effectdata:SetAttachment( ID )
+		effectdata:SetScale( 1 )
+	util.Effect( "AirboatMuzzleFlash", effectdata, true, true )
 	
 	AirboatFire(ply,vehicle,shootOrigin,Attachment,(vehicle.charge / 5))
 	
