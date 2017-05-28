@@ -16,6 +16,49 @@ local function TigersGetAll()
 	return tiger_tanks 
 end
 
+local function GetTrackDelta( ent )
+	ent.Old_Delta_L = ent.Old_Delta_L and ent.Old_Delta_L or 0
+	ent.Old_Delta_R = ent.Old_Delta_R and ent.Old_Delta_R or 0
+	
+	ent.Pose_L = ent:GetPoseParameter( "spin_wheels_left" )
+	ent.Pose_R = ent:GetPoseParameter( "spin_wheels_right" )
+	
+	ent.OldPose_L = ent.OldPose_L and ent.OldPose_L or ent.Pose_L
+	ent.OldPose_R = ent.OldPose_R and ent.OldPose_R or ent.Pose_R
+	
+	local Pose_L_Delta = ent.OldPose_L - ent.Pose_L
+	local Pose_R_Delta = ent.OldPose_R - ent.Pose_R
+	
+	if Pose_L_Delta > 0.5 or Pose_L_Delta < -0.5 then
+		Pose_L_Delta = ent.Old_Delta_L
+	end
+	
+	if Pose_R_Delta > 0.5 or Pose_R_Delta < -0.5 then
+		Pose_R_Delta = ent.Old_Delta_R
+	end
+	
+	ent.OldPose_L = ent.Pose_L
+	ent.OldPose_R = ent.Pose_R
+	
+	ent.Old_Delta_L = Pose_L_Delta
+	ent.Old_Delta_R = Pose_R_Delta
+	
+	return {Left = Pose_L_Delta, Right = Pose_R_Delta}
+end
+
+local function GetTrackPos( ent )
+	local wheelsLocked = ent:GetHandBrakeEnabled()
+	local TrackDelta = GetTrackDelta( ent )
+	
+	ent.sm_TrackDelta_L = wheelsLocked and 0 or (ent.sm_TrackDelta_L and (ent.sm_TrackDelta_L + (TrackDelta.Left * 3.2 - ent.sm_TrackDelta_L) * 0.5) or 0)
+	ent.sm_TrackDelta_R = wheelsLocked and 0 or (ent.sm_TrackDelta_R and (ent.sm_TrackDelta_R + (TrackDelta.Right * 3.2 - ent.sm_TrackDelta_R) * 0.5) or 0)
+	
+	ent.TrackPos_L = ent.TrackPos_L and (ent.TrackPos_L + ent.sm_TrackDelta_L) or 0
+	ent.TrackPos_R = ent.TrackPos_R and (ent.TrackPos_R + ent.sm_TrackDelta_R) or 0
+	
+	return {Left = ent.TrackPos_L,Right = ent.TrackPos_R}
+end
+
 local function UpdateScrollTexture( ent )
 	local id = ent:EntIndex()
 
@@ -26,9 +69,11 @@ local function UpdateScrollTexture( ent )
 	if not ent.wheel_right_mat then
 		ent.wheel_right_mat = CreateMaterial("trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
 	end
-
-	ent.wheel_left_mat:SetVector("$translate", Vector(0,-ent:GetPoseParameter( "spin_wheels_left" ) * 256 / 100,0) )
-	ent.wheel_right_mat:SetVector("$translate", Vector(0,-ent:GetPoseParameter( "spin_wheels_right" ) * 256 / 100,0) )
+	
+	local TrackPos = GetTrackPos( ent )
+	
+	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
 	ent:SetSubMaterial( 1, "!trackmat_"..id.."_left" ) 
 	ent:SetSubMaterial( 2, "!trackmat_"..id.."_right" )
