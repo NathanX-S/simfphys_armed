@@ -1187,7 +1187,7 @@ local V = {
 		ForceTransmission = 1,
 		
 		DifferentialGear = 0.2,
-		Gears = {-0.1,0,0.05,0.1,0.12,0.16,0.19}
+		Gears = {-0.1,0,0.05,0.07,0.09,0.11,0.13,0.16}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank", V )
