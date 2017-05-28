@@ -133,10 +133,10 @@ function simfphys.weapon:ControlTurret( vehicle, deltapos )
 	
 	if not IsValid( ply ) then return end
 	
-	self:AimCannon( ply, vehicle, pod )
-	
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
+	
+	self:AimCannon( ply, vehicle, pod, Attachment )
 	
 	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
 	
@@ -272,7 +272,7 @@ function simfphys.weapon:AimMachinegun( ply, vehicle, pod )
 	vehicle:SetPoseParameter("machinegun_pitch", TargetPitch )
 end
 
-function simfphys.weapon:AimCannon( ply, vehicle, pod )	
+function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )	
 	if not IsValid( pod ) then return end
 
 	local Aimang = ply:EyeAngles()
@@ -280,10 +280,17 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod )
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
-	local TargetYaw = Angles.y
+	vehicle.sm_dir  = vehicle.sm_dir or Vector(0,0,0)
 	
-	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05) or Vector(0,0,0)
+	local L_Right = Angle(0,Aimang.y,0):Right()
+	local La_Right = Angle(0,Attachment.Ang.y,0):Right()
+	local AimRate = 20
+	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
+	
+	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
+	
+	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05
 	vehicle.sm_pitch = vehicle.sm_pitch and (vehicle.sm_pitch + (TargetPitch - vehicle.sm_pitch) * 0.05) or 0
 	
 	vehicle:SetPoseParameter("turret_yaw", vehicle.sm_dir:Angle().y )
