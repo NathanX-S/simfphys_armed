@@ -1056,6 +1056,7 @@ local V = {
 	Members = {
 		Mass = 10000,
 		AirFriction = 5,
+		Inertia = Vector(14017.5,46543,47984.5),
 		
 		MaxHealth = 8000,
 		

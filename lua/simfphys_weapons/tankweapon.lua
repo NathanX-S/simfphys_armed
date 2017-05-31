@@ -111,9 +111,6 @@ function simfphys.weapon:Initialize( vehicle )
 		net.WriteEntity( vehicle )
 	net.Broadcast()
 	
-	local baseInertia =  Vector(5607,18617.2,19193.8)
-	vehicle:GetPhysicsObject():SetInertia( baseInertia * 2.5 ) 
-	
 	simfphys.RegisterCrosshair( vehicle.DriverSeat, { Attachment = "muzzle_machinegun" } )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
