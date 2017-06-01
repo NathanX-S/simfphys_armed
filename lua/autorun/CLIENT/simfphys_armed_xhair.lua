@@ -18,7 +18,12 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 	local trace = util.TraceLine( {
 		start = startpos,
 		endpos = endpos,
-		filter = {vehicle}
+		filter = function( e )
+			local class = not e:GetClass():StartWith( "gmod_sent_vehicle_fphysics_wheel" )
+			local collide = class and e ~= vehicle
+			
+			return collide
+		end
 	} )
 
 	local hitpos = trace.HitPos

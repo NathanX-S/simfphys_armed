@@ -1,6 +1,3 @@
-util.AddNetworkString( "simfphys_register_tank" )
-util.AddNetworkString( "simfphys_tank_do_effect" )
-
 local tiger_susdata = {}
 for i = 1,8 do
 	tiger_susdata[i] = { 
@@ -109,6 +106,7 @@ end
 function simfphys.weapon:Initialize( vehicle )
 	net.Start( "simfphys_register_tank" )
 		net.WriteEntity( vehicle )
+		net.WriteString( "tiger" )
 	net.Broadcast()
 	
 	simfphys.RegisterCrosshair( vehicle.DriverSeat, { Attachment = "muzzle_machinegun" } )

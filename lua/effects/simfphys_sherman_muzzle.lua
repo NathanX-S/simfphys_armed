@@ -29,7 +29,7 @@ end
 function EFFECT:Init( data )
 	local vehicle = data:GetEntity()
 	
-	local ID = vehicle:LookupAttachment( "muzzle" )
+	local ID = vehicle:LookupAttachment( "turret_cannon" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
 	local Pos = Attachment.Pos
@@ -38,8 +38,6 @@ function EFFECT:Init( data )
 	
 	self:Muzzle( Pos, Dir, vel )
 	self:Smoke( Pos, Dir, vel )
-	self:Smoke2( Pos, Attachment.Ang:Forward(), Dir, vel )
-	self:Smoke2( Pos, -Attachment.Ang:Forward(), Dir, vel )
 	
 	self.Time = math.Rand(3,6)
 	self.DieTime = CurTime() + self.Time
@@ -92,31 +90,6 @@ function EFFECT:Smoke( pos, dir, vel )
 	
 	emitter:Finish()
 end
-
-function EFFECT:Smoke2( pos, dir, dir_muzzle, vel )
-	pos = pos + dir_muzzle * 5
-	local emitter = ParticleEmitter( pos, false )
-	
-	for i = 0,20 do
-		local particle = emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
-		
-		if particle then
-			particle:SetVelocity( dir * math.Rand(250,800) + RandVector() * math.Rand(0,50) + vel)
-			particle:SetDieTime( math.Rand(1,3) )
-			particle:SetAirResistance( 800 ) 
-			particle:SetStartAlpha( 150 )
-			particle:SetStartSize( 0 )
-			particle:SetEndSize( math.Rand(20,60) )
-			particle:SetRoll( math.Rand(-1,1) )
-			particle:SetColor( 120,120,120 )
-			particle:SetGravity( Vector(0,0,10) )
-			particle:SetCollide( false )
-		end
-	end
-	
-	emitter:Finish()
-end
-
 
 function EFFECT:Think()
 	local vehicle = self.Vehicle

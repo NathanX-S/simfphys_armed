@@ -20,9 +20,6 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 				
 			util.BlastDamage( vehicle, ply, tr.HitPos,50,30)
 			
-			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
-			
-			sound.Play( Sound( "ambient/explosions/explode_1.wav" ), tr.HitPos + tr.HitNormal, 75, 200, 1 )
 		end
 		
 	vehicle:FireBullets( bullet )

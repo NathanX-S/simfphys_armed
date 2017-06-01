@@ -6,6 +6,9 @@ simfphys.ManagedVehicles = istable( simfphys.ManagedVehicles ) and simfphys.Mana
 simfphys.Weapons = istable( simfphys.Weapons ) and simfphys.Weapons or {}
 simfphys.weapon = {}
 
+util.AddNetworkString( "simfphys_register_tank" )
+util.AddNetworkString( "simfphys_tank_do_effect" )
+
 sound.Add( {
 	name = "apc_fire",
 	channel = CHAN_STATIC,
@@ -21,7 +24,7 @@ sound.Add( {
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
-	sound = "^simulated_vehicles/weapons/88_fire.wav"
+	sound = "^simulated_vehicles/weapons/tiger_cannon.wav"
 } )
 
 sound.Add( {
@@ -30,7 +33,7 @@ sound.Add( {
 	volume = 1.0,
 	level = 110,
 	pitch = { 90, 110 },
-	sound = "^simulated_vehicles/weapons/7_62_fire.wav"
+	sound = "^simulated_vehicles/weapons/tiger_mg.wav"
 } )
 
 sound.Add( {
@@ -39,7 +42,34 @@ sound.Add( {
 	volume = 1.0,
 	level = 70,
 	pitch = { 90, 110 },
-	sound = "simulated_vehicles/weapons/88_reload.wav"
+	sound = "simulated_vehicles/weapons/tiger_reload.wav"
+} )
+
+sound.Add( {
+	name = "sherman_fire",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 140,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/sherman_cannon.wav"
+} )
+
+sound.Add( {
+	name = "sherman_fire_mg",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 110,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/sherman_mg.wav"
+} )
+
+sound.Add( {
+	name = "sherman_reload",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 70,
+	pitch = { 90, 110 },
+	sound = "simulated_vehicles/weapons/sherman_reload.wav"
 } )
 
 sound.Add( {

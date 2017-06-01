@@ -1072,7 +1072,7 @@ local V = {
 		CustomWheels = true,
 		CustomSuspensionTravel = 10,
 		
-		CustomWheelModel = "models/Items/combine_rifle_ammo01.mdl",
+		CustomWheelModel = "models/props_c17/canisterchunk01g.mdl",
 		
 		CustomWheelPosFL = Vector(110,45,45),
 		CustomWheelPosFR = Vector(110,-45,45),
@@ -1192,3 +1192,136 @@ local V = {
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank", V )
+
+
+
+local V = {
+	Name = "DOD:S Sherman Tank",
+	Model = "models/blu/tanks/sherman.mdl",
+	Class = "gmod_sent_vehicle_fphysics_base",
+	Category = "Armed Vehicles",
+	SpawnOffset = Vector(0,0,60),
+	SpawnAngleOffset = 90,
+
+	Members = {
+		Mass = 8000,
+		AirFriction = 7,
+		Inertia = Vector(14000,47000,48000),
+		
+		MaxHealth = 4000,
+		
+		IsArmored = true,
+		
+		FirstPersonViewPos = Vector(0,-50,15),
+		
+		FrontWheelRadius = 40,
+		RearWheelRadius = 40,
+		
+		EnginePos = Vector(-79.66,0,72.21),
+		
+		CustomWheels = true,
+		CustomSuspensionTravel = 10,
+		
+		CustomWheelModel = "models/props_c17/canisterchunk01g.mdl",
+		
+		CustomWheelPosFL = Vector(100,35,50),
+		CustomWheelPosFR = Vector(100,-35,50),
+		CustomWheelPosML = Vector(-5,35,50),
+		CustomWheelPosMR = Vector(-5,-35,50),
+		CustomWheelPosRL = Vector(-110,35,50),
+		CustomWheelPosRR = Vector(-110,-35,50),
+		CustomWheelAngleOffset = Angle(0,0,90),
+		
+		CustomMassCenter = Vector(0,0,3),
+		
+		CustomSteerAngle = 60,
+		
+		SeatOffset = Vector(60,-20,55),
+		SeatPitch = 0,
+		SeatYaw = 90,
+		
+		ModelInfo = {
+			WheelColor = Color(0,0,0,0),
+		},
+		
+		ExhaustPositions = {
+			{
+				pos = Vector(-90.47,17.01,52.77),
+				ang = Angle(180,0,0)
+			},
+			{
+				pos = Vector(-90.47,-17.01,52.77),
+				ang = Angle(180,0,0)
+			},
+		},
+
+		
+		PassengerSeats = {
+			{
+				pos = Vector(50,-20,30),
+				ang = Angle(0,-90,0)
+			}
+		},
+		
+		FrontHeight = 20,
+		FrontConstant = 50000,
+		FrontDamping = 4000,
+		FrontRelativeDamping = 4000,
+		
+		RearHeight = 20,
+		RearConstant = 50000,
+		RearDamping = 4000,
+		RearRelativeDamping = 4000,
+		
+		FastSteeringAngle = 14,
+		SteeringFadeFastSpeed = 400,
+		
+		TurnSpeed = 6,
+		
+		MaxGrip = 800,
+		Efficiency = 0.85,
+		GripOffset = -300,
+		BrakePower = 150,
+		BulletProofTires = true,
+		
+		IdleRPM = 600,
+		LimitRPM = 4500,
+		PeakTorque = 250,
+		PowerbandStart = 600,
+		PowerbandEnd = 3500,
+		Turbocharged = false,
+		Supercharged = false,
+		DoNotStall = true,
+		
+		PowerBias = -0.5,
+		
+		EngineSoundPreset = 0,
+		
+		Sound_Idle = "simulated_vehicles/sherman/idle.wav",
+		Sound_IdlePitch = 1,
+		
+		Sound_Mid = "simulated_vehicles/sherman/low.wav",
+		Sound_MidPitch = 1.3,
+		Sound_MidVolume = 0.75,
+		Sound_MidFadeOutRPMpercent = 50,
+		Sound_MidFadeOutRate = 0.85,
+		
+		Sound_High = "simulated_vehicles/sherman/high.wav",
+		Sound_HighPitch = 1,
+		Sound_HighVolume = 1,
+		Sound_HighFadeInRPMpercent = 20,
+		Sound_HighFadeInRate = 0.2,
+		
+		Sound_Throttle = "",
+		Sound_ThrottlePitch = 0,
+		Sound_ThrottleVolume = 0,
+		
+		snd_horn = "common/null.wav",
+		
+		ForceTransmission = 1,
+		
+		DifferentialGear = 0.3,
+		Gears = {-0.1,0,0.05,0.08,0.11,0.14,0.17}
+	}
+}
+list.Set( "simfphys_vehicles", "sim_fphys_tank2", V )
