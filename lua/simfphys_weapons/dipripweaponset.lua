@@ -70,6 +70,14 @@ function simfphys.weapon:Initialize( vehicle )
 	vehicle.neg = class == "sim_fphys_ratmobile" and 1 or -1
 	
 	vehicle.VehicleData["steerangle"] = 45
+
+	local data = {}
+	data.Attachment = "machinegun_ref"
+	data.Direction = Vector(1,0,0)
+	data.Attach_Start_Left = "machinegun_barell_right"
+	data.Attach_Start_Right = "machinegun_barell_left"
+
+	simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
 end
 
 function simfphys.weapon:Think( vehicle )
@@ -157,28 +165,6 @@ function simfphys.weapon:Think( vehicle )
 	end
 	
 	local inrange = math.abs( Angles.y ) <= 10
-	
-	if vehicle.old_inrange ~= inrange then
-		vehicle.old_inrange = inrange
-		
-		if inrange then
-			local data = {}
-			data.Attachment = "minigun_barell_left"
-			data.Direction = Vector(1,0,0)
-			data.Attach_Start_Left = "minigun_barell_right"
-			data.Attach_Start_Right = "minigun_barell_left"
-		
-			simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
-		else
-			local data = {}
-			data.Attachment = "machinegun_ref"
-			data.Direction = Vector(1,0,0)
-			data.Attach_Start_Left = "machinegun_barell_right"
-			data.Attach_Start_Right = "machinegun_barell_left"
-		
-			simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
-		end
-	end
 	
 	local fire = false
 	local fire2 = false
