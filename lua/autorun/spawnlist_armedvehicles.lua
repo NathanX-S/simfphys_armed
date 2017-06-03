@@ -657,6 +657,8 @@ local V = {
 		
 		snd_horn = "simulated_vehicles/horn_2.wav",
 		
+		ForceTransmission = 1,
+		
 		DifferentialGear = 0.27,
 		Gears = {-0.09,0,0.09,0.18,0.28,0.35}
 	}
@@ -1208,7 +1210,7 @@ local V = {
 		AirFriction = 7,
 		Inertia = Vector(14000,47000,48000),
 		
-		MaxHealth = 4000,
+		MaxHealth = 6000,
 		
 		IsArmored = true,
 		
