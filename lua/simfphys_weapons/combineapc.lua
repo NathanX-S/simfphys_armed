@@ -52,18 +52,16 @@ function simfphys.weapon:Initialize( vehicle )
 	simfphys.RegisterCrosshair( pod )
 end
 
-function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
+function simfphys.weapon:AimWeapon( ply, vehicle, pod, Attachment )	
 	local Aimang = ply:EyeAngles() + ( pod:GetThirdPersonMode() and Angle(-13,0,0) or Angle(0,0,0) )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
 	Angles:Normalize()
 	
-	local Rate = 3
+	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (-Angles:Forward() - vehicle.sm_dir) * 0.1) or Vector(0,0,0)
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
 	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + math.Clamp(Angles.y - vehicle.sm_pp_yaw,-Rate,Rate) ) or 0
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and ( vehicle.sm_pp_pitch + math.Clamp(Angles.p - vehicle.sm_pp_pitch,-Rate,Rate) ) or 0
-	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_pp_yaw )
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_dir:Angle().y - 180 )
 	vehicle:SetPoseParameter("vehicle_weapon_pitch", vehicle.sm_pp_pitch )
 	
 	return Aimang
@@ -89,7 +87,7 @@ function simfphys.weapon:Think( vehicle )
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
-	local Aimang = self:AimWeapon( ply, vehicle, pod )
+	local Aimang = self:AimWeapon( ply, vehicle, pod, Attachment )
 	
 	local tr = util.TraceLine( {
 		start = Attachment.Pos,
