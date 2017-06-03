@@ -107,7 +107,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 				effectdata:SetOrigin( tr.HitPos )
 				util.Effect( "helicoptermegabomb", effectdata, true, true )
 				
-			util.BlastDamage( vehicle, ply, tr.HitPos,50,30)
+			util.BlastDamage( vehicle, ply, tr.HitPos,50,50)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
