@@ -75,7 +75,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 				net.WriteVector( tr.HitPos )
 			net.Broadcast()
 			
-			util.BlastDamage( vehicle, ply, tr.HitPos,400,250)
+			util.BlastDamage( vehicle, ply, tr.HitPos,400,50)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
