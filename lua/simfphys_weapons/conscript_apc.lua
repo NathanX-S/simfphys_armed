@@ -18,7 +18,7 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 				effectdata:SetOrigin( tr.HitPos )
 				util.Effect( "helicoptermegabomb", effectdata, true, true )
 				
-			util.BlastDamage( vehicle, ply, tr.HitPos,50,30)
+			util.BlastDamage( vehicle, ply, tr.HitPos,50,20)
 			
 		end
 		
@@ -67,7 +67,7 @@ function simfphys.weapon:AimWeapon( ply, vehicle, pod )
 	
 	local L_Right = Angle(0,Aimang.y,0):Right()
 	local La_Right = Angle(0,Attachment.Ang.y,0):Forward()
-	local AimRate = 40
+	local AimRate = 60
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
 	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
