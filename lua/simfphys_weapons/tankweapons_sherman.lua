@@ -150,8 +150,8 @@ function simfphys.weapon:Initialize( vehicle )
 		net.WriteString( "sherman" )
 	net.Broadcast()
 	
-	simfphys.RegisterCrosshair( vehicle.DriverSeat, { Direction = Vector(0,0,1),Attachment = "turret_cannon" } )
-	simfphys.RegisterCamera( vehicle.DriverSeat, Vector(20,60,65), Vector(20,60,65) )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Direction = Vector(0,0,1),Attachment = "turret_cannon" } )
+	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(20,60,65), Vector(20,60,65) )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
@@ -218,7 +218,7 @@ function simfphys.weapon:ControlMachinegun( vehicle, deltapos )
 end
 
 function simfphys.weapon:ControlTurret( vehicle, deltapos )
-	local pod = vehicle.DriverSeat
+	local pod = vehicle:GetDriverSeat()
 	
 	if not IsValid( pod ) then return end
 	

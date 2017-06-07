@@ -109,7 +109,7 @@ function simfphys.weapon:Initialize( vehicle )
 		net.WriteString( "tiger" )
 	net.Broadcast()
 	
-	simfphys.RegisterCrosshair( vehicle.DriverSeat, { Attachment = "muzzle_machinegun" } )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Attachment = "muzzle_machinegun" } )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
@@ -144,7 +144,7 @@ end
 
 function simfphys.weapon:ControlMachinegun( vehicle, deltapos )
 
-	local pod = vehicle.DriverSeat
+	local pod = vehicle:GetDriverSeat()
 	
 	if not IsValid( pod ) then return end
 	

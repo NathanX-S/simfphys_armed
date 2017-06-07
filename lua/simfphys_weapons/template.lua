@@ -31,7 +31,7 @@ vehicle:IsInitialized()  -- checks if the vehicle is fully spawned
 
 ------------------------------------------
 -- driver / driverseat
-local pod = vehicle.DriverSeat  -- gets the driver seat
+local pod = vehicle:GetDriverSeat()  -- gets the driver seat
 local ply = pod:GetDriver()  -- gets the driver
 ------------------------------------------
 
@@ -61,7 +61,7 @@ data.Attachment = "minigun_barell_left" -- used for the direction
 data.Direction = Vector(1,0,0)
 data.Attach_Start_Left = "minigun_barell_right"   -- used as postion 1
 data.Attach_Start_Right = "minigun_barell_left"  -- used as postion 2
-simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
+simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
 ------------------------------------------
 
 

@@ -47,7 +47,7 @@ function simfphys.weapon:ValidClasses()
 end
 
 function simfphys.weapon:Initialize( vehicle )
-	local pod = vehicle.DriverSeat
+	local pod = vehicle:GetDriverSeat()
 	
 	simfphys.RegisterCrosshair( pod )
 end
@@ -68,7 +68,7 @@ function simfphys.weapon:AimWeapon( ply, vehicle, pod, Attachment )
 end
 
 function simfphys.weapon:Think( vehicle )
-	local pod =  vehicle.DriverSeat
+	local pod = vehicle:GetDriverSeat()
 	
 	if not IsValid( pod ) then return end
 	

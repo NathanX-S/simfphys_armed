@@ -77,15 +77,17 @@ function simfphys.weapon:Initialize( vehicle )
 	data.Attach_Start_Left = "machinegun_barell_right"
 	data.Attach_Start_Right = "machinegun_barell_left"
 
-	simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
 end
 
 function simfphys.weapon:Think( vehicle )
 	local curtime = CurTime()
 	
-	if not IsValid( vehicle.DriverSeat ) then return end
+	local DriverSeat = vehicle:GetDriverSeat()
 	
-	local ply = vehicle.DriverSeat:GetDriver()
+	if not IsValid( DriverSeat ) then return end
+	
+	local ply = DriverSeat:GetDriver()
 	
 	if not IsValid(ply) then
 		if vehicle.wpn then

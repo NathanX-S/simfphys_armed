@@ -41,8 +41,8 @@ function simfphys.weapon:Initialize( vehicle )
 	data.Attach_Start_Left = "muzzle_right"
 	data.Attach_Start_Right = "muzzle_left"
 
-	simfphys.RegisterCrosshair( vehicle.DriverSeat, data )
-	simfphys.RegisterCamera( vehicle.DriverSeat, Vector(0,-20,0), Vector(13,45,50) )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
+	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(0,-20,0), Vector(13,45,50) )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 	
@@ -81,7 +81,7 @@ function simfphys.weapon:AimWeapon( ply, vehicle, pod )
 end
 
 function simfphys.weapon:Think( vehicle )
-	local pod =  vehicle.DriverSeat
+	local pod = vehicle:GetDriverSeat()
 	if not IsValid( pod ) then return end
 	
 	local ply = pod:GetDriver()
