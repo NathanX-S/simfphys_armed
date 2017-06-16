@@ -100,7 +100,7 @@ function EFFECT:Think()
 		
 		local Attachment = vehicle:GetAttachment( self.AttachmentID )
 		local dir = Attachment.Ang:Up()
-		local pos = Attachment.Pos + dir * 15
+		local pos = Attachment.Pos + dir * 3
 		
 		local emitter = ParticleEmitter( pos, false )
 	
