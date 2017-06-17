@@ -157,6 +157,51 @@ function simfphys.weapon:Initialize( vehicle )
 
 	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "machinegun" } )
 	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,-40,5), Vector(0,-40,50) )
+	
+	vehicle.WheelOnGround = function( ent )
+		ent.FrontWheelPowered = ent:GetPowerDistribution() ~= 1
+		ent.RearWheelPowered = ent:GetPowerDistribution() ~= -1
+		
+		for i = 1, table.Count( ent.Wheels ) do
+			local Wheel = ent.Wheels[i]		
+			if IsValid( Wheel ) then
+				local dmgMul = Wheel:GetDamaged() and 0.5 or 1
+				local surfacemul = simfphys.TractionData[Wheel:GetSurfaceMaterial():lower()]
+				
+				ent.VehicleData[ "SurfaceMul_" .. i ] = (surfacemul and math.max(surfacemul,0.001) or 1) * dmgMul
+				
+				local WheelPos = ent:LogicWheelPos( i )
+				
+				local WheelRadius = WheelPos.IsFrontWheel and ent.FrontWheelRadius or ent.RearWheelRadius
+				local startpos = Wheel:GetPos()
+				local dir = -ent.Up
+				local len = WheelRadius + math.Clamp(-ent.Vel.z / 50,2.5,6)
+				local HullSize = Vector(WheelRadius,WheelRadius,0)
+				local tr = util.TraceHull( {
+					start = startpos,
+					endpos = startpos + dir * len,
+					maxs = HullSize,
+					mins = -HullSize,
+					filter = ent.VehicleData["filter"]
+				} )
+				
+				local onground = self:IsOnGround( vehicle ) and 1 or 0
+				Wheel:SetOnGround( onground )
+				ent.VehicleData[ "onGround_" .. i ] = onground
+				
+				if tr.Hit then
+					Wheel:SetSpeed( Wheel.FX )
+					Wheel:SetSkidSound( Wheel.skid )
+					Wheel:SetSurfaceMaterial( util.GetSurfacePropName( tr.SurfaceProps ) )
+				end
+			end
+		end
+		
+		local FrontOnGround = math.max(ent.VehicleData[ "onGround_1" ],ent.VehicleData[ "onGround_2" ])
+		local RearOnGround = math.max(ent.VehicleData[ "onGround_3" ],ent.VehicleData[ "onGround_4" ])
+		
+		ent.DriveWheelsOnGround = math.max(ent.FrontWheelPowered and FrontOnGround or 0,ent.RearWheelPowered and RearOnGround or 0)
+	end
 end
 
 function simfphys.weapon:Think( vehicle )
