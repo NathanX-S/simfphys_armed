@@ -81,13 +81,14 @@ sound.Add( {
 	sound = "weapons/gauss/fire1.wav"
 } )
 
-function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson )
+function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, bLocalAng )
 	if not IsValid( ent ) then return end
 	
 	offset_firstperson = isvector( offset_firstperson ) and offset_firstperson or Vector(0,0,0)
 	offset_thirdperson = isvector( offset_thirdperson ) and offset_thirdperson or Vector(0,0,0)
 	
 	ent:SetNWBool( "simfphys_SpecialCam", true )
+	ent:SetNWBool( "SpecialCam_LocalAngles",  bLocalAng or false )
 	ent:SetNWVector( "SpecialCam_Firstperson", offset_firstperson )
 	ent:SetNWVector( "SpecialCam_Thirdperson", offset_thirdperson )
 end
@@ -99,7 +100,9 @@ function simfphys.RegisterCrosshair( ent, data )
 	
 	local Base = data.Attachment or "muzzle"
 	local Dir = data.Direction or Vector(1,0,0)
+	local Type = data.Type and data.Type or 0
 	
+	ent:SetNWInt( "CrosshairType", Type )
 	ent:SetNWBool( "HasCrosshair", true )
 	ent:SetNWString( "Attachment", Base )
 	ent:SetNWVector( "Direction", Dir )

@@ -103,11 +103,13 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		bullet.IgnoreEntity  	= vehicle
 		bullet.Callback = function(att, tr, dmginfo)
 			
-			local effectdata = EffectData()
-				effectdata:SetOrigin( tr.HitPos )
-				util.Effect( "helicoptermegabomb", effectdata, true, true )
-				
-			util.BlastDamage( vehicle, ply, tr.HitPos,50,50)
+			net.Start( "simfphys_tank_do_effect" )
+				net.WriteEntity( vehicle )
+				net.WriteString( "Explosion_small" )
+				net.WriteVector( tr.HitPos )
+			net.Broadcast()
+			
+			util.BlastDamage( vehicle, ply, tr.HitPos,200,50)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
@@ -150,13 +152,13 @@ function simfphys.weapon:Initialize( vehicle )
 		net.WriteString( "sherman" )
 	net.Broadcast()
 	
-	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Direction = Vector(0,0,1),Attachment = "turret_cannon" } )
-	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(20,60,65), Vector(20,60,65) )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Direction = Vector(0,0,1),Attachment = "turret_cannon", Type = 2 } )
+	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(20,60,65), Vector(20,60,65), true )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
-	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "machinegun" } )
-	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,-40,5), Vector(0,-40,50) )
+	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "machinegun", Type = 1 } )
+	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,-40,5), Vector(0,-40,50), true )
 	
 	
 	timer.Simple( 1, function()
@@ -230,12 +232,12 @@ end
 function simfphys.weapon:AimMachinegun( ply, vehicle, pod )	
 	if not IsValid( pod ) then return end
 
-	local Aimang = ply:EyeAngles()
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetPitch = Angles.p
 	local TargetYaw = Angles.y
 	
 	vehicle:SetPoseParameter("machinegun_yaw", TargetYaw )
@@ -337,7 +339,7 @@ end
 function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )	
 	if not IsValid( pod ) then return end
 
-	local Aimang = ply:EyeAngles()
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
@@ -349,7 +351,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	local AimRate = 40
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetPitch = Angles.p
 	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
 	
 	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05

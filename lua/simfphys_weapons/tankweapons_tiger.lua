@@ -75,7 +75,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 				net.WriteVector( tr.HitPos )
 			net.Broadcast()
 			
-			util.BlastDamage( vehicle, ply, tr.HitPos,400,50)
+			util.BlastDamage( vehicle, ply, tr.HitPos,600,50)
 			
 			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
 			
@@ -109,12 +109,12 @@ function simfphys.weapon:Initialize( vehicle )
 		net.WriteString( "tiger" )
 	net.Broadcast()
 	
-	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Attachment = "muzzle_machinegun" } )
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Attachment = "muzzle_machinegun", Type = 1 } )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
-	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Direction = Vector(0,0,1) } )
-	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,0,40), Vector(0,0,40) )
+	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Direction = Vector(0,0,1), Type = 2 } )
+	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,0,40), Vector(0,0,40), true )
 	
 	
 	timer.Simple( 1, function()
@@ -311,7 +311,7 @@ function simfphys.weapon:AimMachinegun( ply, vehicle, pod )
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetPitch = Angles.p
 	local TargetYaw = Angles.y
 	
 	vehicle:SetPoseParameter("machinegun_yaw", -TargetYaw )
@@ -321,7 +321,7 @@ end
 function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )	
 	if not IsValid( pod ) then return end
 
-	local Aimang = ply:EyeAngles()
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
@@ -333,7 +333,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	local AimRate = 20
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetPitch = Angles.p
 	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
 	
 	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05

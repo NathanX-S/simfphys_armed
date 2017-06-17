@@ -56,7 +56,7 @@ function simfphys.weapon:Initialize( vehicle )
 end
 
 function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
-	local Aimang = ply:EyeAngles() + ( pod:GetThirdPersonMode() and Angle(-13,0,0) or Angle(0,0,0) )
+	local Aimang = ply:EyeAngles()
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
 	Angles:Normalize()

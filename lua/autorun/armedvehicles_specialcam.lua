@@ -44,9 +44,14 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	
 	local view = {
 		origin = pos,
-		angles = Vehicle:LocalToWorldAngles( ply:EyeAngles() ),
 		drawviewer = false,
 	}
+	
+	if Vehicle:GetNWBool( "SpecialCam_LocalAngles" ) then
+		view.angles = ply:EyeAngles()
+	else
+		view.angles = Vehicle:LocalToWorldAngles( ply:EyeAngles() )
+	end
 	
 	if Vehicle.GetThirdPersonMode == nil or ply:GetViewEntity() ~= ply then
 		return

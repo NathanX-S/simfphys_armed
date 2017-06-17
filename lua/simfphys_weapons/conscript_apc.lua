@@ -40,9 +40,10 @@ function simfphys.weapon:Initialize( vehicle )
 	data.Direction = Vector(1,0,0)
 	data.Attach_Start_Left = "muzzle_right"
 	data.Attach_Start_Right = "muzzle_left"
+	data.Type = 3
 
 	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
-	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(0,-20,0), Vector(13,45,50) )
+	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(13,45,50), Vector(13,45,50), true )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 	
@@ -58,7 +59,7 @@ function simfphys.weapon:AimWeapon( ply, vehicle, pod )
 	local ID = vehicle:LookupAttachment( "muzzle_left" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
-	local Aimang = ply:EyeAngles()
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
@@ -70,7 +71,7 @@ function simfphys.weapon:AimWeapon( ply, vehicle, pod )
 	local AimRate = 60
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
-	local TargetPitch = Angles.p + (pod:GetThirdPersonMode() and -16 or 0)
+	local TargetPitch = Angles.p
 	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
 	
 	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05

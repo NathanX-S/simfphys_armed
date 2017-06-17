@@ -167,7 +167,12 @@ net.Receive( "simfphys_tank_do_effect", function( length )
 	elseif effect == "Explosion" then
 		local effectdata = EffectData()
 			effectdata:SetOrigin( net.ReadVector() )
-		util.Effect( "simfphys_explosion", effectdata )
+		util.Effect( "simfphys_tankweapon_explosion", effectdata )
+		
+	elseif effect == "Explosion_small" then
+		local effectdata = EffectData()
+			effectdata:SetOrigin( net.ReadVector() )
+		util.Effect( "simfphys_tankweapon_explosion_small", effectdata )
 	end
 end)
 
