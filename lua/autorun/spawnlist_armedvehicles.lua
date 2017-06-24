@@ -158,6 +158,9 @@ local V = {
 		PowerbandStart = 2200,
 		PowerbandEnd = 6300,
 		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 65,
+		
 		PowerBias = 0.5,
 		
 		EngineSoundPreset = -1,
@@ -226,6 +229,9 @@ local V = {
 		PeakTorque = 100,
 		PowerbandStart = 2200,
 		PowerbandEnd = 6300,
+		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 65,
 		
 		PowerBias = 0.5,
 		
@@ -319,6 +325,9 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 65,
+		
 		PowerBias = 0.6,
 		
 		EngineSoundPreset = -1,
@@ -409,6 +418,9 @@ local V = {
 		PowerbandEnd = 7300,
 		Turbocharged = false,
 		Supercharged = false,
+		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 65,
 		
 		PowerBias = 0.6,
 		
@@ -632,6 +644,9 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelType = FUELTYPE_DIESEL,
+		FuelTankSize = 120,
+		
 		PowerBias = 0,
 		
 		EngineSoundPreset = 0,
@@ -762,6 +777,9 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 120,
+		
 		PowerBias = 0.25,
 		
 		EngineSoundPreset = 0,
@@ -889,6 +907,9 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 120,
+		
 		PowerBias = 0.25,
 		
 		EngineSoundPreset = 0,
@@ -1014,6 +1035,9 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		DoNotStall = true,
+		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 120,
 		
 		PowerBias = 0.25,
 		
@@ -1162,6 +1186,9 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 160,
+		
 		PowerBias = -0.5,
 		
 		EngineSoundPreset = 0,
@@ -1294,6 +1321,9 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		DoNotStall = true,
+		
+		FuelType = FUELTYPE_PETROL,
+		FuelTankSize = 160,
 		
 		PowerBias = -0.5,
 		
