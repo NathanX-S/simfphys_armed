@@ -87,6 +87,8 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelFillPos = Vector(32.82,-78.31,81.89),
+		
 		PowerBias = 0,
 		
 		EngineSoundPreset = 0,
@@ -158,6 +160,7 @@ local V = {
 		PowerbandStart = 2200,
 		PowerbandEnd = 6300,
 		
+		FuelFillPos = Vector(17.64,-14.55,30.06),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 65,
 		
@@ -230,6 +233,7 @@ local V = {
 		PowerbandStart = 2200,
 		PowerbandEnd = 6300,
 		
+		FuelFillPos = Vector(17.64,-14.55,30.06),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 65,
 		
@@ -325,6 +329,7 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelFillPos = Vector(20.92,6.95,26.83),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 65,
 		
@@ -419,6 +424,7 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelFillPos = Vector(20.92,6.95,26.83),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 65,
 		
@@ -644,6 +650,7 @@ local V = {
 		Turbocharged = false,
 		Supercharged = false,
 		
+		FuelFillPos = Vector(-61.34,49.71,15.98),
 		FuelType = FUELTYPE_DIESEL,
 		FuelTankSize = 120,
 		
@@ -777,6 +784,7 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelFillPos = Vector(-75.5,-0.01,9.58),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 120,
 		
@@ -907,6 +915,7 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelFillPos = Vector(-12.89,32.29,4.28),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 120,
 		
@@ -1036,6 +1045,7 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelFillPos = Vector(-29.73,36.13,28.99),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 120,
 		
@@ -1186,6 +1196,7 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelFillPos = Vector(-111.88,-0.14,59.15),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 160,
 		
@@ -1322,6 +1333,7 @@ local V = {
 		Supercharged = false,
 		DoNotStall = true,
 		
+		FuelFillPos = Vector(-46.03,-34.64,75.23),
 		FuelType = FUELTYPE_PETROL,
 		FuelTankSize = 160,
 		
