@@ -58,7 +58,7 @@ local function hmg_fire(ply,vehicle,shootOrigin,shootDirection)
 		bullet.Tracer		= 2
 		bullet.TracerName	= "simfphys_tracer"
 		bullet.Force		= 12
-		bullet.Damage		= 9
+		bullet.Damage		= 12
 		bullet.HullSize		= 3
 		bullet.Attacker 	= ply
 		bullet.IgnoreEntity = vehicle.Wheels[2]
@@ -168,7 +168,7 @@ function simfphys.weapon:Initialize( vehicle )
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
 	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "mg_muzzle", Type = 5 } )
-	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(-80,-15,0), Vector(0,0,50), true, "mg_muzzle" )
+	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(-80,-15,0), Vector(0,0,60), true, "mg_muzzle" )
 	
 	simfphys.RegisterCamera( vehicle.pSeat[2], Vector(-25,5,55), Vector(-25,5,55), true )
 	
@@ -264,7 +264,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	
 	local L_Right = Angle(0,Aimang.y,0):Right()
 	local La_Right = Angle(0,Attachment.Ang.y + 90,0):Right()
-	local AimRate = 30
+	local AimRate = 30 * FrameTime() * 66.666
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
 	local TargetPitch = Angles.p
@@ -426,7 +426,7 @@ function simfphys.weapon:SecondaryAttack( vehicle, ply, deltapos, cPos, cAng )
 
 	hmg_fire( ply, vehicle, Attachment.Pos, (trace.HitPos - Attachment.Pos):GetNormalized() )
 	
-	self:SetNextSecondaryFire( vehicle, CurTime() + 0.15 )
+	self:SetNextSecondaryFire( vehicle, CurTime() + 0.17 )
 end
 
 function simfphys.weapon:CanSecondaryAttack( vehicle )
