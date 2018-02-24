@@ -378,7 +378,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	
 	local L_Right = Angle(0,Aimang.y,0):Right()
 	local La_Right = Angle(0,Attachment.Ang.y,0):Right()
-	local AimRate = 40
+	local AimRate = 40 * FrameTime() * 66.666
 	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
 	
 	local TargetPitch = Angles.p
