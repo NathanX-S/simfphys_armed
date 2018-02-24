@@ -39,10 +39,11 @@ function ENT:Think()
 	self:NextThink( curtime )
 	
 	local Size = self:GetSize() * 0.5
+	local FixTick = FrameTime() * 66.666
 	
 	local trace = util.TraceHull( {
 		start = self:GetPos(),
-		endpos = self:GetPos() + self.Vel,
+		endpos = self:GetPos() + self.Vel * FixTick,
 		maxs = Size,
 		mins = -Size,
 		filter = self.Filter
@@ -87,9 +88,9 @@ function ENT:Think()
 		
 		self:Remove()
 	else
-		self:SetPos( self:GetPos() + self.Vel )
+		self:SetPos( self:GetPos() + self.Vel * FixTick )
 		
-		self.Vel = self.Vel - Vector(0,0,0.1)
+		self.Vel = self.Vel - Vector(0,0,0.1) * FixTick
 	end
 	
 	if (self.SpawnTime + 12) < curtime then
