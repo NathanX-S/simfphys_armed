@@ -23,6 +23,23 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		end
 		
 	vehicle:FireBullets( bullet )
+	
+	--[[
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.attackingent = vehicle
+		projectile.Damage = 15
+		projectile.Force = 50
+		projectile.Size = 2
+		projectile.BlastRadius = 50
+		projectile.BlastDamage = 20
+		projectile.BlastEffect = "helicoptermegabomb"
+	
+	simfphys.FirePhysProjectile( projectile )
+	]]--
 end
 
 function simfphys.weapon:ValidClasses()

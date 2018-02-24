@@ -38,8 +38,9 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	if not IsValid( ply ) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
 	
 	local Vehicle = ply:GetVehicle()
+	local Base = Vehicle.vehiclebase
 	
-	if not IsValid( Vehicle ) then return end
+	if not IsValid( Vehicle ) or not IsValid( Base ) then return end
 	if not Vehicle:GetNWBool( "simfphys_SpecialCam" ) then return end
 	
 	local view = {
@@ -63,8 +64,15 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	
 	if not Vehicle:GetThirdPersonMode() then
 		local offset = Vehicle:GetNWVector( "SpecialCam_Firstperson" )
+		local ID = Base:LookupAttachment( Vehicle:GetNWString( "SpecialCam_Attachment" ) )
 		
-		view.origin = view.origin + Vehicle:GetForward() * offset.x + Vehicle:GetRight() * offset.y + Vehicle:GetUp() * offset.z
+		if ID == 0 then
+			view.origin = view.origin + Vehicle:GetForward() * offset.x + Vehicle:GetRight() * offset.y + Vehicle:GetUp() * offset.z
+		else
+			local attachment = Base:GetAttachment( ID )
+			
+			view.origin = attachment.Pos + attachment.Ang:Forward() * offset.x  + attachment.Ang:Right() * offset.y  + attachment.Ang:Up() *  offset.z
+		end
 		
 		return simfphyslerpView( ply, view )
 	end

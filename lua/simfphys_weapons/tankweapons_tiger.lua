@@ -54,8 +54,24 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		net.WriteString( "Muzzle" )
 	net.Broadcast()
 	
-	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 200000, shootOrigin ) 
+	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 400000, shootOrigin ) 
 	
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.attackingent = vehicle
+		projectile.Damage = 3000
+		projectile.Force = 6000
+		projectile.Size = 20
+		projectile.BlastRadius = 600
+		projectile.BlastDamage = 50
+		projectile.BlastEffect = "simfphys_tankweapon_explosion"
+	
+	simfphys.FirePhysProjectile( projectile )
+	
+	--[[
 	local bullet = {}
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin
@@ -92,6 +108,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		end
 		
 	vehicle:FireBullets( bullet )
+	]]--
 end
 
 function simfphys.weapon:ValidClasses()
@@ -114,7 +131,7 @@ function simfphys.weapon:Initialize( vehicle )
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
 	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Direction = Vector(0,0,1), Type = 2 } )
-	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,0,40), Vector(0,0,40), true )
+	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(20,0,-130), Vector(0,0,40), true, "muzzle" )
 	
 	
 	timer.Simple( 1, function()
@@ -178,6 +195,18 @@ function simfphys.weapon:ControlTurret( vehicle, deltapos )
 	local ply = pod:GetDriver()
 	
 	if not IsValid( ply ) then return end
+	
+	local safemode = ply:KeyDown( IN_WALK )
+
+	if vehicle.ButtonSafeMode ~= safemode then
+		vehicle.ButtonSafeMode = safemode
+		
+		if safemode then
+			vehicle:SetNWBool( "TurretSafeMode", not vehicle:GetNWBool( "TurretSafeMode", true ) )
+		end
+	end
+	
+	if vehicle:GetNWBool( "TurretSafeMode", true ) then return end
 	
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
@@ -326,7 +355,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
 	
-	vehicle.sm_dir  = vehicle.sm_dir or Vector(0,0,0)
+	vehicle.sm_dir  = vehicle.sm_dir or Vector(1,0,0)
 	
 	local L_Right = Angle(0,Aimang.y,0):Right()
 	local La_Right = Angle(0,Attachment.Ang.y,0):Right()
@@ -403,4 +432,10 @@ function simfphys.weapon:DoWheelSpin( vehicle )
 	
 	vehicle:SetPoseParameter("spin_wheels_right", spin_r)
 	vehicle:SetPoseParameter("spin_wheels_left", spin_l )
+	
+	net.Start( "simfphys_update_tracks", true )
+		net.WriteEntity( vehicle )
+		net.WriteFloat( spin_r ) 
+		net.WriteFloat( spin_l ) 
+	net.Broadcast()
 end

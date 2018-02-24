@@ -89,6 +89,23 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 	
 	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 300000, shootOrigin ) 
 	
+	
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.attackingent = vehicle
+		projectile.Damage = 1000
+		projectile.Force = 6000
+		projectile.Size = 10
+		projectile.BlastRadius = 200
+		projectile.BlastDamage = 50
+		projectile.BlastEffect = "simfphys_tankweapon_explosion_small"
+	
+	simfphys.FirePhysProjectile( projectile )
+	
+	--[[
 	local bullet = {}
 		bullet.Num 			= 1
 		bullet.Src 			= shootOrigin
@@ -135,6 +152,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		end
 		
 	vehicle:FireBullets( bullet )
+	]]--
 end
 
 function simfphys.weapon:ValidClasses()
@@ -153,7 +171,7 @@ function simfphys.weapon:Initialize( vehicle )
 	net.Broadcast()
 	
 	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Direction = Vector(0,0,1),Attachment = "turret_cannon", Type = 2 } )
-	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(20,60,65), Vector(20,60,65), true )
+	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(1,0,0), Vector(20,60,65), true,"turret_machinegun" )
 	
 	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
 
@@ -279,6 +297,18 @@ function simfphys.weapon:ControlTurret( vehicle, deltapos )
 	
 	if not IsValid( ply ) then return end
 	
+	local safemode = ply:KeyDown( IN_WALK )
+
+	if vehicle.ButtonSafeMode ~= safemode then
+		vehicle.ButtonSafeMode = safemode
+		
+		if safemode then
+			vehicle:SetNWBool( "TurretSafeMode", not vehicle:GetNWBool( "TurretSafeMode", true ) )
+		end
+	end
+	
+	if vehicle:GetNWBool( "TurretSafeMode", true ) then return end
+	
 	local ID = vehicle:LookupAttachment( "turret_cannon" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
@@ -344,7 +374,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	Angles:Normalize()
 	
-	vehicle.sm_dir  = vehicle.sm_dir or Vector(0,0,0)
+	vehicle.sm_dir  = vehicle.sm_dir or Vector(1,0,0)
 	
 	local L_Right = Angle(0,Aimang.y,0):Right()
 	local La_Right = Angle(0,Attachment.Ang.y,0):Right()
@@ -481,9 +511,15 @@ function simfphys.weapon:UpdateSuspension( vehicle )
 end
 
 function simfphys.weapon:DoWheelSpin( vehicle )
-	local spin_r = vehicle.VehicleData[ "spin_4" ] + vehicle.VehicleData[ "spin_6" ]
-	local spin_l = vehicle.VehicleData[ "spin_3" ] + vehicle.VehicleData[ "spin_5" ]
+	local spin_r = (vehicle.VehicleData[ "spin_4" ] + vehicle.VehicleData[ "spin_6" ]) * 1.2
+	local spin_l = (vehicle.VehicleData[ "spin_3" ] + vehicle.VehicleData[ "spin_5" ]) * 1.2
 	
-	vehicle:SetPoseParameter("spin_wheels_right", spin_r * 1.2)
-	vehicle:SetPoseParameter("spin_wheels_left", spin_l  * 1.2)
+	vehicle:SetPoseParameter("spin_wheels_right", spin_r)
+	vehicle:SetPoseParameter("spin_wheels_left", spin_l )
+	
+	net.Start( "simfphys_update_tracks", true )
+		net.WriteEntity( vehicle )
+		net.WriteFloat( spin_r ) 
+		net.WriteFloat( spin_l ) 
+	net.Broadcast()
 end

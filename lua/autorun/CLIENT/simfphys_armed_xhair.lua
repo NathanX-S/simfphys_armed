@@ -29,142 +29,259 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 	local hitpos = trace.HitPos
 	
 	local scr = hitpos:ToScreen()
-	
-	if scr.visible then
-		local Type = pod:GetNWInt( "CrosshairType", 0 )
-	
-		surface.SetDrawColor( 240, 200, 0, 255 ) 
-	
-		if Type == 0 then
-			surface.SetMaterial( xhair )
-			surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
-			
-		elseif Type == 1 then
-			local X = scr.x
-			local Y = scr.y
-			
-			local Scale = 0.75
-			
-			local scrW = ScrW() / 2
-			local scrH = ScrH() / 2
-			local Z = scrW * Scale
-			
-			local rOuter = scrW * 0.03 * Scale
-			local rInner = scrW * 0.005 * Scale
-			
-			DrawCircle( X, Y, rOuter )
-			DrawCircle( X, Y, rInner )
-			
-			surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
-			surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
-			surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
-			surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
 
-			surface.SetDrawColor( 240, 200, 0, 20 ) 
+	local Type = pod:GetNWInt( "CrosshairType", 0 )
+
+	surface.SetDrawColor( 240, 200, 0, 255 ) 
+
+	if Type == 0 then
+		surface.SetMaterial( xhair )
+		surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
+		
+	elseif Type == 1 then
+		local X = scr.x
+		local Y = scr.y
+		
+		local Scale = 0.75
+		
+		local scrW = ScrW() / 2
+		local scrH = ScrH() / 2
+		local Z = scrW * Scale
+		
+		local rOuter = scrW * 0.03 * Scale
+		local rInner = scrW * 0.005 * Scale
+		
+		DrawCircle( X, Y, rOuter )
+		DrawCircle( X, Y, rInner )
+		
+		surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
+		surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
+		surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
+		surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
+
+		surface.SetDrawColor( 240, 200, 0, 20 ) 
+		
+		local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		
+	elseif Type == 2 then
+		local X = scr.x
+		local Y = scr.y
+		
+		local Scale = 0.75
+		
+		local scrW = ScrW() / 2
+		local scrH = ScrH() / 2
+		local Z = scrW * Scale
+		
+		local rOuter = scrW * 0.03 * Scale
+		local rInner = scrW * 0.005 * Scale
+		
+		local safemode =  vehicle:GetNWBool( "TurretSafeMode", true )
+		
+		if not safemode then
+			surface.SetDrawColor( 240, 200, 0, 255 ) 
+		else
+			local sz = scrH * 0.6
+			local alpha = math.abs( math.cos( CurTime() * 1 ) )
 			
-			local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
+			draw.SimpleText( "Press IN_WALK to activate turret!", "simfphysfont", scrW + scrH * 0.4, ScrH() - scrH * 0.05 - sz * 0.1, Color( 255, 235, 0, 255 * alpha ), 1, 1)
 			
-			local dX = math.cos( math.rad( -Yaw ) )
-			local dY = math.sin( math.rad( -Yaw ) )
-			local len = scrH * 0.04
-			
-			DrawCircle( scrW, scrH * 1.85, len )
-			surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
-			
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-			
-		elseif Type == 2 then
-			local X = scr.x
-			local Y = scr.y
-			
-			local Scale = 0.75
-			
-			local scrW = ScrW() / 2
-			local scrH = ScrH() / 2
-			local Z = scrW * Scale
-			
-			local rOuter = scrW * 0.03 * Scale
-			local rInner = scrW * 0.005 * Scale
-			
-			DrawCircle( X, Y, rOuter )
-			DrawCircle( X, Y, rInner )
-			
-			surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
-			surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
-			surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
-			surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
-			
-			--surface.DrawLine( X, Y, X, Y + Z * 0.2)
-			
-			--surface.DrawLine( X, Y + Z * 0.05, X - Z * 0.015, Y + Z * 0.05)
-			--surface.DrawLine( X, Y + Z * 0.1, X - Z * 0.015, Y + Z * 0.1)
-			--surface.DrawLine( X, Y + Z * 0.15, X - Z * 0.015, Y + Z * 0.15)
-			--surface.DrawLine( X, Y + Z * 0.2, X - Z * 0.015, Y + Z * 0.2)
-			
-			--surface.DrawLine( X, Y, X - Z * 0.015, Y + Z * 0.02)
-			--surface.DrawLine( X, Y, X + Z * 0.015, Y + Z * 0.02)
-			
-			surface.SetDrawColor( 240, 200, 0, 120 ) 
-			
-			surface.DrawLine( X + Z * 0.3, Y - Z * 0.35, X + Z * 0.6, Y - Z * 0.35 )
-			surface.DrawLine( X + Z * 0.6, Y - Z * 0.35, X + Z * 0.7, Y - Z * 0.25 )
-			surface.DrawLine( X - Z * 0.3, Y - Z * 0.35, X - Z * 0.6, Y - Z * 0.35 )
-			surface.DrawLine( X - Z * 0.6, Y - Z * 0.35, X - Z * 0.7, Y - Z * 0.25 )
-			
-			surface.DrawLine( X + Z * 0.3, Y + Z * 0.35, X + Z * 0.6, Y + Z * 0.35 )
-			surface.DrawLine( X + Z * 0.6, Y + Z * 0.35, X + Z * 0.7, Y + Z * 0.25 )
-			surface.DrawLine( X - Z * 0.3, Y + Z * 0.35, X - Z * 0.6, Y + Z * 0.35 )
-			surface.DrawLine( X - Z * 0.6, Y + Z * 0.35, X - Z * 0.7, Y + Z * 0.25 )
-			
-			
-			local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
-			
-			local dX = math.cos( math.rad( -Yaw ) )
-			local dY = math.sin( math.rad( -Yaw ) )
-			local len = scrH * 0.04
-			
-			DrawCircle( scrW, scrH * 1.85, len )
-			surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
-			
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-			
-		elseif Type == 3 then
-			surface.SetMaterial( xhair )
-			surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
-			
-			local scrW = ScrW() / 2
-			local scrH = ScrH() / 2
-			
-			local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
-			
-			local dX = math.cos( math.rad( -Yaw ) )
-			local dY = math.sin( math.rad( -Yaw ) )
-			local len = scrH * 0.04
-			
-			DrawCircle( scrW, scrH * 1.85, len )
-			surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
-			
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
-			surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+			surface.SetDrawColor( 240, 200, 0, 50 ) 
 		end
 		
-		surface.SetDrawColor( 255, 255, 255, 255 )
-		draw.NoTexture()
+		DrawCircle( X, Y, rOuter )
+		DrawCircle( X, Y, rInner )
+		
+		surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
+		surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
+		surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
+		surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
+		
+		--surface.DrawLine( X, Y, X, Y + Z * 0.2)
+		
+		--surface.DrawLine( X, Y + Z * 0.05, X - Z * 0.015, Y + Z * 0.05)
+		--surface.DrawLine( X, Y + Z * 0.1, X - Z * 0.015, Y + Z * 0.1)
+		--surface.DrawLine( X, Y + Z * 0.15, X - Z * 0.015, Y + Z * 0.15)
+		--surface.DrawLine( X, Y + Z * 0.2, X - Z * 0.015, Y + Z * 0.2)
+		
+		--surface.DrawLine( X, Y, X - Z * 0.015, Y + Z * 0.02)
+		--surface.DrawLine( X, Y, X + Z * 0.015, Y + Z * 0.02)
+		
+		if not safemode then
+			surface.SetDrawColor( 240, 200, 0, 180 )
+		else
+			surface.SetDrawColor( 240, 200, 0, 50 ) 
+		end
+		
+		surface.DrawLine( X + Z * 0.3, Y - Z * 0.35, X + Z * 0.6, Y - Z * 0.35 )
+		surface.DrawLine( X + Z * 0.6, Y - Z * 0.35, X + Z * 0.7, Y - Z * 0.25 )
+		surface.DrawLine( X - Z * 0.3, Y - Z * 0.35, X - Z * 0.6, Y - Z * 0.35 )
+		surface.DrawLine( X - Z * 0.6, Y - Z * 0.35, X - Z * 0.7, Y - Z * 0.25 )
+		
+		surface.DrawLine( X + Z * 0.3, Y + Z * 0.35, X + Z * 0.6, Y + Z * 0.35 )
+		surface.DrawLine( X + Z * 0.6, Y + Z * 0.35, X + Z * 0.7, Y + Z * 0.25 )
+		surface.DrawLine( X - Z * 0.3, Y + Z * 0.35, X - Z * 0.6, Y + Z * 0.35 )
+		surface.DrawLine( X - Z * 0.6, Y + Z * 0.35, X - Z * 0.7, Y + Z * 0.25 )
+		
+		
+		local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.SetDrawColor( 240, 200, 0, 180 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		
+	elseif Type == 3 then
+		surface.SetMaterial( xhair )
+		surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
+		
+		local scrW = ScrW() / 2
+		local scrH = ScrH() / 2
+		
+		local Yaw = vehicle:GetPoseParameter( "turret_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		
+	elseif Type == 4 then
+		local scrW = ScrW() / 2
+		local scrH = ScrH() / 2
+		local safemode =  vehicle:GetNWBool( "TurretSafeMode", true )
+		
+		if not safemode then
+			surface.SetDrawColor( 20, 180, 20, 50 )
+		else
+			local sz = scrH * 0.6
+			local alpha = math.abs( math.cos( CurTime() * 1 ) )
+			
+			--draw.RoundedBox( 8, scrW + scrH * 0.4 - sz * 0.5,ScrH() - scrH * 0.05 - sz * 0.2, sz, sz * 0.2, Color( 0, 0, 0, 80 * alpha ) )
+			draw.SimpleText( "Press IN_WALK to activate turret!", "simfphysfont", scrW + scrH * 0.4, ScrH() - scrH * 0.05 - sz * 0.1, Color( 20, 180, 20, 255 * alpha ), 1, 1)
+			
+			surface.SetDrawColor( 20, 100, 20, 50 ) 
+		end
+		
+		--DrawCircle( scr.x, scr.y, scrH * 0.4 )
+		local pL1 = scrH * 0.4
+		local pL2 = scrH * 0.42
+		for i = 0, 360, 1.25 do
+			local pX = math.cos( math.rad( i ) )
+			local pY = math.sin( math.rad( i ) )
+			surface.DrawLine(scr.x + pX * pL1, scr.y + pY * pL1, scr.x + pX * pL2, scr.y + pY * pL2 )
+		end
+		
+		if not safemode then
+			surface.SetDrawColor( 20, 180, 20, 255 )
+		else
+			surface.SetDrawColor( 20, 200, 20, 50 ) 
+		end
+		
+		surface.DrawLine(scr.x - scrH * 0.4, scr.y, scr.x - scrH * 0.07, scr.y )
+		surface.DrawLine(scr.x - scrH * 0.4, scr.y + 1 , scr.x - scrH * 0.15, scr.y + 1 )
+		surface.DrawLine(scr.x - scrH * 0.4, scr.y - 1, scr.x - scrH * 0.15, scr.y - 1 )
+		
+		surface.DrawLine(scr.x + scrH * 0.4, scr.y, scr.x + scrH * 0.07, scr.y )
+		surface.DrawLine(scr.x + scrH * 0.4, scr.y + 1 , scr.x + scrH * 0.15, scr.y + 1 )
+		surface.DrawLine(scr.x + scrH * 0.4, scr.y - 1, scr.x + scrH * 0.15, scr.y - 1 )
+		
+		surface.DrawLine(scr.x, scr.y + scrH * 0.4, scr.x, scr.y + scrH * 0.01 )
+		surface.DrawLine(scr.x - 1, scr.y + scrH * 0.4, scr.x - 1, scr.y + scrH * 0.1 )
+		surface.DrawLine(scr.x + 1, scr.y + scrH * 0.4, scr.x + 1, scr.y + scrH * 0.1 )
+		
+		local Yaw = vehicle:GetPoseParameter( "cannon_aim_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.SetDrawColor( 20, 180, 20, 255 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		
+	elseif Type == 5 then
+		local X = scr.x
+		local Y = scr.y
+		
+		local Scale = 0.75
+		
+		local scrW = ScrW() / 2
+		local scrH = ScrH() / 2
+		local Z = scrW * Scale
+		
+		local rOuter = scrW * 0.03 * Scale
+		local rInner = scrW * 0.005 * Scale
+		
+		surface.SetDrawColor( 20, 180, 20, 255 )
+		
+		DrawCircle( X, Y, rOuter )
+		DrawCircle( X, Y, rInner )
+		
+		surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
+		surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
+		surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
+		surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
+
+		surface.SetDrawColor( 10, 100, 10, 200 )
+		
+		local Yaw = vehicle:GetPoseParameter( "cannon_aim_yaw" ) * 360 - 90
+		
+		local dX = math.cos( math.rad( -Yaw ) )
+		local dY = math.sin( math.rad( -Yaw ) )
+		local len = scrH * 0.04
+		
+		DrawCircle( scrW, scrH * 1.85, len )
+		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
+		
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
+		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
 	end
+	
+	surface.SetDrawColor( 255, 255, 255, 255 )
+	draw.NoTexture()
 end
 
 local function MixDirection( ang, direction )
 
 	local Dir = ang:Forward()
 	
+	-- placeholder code
 	if direction.x == -1 then
 		Dir = -ang:Forward()
 		

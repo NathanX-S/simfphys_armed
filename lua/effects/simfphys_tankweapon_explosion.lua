@@ -30,8 +30,8 @@ function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	
 	self:Explosion( Pos )
-	self:ShockWave( Pos )
-	self:Debris( Pos )
+	--self:ShockWave( Pos )
+	--self:Debris( Pos )
 	
 	local random = math.random(1,3)
 	

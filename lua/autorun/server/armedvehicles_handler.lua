@@ -8,6 +8,7 @@ simfphys.weapon = {}
 
 util.AddNetworkString( "simfphys_register_tank" )
 util.AddNetworkString( "simfphys_tank_do_effect" )
+util.AddNetworkString( "simfphys_update_tracks" )
 
 sound.Add( {
 	name = "apc_fire",
@@ -25,6 +26,15 @@ sound.Add( {
 	level = 140,
 	pitch = { 90, 110 },
 	sound = "^simulated_vehicles/weapons/tiger_cannon.wav"
+} )
+
+sound.Add( {
+	name = "leopard_fire",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 140,
+	pitch = { 90, 110 },
+	sound = "^simulated_vehicles/weapons/leopard_cannon.wav"
 } )
 
 sound.Add( {
@@ -81,7 +91,7 @@ sound.Add( {
 	sound = "weapons/gauss/fire1.wav"
 } )
 
-function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, bLocalAng )
+function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
 	if not IsValid( ent ) then return end
 	
 	offset_firstperson = isvector( offset_firstperson ) and offset_firstperson or Vector(0,0,0)
@@ -91,6 +101,39 @@ function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, b
 	ent:SetNWBool( "SpecialCam_LocalAngles",  bLocalAng or false )
 	ent:SetNWVector( "SpecialCam_Firstperson", offset_firstperson )
 	ent:SetNWVector( "SpecialCam_Thirdperson", offset_thirdperson )
+	
+	if isstring( attachment ) then 
+		ent:SetNWString( "SpecialCam_Attachment", attachment )
+	end
+end
+
+function simfphys.FirePhysProjectile( data )
+	if not data then return end
+	if not istable( data.filter ) then return end
+	if not isvector( data.shootOrigin ) then return end
+	if not isvector( data.shootDirection ) then return end
+	if not IsValid( data.attacker ) then return end
+	if not IsValid( data.attackingent ) then return end
+	
+	local projectile = ents.Create( "simfphys_tankprojectile" )
+	projectile:SetPos( data.shootOrigin )
+	projectile:SetAngles( data.shootDirection:Angle() )
+	projectile:SetOwner( data.attackingent )
+	projectile.Attacker = data.attacker
+	projectile.AttackingEnt = data.attackingent 
+	
+	local filter = data.filter 
+	table.insert( filter, projectile )
+	
+	projectile.Force = data.Force and data.Force or 100
+	projectile.Damage = data.Damage and data.Damage or 100
+	projectile.BlastRadius = data.BlastRadius and data.BlastRadius or 200
+	projectile.BlastDamage = data.BlastDamage and data.BlastDamage or 50
+	projectile:SetBlastEffect( isstring( data.BlastEffect ) and data.BlastEffect or "simfphys_tankweapon_explosion" )
+	projectile:SetSize( data.Size and data.Size or 1 )
+	projectile.Filter = filter
+	projectile:Spawn()
+	projectile:Activate()
 end
 
 function simfphys.RegisterCrosshair( ent, data )
