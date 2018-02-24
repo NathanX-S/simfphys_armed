@@ -1098,6 +1098,8 @@ local V = {
 		
 		IsArmored = true,
 		
+		NoWheelGibs = true,
+		
 		FirstPersonViewPos = Vector(0,-50,15),
 		
 		FrontWheelRadius = 45,
@@ -1251,6 +1253,8 @@ local V = {
 		MaxHealth = 6000,
 		
 		IsArmored = true,
+		
+		NoWheelGibs = true,
 		
 		FirstPersonViewPos = Vector(0,-50,15),
 		
@@ -1430,6 +1434,8 @@ local V = {
 		
 		IsArmored = true,
 		
+		NoWheelGibs = true,
+		
 		FirstPersonViewPos = Vector(0,-50,50),
 		
 		FrontWheelRadius = 40,
@@ -1485,11 +1491,11 @@ local V = {
 		
 		PassengerSeats = {
 			{
-				pos = Vector(0,0,50),
+				pos = Vector(0,0,40),
 				ang = Angle(0,0,0)
 			},
 			{
-				pos = Vector(25,-5,55),
+				pos = Vector(25,-5,45),
 				ang = Angle(0,0,0)
 			}
 		},
