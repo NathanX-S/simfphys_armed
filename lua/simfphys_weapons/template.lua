@@ -3,6 +3,7 @@
 function simfphys.weapon:ValidClasses()
 	
 	local classes = {
+		--"sim_fphys_jeep",
 		"sim_fphys_testvehicle",  -- all classes listed in this table will be using this weapon
 		"my_vehicle",  -- you can add as many vehicles you want
 	}
@@ -16,6 +17,61 @@ end
 
 function simfphys.weapon:Think( vehicle )
 	-- this function is called on tick
+	
+	local ply = vehicle:GetDriver()
+	
+	if not IsValid( ply ) then return end
+	
+	local fire = ply:KeyDown( IN_ATTACK )
+	local fire2 = ply:KeyDown( IN_ATTACK2 )
+	
+	if fire then
+		self:PrimaryAttack( vehicle )
+	end
+	
+	if fire2 then
+		self:SecondaryAttack( vehicle )
+	end
+end
+
+
+function simfphys.weapon:PrimaryAttack( vehicle, ply )
+	if not self:CanPrimaryAttack( vehicle ) then return end
+	
+	--primary attack code here
+	print("primary fire")
+	vehicle:EmitSound("Weapon_SMG1.NPC_Single")
+	
+	self:SetNextPrimaryFire( vehicle, CurTime() + 0.1 )
+end
+
+function simfphys.weapon:SecondaryAttack( vehicle, ply, deltapos, cPos, cAng )
+	
+	if not self:CanSecondaryAttack( vehicle ) then return end
+	
+	--secondary attack code here
+	print("secondary fire")
+	vehicle:EmitSound("Weapon_Mortar.Single")
+	
+	self:SetNextSecondaryFire( vehicle, CurTime() + 0.3 )
+end
+
+function simfphys.weapon:CanPrimaryAttack( vehicle )
+	vehicle.NextShoot = vehicle.NextShoot or 0
+	return vehicle.NextShoot < CurTime()
+end
+
+function simfphys.weapon:SetNextPrimaryFire( vehicle, time )
+	vehicle.NextShoot = time
+end
+
+function simfphys.weapon:CanSecondaryAttack( vehicle )
+	vehicle.NextShoot2 = vehicle.NextShoot2 or 0
+	return vehicle.NextShoot2 < CurTime()
+end
+
+function simfphys.weapon:SetNextSecondaryFire( vehicle, time )
+	vehicle.NextShoot2 = time
 end
 
 
