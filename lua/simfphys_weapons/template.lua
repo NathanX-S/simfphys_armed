@@ -26,11 +26,11 @@ function simfphys.weapon:Think( vehicle )
 	local fire2 = ply:KeyDown( IN_ATTACK2 )
 	
 	if fire then
-		self:PrimaryAttack( vehicle )
+		self:PrimaryAttack( vehicle, ply )
 	end
 	
 	if fire2 then
-		self:SecondaryAttack( vehicle )
+		self:SecondaryAttack( vehicle, ply )
 	end
 end
 
@@ -45,7 +45,7 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply )
 	self:SetNextPrimaryFire( vehicle, CurTime() + 0.1 )
 end
 
-function simfphys.weapon:SecondaryAttack( vehicle, ply, deltapos, cPos, cAng )
+function simfphys.weapon:SecondaryAttack( vehicle, ply )
 	
 	if not self:CanSecondaryAttack( vehicle ) then return end
 	
