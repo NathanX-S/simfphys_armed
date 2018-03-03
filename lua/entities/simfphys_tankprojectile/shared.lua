@@ -6,7 +6,7 @@ ENT.Author = ""
 ENT.Information = ""
 ENT.Category = "simfphys Armed Vehicles"
 
-ENT.Spawnable = true
+ENT.Spawnable = false
 ENT.AdminOnly = false
 
 function ENT:SetupDataTables()
