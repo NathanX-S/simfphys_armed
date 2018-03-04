@@ -470,6 +470,8 @@ local V = {
 		
 		LightsTable = "conapc",
 		
+		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
 		CustomWheels = true,
 		CustomSuspensionTravel = 10,
 		
@@ -1094,6 +1096,8 @@ local V = {
 		AirFriction = 5,
 		Inertia = Vector(14017.5,46543,47984.5),
 		
+		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
 		MaxHealth = 8000,
 		
 		IsArmored = true,
@@ -1249,6 +1253,8 @@ local V = {
 		Mass = 8000,
 		AirFriction = 7,
 		Inertia = Vector(14000,47000,48000),
+		
+		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
 		
 		MaxHealth = 6000,
 		
@@ -1426,9 +1432,11 @@ local V = {
 		Mass = 20000,
 		AirFriction = 250,
 		--Inertia = Vector(14017.5,46543,47984.5),
-		Inertia = Vector(280000,15000,100000),
+		Inertia = Vector(30000,15000,100000),
 		
 		LightsTable = "leopard",
+		
+		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
 		
 		MaxHealth = 8200,
 		
@@ -1459,7 +1467,7 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,8),
 		
-		CustomSteerAngle = 35,
+		CustomSteerAngle = 60,
 		
 		SeatOffset = Vector(55,25,35),
 		SeatPitch = -15,
@@ -1516,7 +1524,7 @@ local V = {
 		TurnSpeed = 3,
 		
 		MaxGrip = 800,
-		Efficiency = 0.52,
+		Efficiency = 0.6,
 		GripOffset = -250,
 		BrakePower = 450,
 		BulletProofTires = true,
