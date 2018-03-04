@@ -90,7 +90,7 @@ function ENT:Think()
 	else
 		self:SetPos( self:GetPos() + self.Vel * FixTick )
 		
-		self.Vel = self.Vel - Vector(0,0,0.1) * FixTick
+		self.Vel = self.Vel - Vector(0,0,0.15) * FixTick
 	end
 	
 	if (self.SpawnTime + 12) < curtime then
