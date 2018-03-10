@@ -3,6 +3,7 @@ local next_find = 0
 local tigers = {}
 local shermans = {}
 local leopards = {}
+local t90s = {}
 
 local function TigersGetAll()
 	local tiger_tanks = {}
@@ -30,6 +31,20 @@ local function LeopardsGetAll()
 	end
 	
 	return leopard_tanks 
+end
+
+local function T90sGetAll()
+	local t90_tanks = {}
+	
+	for i, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
+		local class = ent:GetSpawn_List()
+		
+		if class == "sim_fphys_tank4" then
+			table.insert(t90_tanks, ent)
+		end
+	end
+	
+	return t90_tanks 
 end
 
 local function ShermansGetAll()
@@ -117,6 +132,26 @@ local function UpdateLeopardScrollTexture( ent )
 	ent:SetSubMaterial( 3, "!l_trackmat_"..id.."_right" )
 end
 
+
+local function UpdateT90ScrollTexture( ent )
+	local id = ent:EntIndex()
+
+	if not ent.wheel_left_mat then
+		ent.wheel_left_mat = CreateMaterial("t90_trackmat_"..id.."_left", "VertexLitGeneric", { ["$basetexture"] = "models/blu/t90ms/t90ms_track_a_c", ["$alphatest"] = "1",  ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+	end
+
+	if not ent.wheel_right_mat then
+		ent.wheel_right_mat = CreateMaterial("t90_trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/t90ms/t90ms_track_a_c", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+	end
+	
+	local TrackPos = GetTrackPos( ent, 80, 0.25 )
+	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
+
+	ent:SetSubMaterial( 2, "!t90_trackmat_"..id.."_left" ) 
+	ent:SetSubMaterial( 1, "!t90_trackmat_"..id.."_right" )
+end
+
 local function UpdateTracks()
 	if tigers then
 		for index, ent in pairs( tigers ) do
@@ -147,6 +182,16 @@ local function UpdateTracks()
 			end
 		end
 	end
+	
+	if t90s then
+		for index, ent in pairs( t90s ) do
+			if IsValid( ent ) then
+				UpdateT90ScrollTexture( ent )
+			else
+				t90s[index] = nil
+			end
+		end
+	end
 end
 
 net.Receive( "simfphys_register_tank", function( length )
@@ -163,6 +208,9 @@ net.Receive( "simfphys_register_tank", function( length )
 		
 	elseif type == "leopard" then
 		table.insert(leopards, tank)
+		
+	elseif type == "t90ms" then
+		table.insert(t90s, tank)
 	end
 end)
 
@@ -225,6 +273,9 @@ hook.Add( "Think", "simfphys_manage_tanks", function()
 		
 		elseif NumCycl >= 3 then
 			leopards = LeopardsGetAll()
+			
+		elseif NumCycl >= 4 then
+			t90s = T90sGetAll()
 			NumCycl = 0
 		end
 	end

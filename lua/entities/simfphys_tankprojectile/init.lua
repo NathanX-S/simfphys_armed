@@ -66,6 +66,7 @@ function ENT:Think()
 			bullet.HullSize		= self:GetSize()
 			bullet.Attacker 	= self.Attacker
 			bullet.Callback = function(att, tr, dmginfo)
+				dmginfo:SetDamageType(DMG_AIRBOAT)
 				local attackingEnt = IsValid( self.AttackingEnt ) and self.AttackingEnt or self
 				util.BlastDamage( attackingEnt, self.Attacker, tr.HitPos,self.BlastRadius,self.BlastDamage)
 				

@@ -16,33 +16,18 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 
 	vehicle:EmitSound("tiger_fire_mg")
 	
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin + shootDirection * 50
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 2
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 12
-		bullet.Damage		= 30
-		bullet.HullSize		= 5
-		bullet.Attacker 	= ply
-		bullet.IgnoreEntity = vehicle.Wheels[2]
-		
-		bullet.Callback = function(att, tr, dmginfo)
-			if tr.Entity ~= Entity(0) then
-				if simfphys.IsCar( tr.Entity ) then
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + tr.HitNormal )
-						effectdata:SetNormal( tr.HitNormal )
-					util.Effect( "stunstickimpact", effectdata, true, true )
-				
-					sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
-				end
-			end
-		end
-		
-	vehicle:FireBullets( bullet )
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.Tracer	= 2
+		projectile.HullSize = 5
+		projectile.attackingent = vehicle
+		projectile.Damage = 30
+		projectile.Force = 12
+	simfphys.FireHitScan( projectile )
+	
 end
 
 local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
