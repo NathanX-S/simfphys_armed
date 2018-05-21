@@ -1,38 +1,3 @@
-local function simfphyslerpView( ply, view )
-	
-	ply.simfphys_smooth_in = ply.simfphys_smooth_in or 1
-	ply.simfphys_smooth_out = ply.simfphys_smooth_out or 1
-	
-	if ply:InVehicle() then
-		if ply.simfphys_smooth_in < 0.999 then
-			ply.simfphys_smooth_in = ply.simfphys_smooth_in + (1 - ply.simfphys_smooth_in) * FrameTime() * 5
-			
-			view.origin = LerpVector(ply.simfphys_smooth_in, ply.simfphys_eyepos_in, view.origin )
-			view.angles = LerpAngle(ply.simfphys_smooth_in, ply.simfphys_eyeang_in, view.angles )
-		end
-		
-		local vehicle = ply:GetVehicle()
-		if IsValid(vehicle) then
-			ply.simfphys_eyeang_out = view.angles
-			ply.simfphys_eyepos_out = view.origin
-		end
-	else
-		if ply.simfphys_smooth_out < 0.999 then
-			ply.simfphys_smooth_out = ply.simfphys_smooth_out + (1 - ply.simfphys_smooth_out) * FrameTime() * 5
-			
-			view.origin = LerpVector(ply.simfphys_smooth_out, ply.simfphys_eyepos_out, ply:GetShootPos() )
-			view.angles = LerpAngle(ply.simfphys_smooth_out, ply.simfphys_eyeang_out, ply:EyeAngles() )
-		end
-		
-		ply.simfphys_eyeang_in = view.angles
-		ply.simfphys_eyepos_in = view.origin
-	end
-	
-	ply.shootpos = view.origin
-	ply.shootang = view.angles
-	
-	return view
-end
 
 hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 	if not IsValid( ply ) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
@@ -74,7 +39,7 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 			view.origin = attachment.Pos + attachment.Ang:Forward() * offset.x  + attachment.Ang:Right() * offset.y  + attachment.Ang:Up() *  offset.z
 		end
 		
-		return simfphyslerpView( ply, view )
+		return view
 	end
 	
 	view.origin = view.origin + Vehicle:GetForward() * offset.x + Vehicle:GetRight() * offset.y + Vehicle:GetUp() * offset.z
@@ -105,5 +70,5 @@ hook.Add( "CalcView", "simfphys_gunner_view", function( ply, pos, ang )
 		view.origin = view.origin + tr.HitNormal * WallOffset
 	end
 	
-	return simfphyslerpView( ply, view )
+	return view
 end )
