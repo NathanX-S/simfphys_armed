@@ -448,7 +448,7 @@ function simfphys.weapon:UpdateSuspension( vehicle )
 			mins = -Vector(10,10,0),
 			filter = vehicle.filterEntities,
 		} )
-		local Dist = (pos - trace.HitPos):Length() - 52.5
+		local Dist = (pos - trace.HitPos):Length() - 53
 		
 		if trace.Hit then
 			vehicle.susOnGround = true
