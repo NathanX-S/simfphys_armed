@@ -17,24 +17,19 @@ local Materials = {
 	"particle/smokesprites_0015",
 	"particle/smokesprites_0016"
 }
-
-local function RandVector(min,max)
-	min = min or -1
-	max = max or 1
-	
-	local vec = Vector(math.Rand(min,max),math.Rand(min,max),math.Rand(min,max))
-	return vec
-end
-
 function EFFECT:Init( data )
 	local vehicle = data:GetEntity()
 	
 	local ID = vehicle:LookupAttachment( "muzzle" )
+	if ID == 0 then return end
+	
 	local Attachment = vehicle:GetAttachment( ID )
 	
 	local Pos = Attachment.Pos
 	local Dir = Attachment.Ang:Up()
 	local vel = vehicle:GetVelocity()
+	
+	self.emitter = ParticleEmitter( Pos, false )
 	
 	self:Muzzle( Pos, Dir, vel )
 	self:Smoke( Pos, Dir, vel )
@@ -48,10 +43,10 @@ function EFFECT:Init( data )
 end
 
 function EFFECT:Muzzle( pos, dir, vel )
-	local emitter = ParticleEmitter( pos, false )
+	if not self.emitter then return end
 	
 	for i = 0,20 do
-		local particle = emitter:Add( "effects/muzzleflash2", pos )
+		local particle = self.emitter:Add( "effects/muzzleflash2", pos )
 
 		if particle then
 			particle:SetVelocity( dir * math.Rand(50,200) + vel )
@@ -64,20 +59,18 @@ function EFFECT:Muzzle( pos, dir, vel )
 			particle:SetCollide( false )
 		end
 	end
-	
-	emitter:Finish()
 end
 
 function EFFECT:Smoke( pos, dir, vel )
-	local emitter = ParticleEmitter( pos, false )
+	if not self.emitter then return end
 	
 	for i = 0,10 do
-		local particle = emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
+		local particle = self.emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
 		
 		local rCol = math.Rand(120,140)
 		
 		if particle then
-			particle:SetVelocity( dir * math.Rand(300,1300) + RandVector() * math.Rand(0,10) + vel )
+			particle:SetVelocity( dir * math.Rand(300,1300) + VectorRand() * math.Rand(0,10) + vel )
 			particle:SetDieTime( math.Rand(3,4) )
 			particle:SetAirResistance( math.Rand(300,600) ) 
 			particle:SetStartAlpha( math.Rand(50,150) )
@@ -85,23 +78,22 @@ function EFFECT:Smoke( pos, dir, vel )
 			particle:SetEndSize( math.Rand(80,160) )
 			particle:SetRoll( math.Rand(-1,1) )
 			particle:SetColor( rCol,rCol,rCol )
-			particle:SetGravity( RandVector() * 200 + Vector(0,0,200) )
+			particle:SetGravity( VectorRand() * 200 + Vector(0,0,200) )
 			particle:SetCollide( false )
 		end
 	end
-	
-	emitter:Finish()
 end
 
 function EFFECT:Smoke2( pos, dir, dir_muzzle, vel )
+	if not self.emitter then return end
+	
 	pos = pos + dir_muzzle * 5
-	local emitter = ParticleEmitter( pos, false )
 	
 	for i = 0,20 do
-		local particle = emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
+		local particle = self.emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
 		
 		if particle then
-			particle:SetVelocity( dir * math.Rand(250,800) + RandVector() * math.Rand(0,50) + vel)
+			particle:SetVelocity( dir * math.Rand(250,800) + VectorRand() * math.Rand(0,50) + vel)
 			particle:SetDieTime( math.Rand(1,3) )
 			particle:SetAirResistance( 800 ) 
 			particle:SetStartAlpha( 150 )
@@ -113,8 +105,6 @@ function EFFECT:Smoke2( pos, dir, dir_muzzle, vel )
 			particle:SetCollide( false )
 		end
 	end
-	
-	emitter:Finish()
 end
 
 
@@ -123,35 +113,37 @@ function EFFECT:Think()
 	if not IsValid( vehicle ) then return false end
 	
 	if self.DieTime > CurTime() then
-		local intensity = ((self.DieTime - CurTime()) / self.Time)
-		
-		local Attachment = vehicle:GetAttachment( self.AttachmentID )
-		local dir = Attachment.Ang:Up()
-		local pos = Attachment.Pos + dir * 15
-		
-		local emitter = ParticleEmitter( pos, false )
-	
-		for i = 0,math.Rand(3,6) do
-			local particle = emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
+		if self.emitter then
+			local intensity = ((self.DieTime - CurTime()) / self.Time)
 			
-			if particle then
-				particle:SetVelocity( dir * 2 + RandVector() * 10 )
-				particle:SetDieTime( math.Rand(1,2) )
-				particle:SetAirResistance( 0 ) 
-				particle:SetStartAlpha( (intensity ^ 5) * 20 )
-				particle:SetStartSize( intensity * 5 )
-				particle:SetEndSize( math.Rand(10,20) * intensity )
-				particle:SetRoll( math.Rand(-1,1) )
-				particle:SetColor( 120,120,120 )
-				particle:SetGravity( Vector(0,0,20) + RandVector() * math.Rand(0,5) )
-				particle:SetCollide( false )
+			local Attachment = vehicle:GetAttachment( self.AttachmentID )
+			local dir = Attachment.Ang:Up()
+			local pos = Attachment.Pos + dir * 15
+		
+			for i = 0,math.Rand(3,6) do
+				local particle = self.emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
+				
+				if particle then
+					particle:SetVelocity( dir * 2 + VectorRand() * 10 )
+					particle:SetDieTime( math.Rand(1,2) )
+					particle:SetAirResistance( 0 ) 
+					particle:SetStartAlpha( (intensity ^ 5) * 20 )
+					particle:SetStartSize( intensity * 5 )
+					particle:SetEndSize( math.Rand(10,20) * intensity )
+					particle:SetRoll( math.Rand(-1,1) )
+					particle:SetColor( 120,120,120 )
+					particle:SetGravity( Vector(0,0,20) + VectorRand() * math.Rand(0,5) )
+					particle:SetCollide( false )
+				end
 			end
 		end
 		
-		emitter:Finish()
-		
 		return true
 	else
+		if self.emitter then
+			self.emitter:Finish()
+		end
+		
 		return false
 	end
 end

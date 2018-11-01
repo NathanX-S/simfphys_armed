@@ -17,21 +17,10 @@ local Materials = {
 	"particle/smokesprites_0015",
 	"particle/smokesprites_0016"
 }
-
-local function RandVector(min,max)
-	min = min or -1
-	max = max or 1
-	
-	local vec = Vector(math.Rand(min,max),math.Rand(min,max),math.Rand(min,max))
-	return vec
-end
-
 function EFFECT:Init( data )
 	local Pos = data:GetOrigin()
 	
 	self:Explosion( Pos )
-	--self:ShockWave( Pos )
-	--self:Debris( Pos )
 	
 	local random = math.random(1,3)
 	
@@ -44,31 +33,6 @@ function EFFECT:Init( data )
 	end
 end
 
-function EFFECT:Debris( pos )
-	local emitter = ParticleEmitter( pos, false )
-	
-	for i = 0,60 do
-		local particle = emitter:Add( "effects/fleck_tile"..math.random(1,2), pos )
-		local vel = RandVector(-1,1) * 300
-		vel.z = math.Rand(200,600)
-		if particle then
-			particle:SetVelocity( vel )
-			particle:SetDieTime( math.Rand(3,5) )
-			particle:SetAirResistance( 10 ) 
-			particle:SetStartAlpha( 150 )
-			particle:SetStartSize( 5 )
-			particle:SetEndSize( 5 )
-			particle:SetRoll( math.Rand(-1,1) )
-			particle:SetColor( 0,0,0 )
-			particle:SetGravity( Vector( 0, 0, -600 ) )
-			particle:SetCollide( true )
-			particle:SetBounce( 0.3 )
-		end
-	end
-	
-	emitter:Finish()
-end
-
 function EFFECT:Explosion( pos )
 	local emitter = ParticleEmitter( pos, false )
 	
@@ -76,7 +40,7 @@ function EFFECT:Explosion( pos )
 		local particle = emitter:Add( Materials[math.random(1,table.Count( Materials ))], pos )
 		
 		if particle then
-			particle:SetVelocity( RandVector(-1,1) * 800 )
+			particle:SetVelocity( VectorRand() * 800 )
 			particle:SetDieTime( math.Rand(0.8,1.6) )
 			particle:SetAirResistance( math.Rand(200,600) ) 
 			particle:SetStartAlpha( 255 )
@@ -93,7 +57,7 @@ function EFFECT:Explosion( pos )
 		local particle = emitter:Add( "sprites/flamelet"..math.random(1,5), pos )
 		
 		if particle then
-			particle:SetVelocity( RandVector(-1,1) * 1000 )
+			particle:SetVelocity( VectorRand() * 1000 )
 			particle:SetDieTime( 0.14 )
 			particle:SetStartAlpha( 255 )
 			particle:SetStartSize( 10 )
@@ -118,33 +82,6 @@ function EFFECT:Explosion( pos )
 		dlight.Size = 300
 		dlight.DieTime = CurTime() + 0.1
 	end
-end
-
-function EFFECT:ShockWave( pos )
-	local emitter1 = ParticleEmitter( pos, false )
-	
-	for i = 0,36 do
-		local particle = emitter1:Add( Materials[math.Round(math.Rand(1,table.Count( Materials )),0)], pos )
-		
-		if particle then
-			local ang = i * 10
-			local X = math.cos( math.rad(ang) )
-			local Y = math.sin( math.rad(ang) )
-			
-			particle:SetVelocity( Vector(X,Y,0) * math.Rand(4000,5000) )
-			particle:SetDieTime( 1 )
-			particle:SetAirResistance( 800 ) 
-			particle:SetStartAlpha( 200 )
-			particle:SetStartSize( 0 )
-			particle:SetEndSize( math.Rand(40,100) )
-			particle:SetRoll( math.Rand(-1,1) )
-			particle:SetColor( 80,80,80 )
-			particle:SetGravity( Vector( 0, 0, 1000 ) )
-			particle:SetCollide( false )
-		end
-	end
-	
-	emitter1:Finish()
 end
 
 function EFFECT:Think()
