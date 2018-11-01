@@ -3,7 +3,7 @@ resource.AddWorkshop("831680603")
 simfphys = istable( simfphys ) and simfphys or {}
 
 simfphys.ManagedVehicles = istable( simfphys.ManagedVehicles ) and simfphys.ManagedVehicles or {}
-simfphys.Weapons = istable( simfphys.Weapons ) and simfphys.Weapons or {}
+simfphys.Weapons = {}
 simfphys.weapon = {}
 
 util.AddNetworkString( "simfphys_register_tank" )
@@ -246,6 +246,16 @@ end
 function simfphys.armedAutoRegister( vehicle )
 	if not IsValid( vehicle ) then return end
 	
+	simfphys.Weapons = istable( simfphys.Weapons ) and table.Empty( simfphys.Weapons ) or {}
+	
+	for k,v in pairs( simfphys.WeaponsGetAll() ) do
+		local name = string.Explode( ".", v )[1]
+		
+		include("simfphys_weapons/"..v)
+		
+		simfphys.Weapons[ name ] = table.Copy( simfphys.weapon )
+	end
+	
 	local class = vehicle:GetSpawn_List()
 	
 	for wpnname,tbldata in pairs( simfphys.Weapons ) do
@@ -263,19 +273,12 @@ function simfphys.armedAutoRegister( vehicle )
 	end
 end
 
-for k,v in pairs( simfphys.WeaponsGetAll() ) do
-	local name = string.Explode( ".", v )[1]
-	
-	include("simfphys_weapons/"..v)
-	
-	simfphys.Weapons[ name ] = table.Copy( simfphys.weapon )
-end
-
-
 hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
 	if not simfphys.IsCar( vehicle ) then return end
 	
 	if not simfphys.VERSION or simfphys.VERSION < 1.0 then
+		print("SIMFPHYS ARMED: please update simfphys base")
+		
 		timer.Simple( 0.2, function()
 			simfphys.armedAutoRegister( vehicle )
 		end)
