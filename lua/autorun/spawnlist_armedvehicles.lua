@@ -281,8 +281,8 @@ local V = {
 		
 		PassengerSeats = {
 			{
-			pos = Vector(16,-35,16),
-			ang = Angle(0,0,0)
+			pos = Vector(16,-35,21),
+			ang = Angle(0,0,9)
 			}
 		},
 		
@@ -376,8 +376,8 @@ local V = {
 		
 		PassengerSeats = {
 			{
-			pos = Vector(16,-35,16),
-			ang = Angle(0,0,0)
+			pos = Vector(16,-35,21),
+			ang = Angle(0,0,9)
 			}
 		},
 		
@@ -773,7 +773,7 @@ local V = {
 		
 		MaxGrip = 140,
 		Efficiency = 1,
-		GripOffset = 5,
+		GripOffset = -5,
 		BrakePower = 120,
 		BulletProofTires = true,
 		
@@ -904,7 +904,7 @@ local V = {
 		
 		MaxGrip = 140,
 		Efficiency = 1,
-		GripOffset = 5,
+		GripOffset = -5,
 		BrakePower = 120,
 		BulletProofTires = true,
 		
@@ -1034,7 +1034,7 @@ local V = {
 		
 		MaxGrip = 140,
 		Efficiency = 1,
-		GripOffset = 5,
+		GripOffset = -5,
 		BrakePower = 120,
 		BulletProofTires = true,
 		
@@ -1094,9 +1094,19 @@ local V = {
 	Members = {
 		Mass = 10000,
 		AirFriction = 5,
-		Inertia = Vector(14017.5,46543,47984.5),
+		Inertia = Vector(10000,80000,100000),
 		
 		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
+		OnDestroyed = 
+			function(ent)
+				if IsValid( ent.Gib ) then 
+					local yaw = ent.sm_pp_yaw or 0
+					local pitch = ent.sm_pp_pitch or 0
+					ent.Gib:SetPoseParameter("turret_yaw", yaw )
+					ent.Gib:SetPoseParameter("turret_pitch", pitch )
+				end
+			end,
 		
 		MaxHealth = 8000,
 		
@@ -1188,14 +1198,14 @@ local V = {
 		TurnSpeed = 6,
 		
 		MaxGrip = 800,
-		Efficiency = 0.42,
+		Efficiency = 0.7,
 		GripOffset = -300,
 		BrakePower = 150,
 		BulletProofTires = true,
 		
 		IdleRPM = 600,
 		LimitRPM = 4500,
-		PeakTorque = 320,
+		PeakTorque = 280,
 		PowerbandStart = 600,
 		PowerbandEnd = 3500,
 		Turbocharged = false,
@@ -1233,8 +1243,8 @@ local V = {
 		
 		ForceTransmission = 1,
 		
-		DifferentialGear = 0.2,
-		Gears = {-0.1,0,0.05,0.07,0.09,0.11,0.13,0.16}
+		DifferentialGear = 0.21,
+		Gears = {-0.1,0,0.05,0.07,0.09,0.11,0.13}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank", V )
@@ -1252,9 +1262,19 @@ local V = {
 	Members = {
 		Mass = 8000,
 		AirFriction = 7,
-		Inertia = Vector(14000,47000,48000),
+		Inertia = Vector(10000,80000,100000),
 		
 		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
+		OnDestroyed = 
+			function(ent)
+				if IsValid( ent.Gib ) then 
+					local yaw = ent.sm_pp_yaw or 0
+					local pitch = ent.sm_pp_pitch or 0
+					ent.Gib:SetPoseParameter("turret_yaw", yaw )
+					ent.Gib:SetPoseParameter("turret_pitch", pitch )
+				end
+			end,
 		
 		MaxHealth = 6000,
 		
@@ -1313,15 +1333,15 @@ local V = {
 			}
 		},
 		
-		FrontHeight = 20,
+		FrontHeight = 22,
 		FrontConstant = 50000,
-		FrontDamping = 4000,
-		FrontRelativeDamping = 4000,
+		FrontDamping = 5000,
+		FrontRelativeDamping = 5000,
 		
-		RearHeight = 20,
+		RearHeight = 22,
 		RearConstant = 50000,
-		RearDamping = 4000,
-		RearRelativeDamping = 4000,
+		RearDamping = 5000,
+		RearRelativeDamping = 5000,
 		
 		FastSteeringAngle = 14,
 		SteeringFadeFastSpeed = 400,
@@ -1331,7 +1351,7 @@ local V = {
 		MaxGrip = 800,
 		Efficiency = 0.85,
 		GripOffset = -300,
-		BrakePower = 150,
+		BrakePower = 100,
 		BulletProofTires = true,
 		
 		IdleRPM = 600,
@@ -1375,7 +1395,7 @@ local V = {
 		ForceTransmission = 1,
 		
 		DifferentialGear = 0.3,
-		Gears = {-0.1,0,0.05,0.08,0.11,0.14,0.17}
+		Gears = {-0.1,0,0.05,0.08,0.11,0.14}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank2", V )
@@ -1450,11 +1470,21 @@ local V = {
 		Mass = 20000,
 		AirFriction = 120,
 		--Inertia = Vector(14017.5,46543,47984.5),
-		Inertia = Vector(30000,15000,100000),
+		Inertia = Vector(80000,20000,100000),
 		
 		LightsTable = "leopard",
 		
 		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
+		OnDestroyed = 
+			function(ent)
+				if IsValid( ent.Gib ) then 
+					local yaw = ent.sm_pp_yaw or 0
+					local pitch = ent.sm_pp_pitch or 0
+					ent.Gib:SetPoseParameter("cannon_aim_yaw", yaw - 90 )
+					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
+				end
+			end,
 		
 		MaxHealth = 8200,
 		
@@ -1541,9 +1571,9 @@ local V = {
 		
 		TurnSpeed = 3,
 		
-		MaxGrip = 800,
-		Efficiency = 0.6,
-		GripOffset = -250,
+		MaxGrip = 1000,
+		Efficiency = 1,
+		GripOffset = -500,
 		BrakePower = 450,
 		BulletProofTires = true,
 		
@@ -1586,8 +1616,8 @@ local V = {
 		snd_horn = "common/null.wav",
 		ForceTransmission = 1,
 		
-		DifferentialGear = 0.34,
-		Gears = {-0.08,0,0.06,0.08,0.1,0.11,0.125,0.14,0.16}
+		DifferentialGear = 0.4,
+		Gears = {-0.06,0,0.06,0.08,0.1,0.12,0.13}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank3", V )
@@ -1606,11 +1636,21 @@ local V = {
 		Mass = 20000,
 		AirFriction = 0,
 		--Inertia = Vector(14017.5,46543,47984.5),
-		Inertia = Vector(15000,30000,100000),
+		Inertia = Vector(20000,80000,100000),
 		
 		LightsTable = "t90ms",
 		
 		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		
+		OnDestroyed = 
+			function(ent)
+				if IsValid( ent.Gib ) then 
+					local yaw = ent.sm_pp_yaw or 0
+					local pitch = ent.sm_pp_pitch or 0
+					ent.Gib:SetPoseParameter("cannon_aim_yaw", yaw - 180 )
+					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
+				end
+			end,
 		
 		MaxHealth = 8200,
 		
@@ -1694,9 +1734,9 @@ local V = {
 		
 		TurnSpeed = 3,
 		
-		MaxGrip = 800,
-		Efficiency = 0.6,
-		GripOffset = -250,
+		MaxGrip = 1000,
+		Efficiency = 1,
+		GripOffset = -500,
 		BrakePower = 450,
 		BulletProofTires = true,
 		
@@ -1739,8 +1779,8 @@ local V = {
 		snd_horn = "common/null.wav",
 		ForceTransmission = 1,
 		
-		DifferentialGear = 0.34,
-		Gears = {-0.08,0,0.06,0.08,0.1,0.11,0.125,0.14,0.16}
+		DifferentialGear = 0.4,
+		Gears = {-0.06,0,0.06,0.08,0.1,0.12,0.13}
 	}
 }
 list.Set( "simfphys_vehicles", "sim_fphys_tank4", V )
