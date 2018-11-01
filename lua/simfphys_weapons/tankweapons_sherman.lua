@@ -75,55 +75,6 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.BlastEffect = "simfphys_tankweapon_explosion_small"
 	
 	simfphys.FirePhysProjectile( projectile )
-	
-	--[[
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 0
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 6000
-		bullet.Damage		= 1000
-		bullet.HullSize		= 8
-		bullet.Attacker 		= ply
-		bullet.IgnoreEntity  	= vehicle
-		bullet.Callback = function(att, tr, dmginfo)
-			
-			net.Start( "simfphys_tank_do_effect" )
-				net.WriteEntity( vehicle )
-				net.WriteString( "Explosion_small" )
-				net.WriteVector( tr.HitPos )
-			net.Broadcast()
-			
-			util.BlastDamage( vehicle, ply, tr.HitPos,200,50)
-			
-			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
-			
-			if tr.Entity ~= Entity(0) then
-				if simfphys.IsCar( tr.Entity ) then
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + shootDirection * tr.Entity:BoundingRadius() )
-						effectdata:SetNormal( shootDirection * 10 )
-					util.Effect( "manhacksparks", effectdata, true, true )
-					
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + tr.HitNormal )
-						effectdata:SetNormal( tr.HitNormal )
-					util.Effect( "manhacksparks", effectdata, true, true )
-				
-					sound.Play( Sound( "doors/vent_open"..math.random(1,3)..".wav" ), tr.HitPos, 140)
-				else
-					sound.Play( Sound( "ambient/explosions/explode_1.wav" ), tr.HitPos + tr.HitNormal, 75, 200, 1 )
-				end
-			else
-				sound.Play( Sound( "ambient/explosions/explode_1.wav" ), tr.HitPos + tr.HitNormal, 75, 200, 1 )
-			end
-		end
-		
-	vehicle:FireBullets( bullet )
-	]]--
 end
 
 function simfphys.weapon:ValidClasses()
@@ -339,27 +290,21 @@ end
 
 function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )	
 	if not IsValid( pod ) then return end
-
+	
 	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
+	local AimRate = 80
+	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
-	Angles:Normalize()
 	
-	vehicle.sm_dir  = vehicle.sm_dir or Vector(1,0,0)
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	local L_Right = Angle(0,Aimang.y,0):Right()
-	local La_Right = Angle(0,Attachment.Ang.y,0):Right()
-	local AimRate = 40 * FrameTime() * 66.666
-	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
-	
-	local TargetPitch = Angles.p
-	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
-	
-	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05
-	vehicle.sm_pitch = vehicle.sm_pitch and (vehicle.sm_pitch + (TargetPitch - vehicle.sm_pitch) * 0.05) or 0
-	
-	vehicle:SetPoseParameter("turret_yaw", vehicle.sm_dir:Angle().y )
-	vehicle:SetPoseParameter("turret_pitch", vehicle.sm_pitch )
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
+
+	vehicle:SetPoseParameter("turret_yaw", TargetAng.y )
+	vehicle:SetPoseParameter("turret_pitch", TargetAng.p )
 end
 
 function simfphys.weapon:CanPrimaryAttack( vehicle )

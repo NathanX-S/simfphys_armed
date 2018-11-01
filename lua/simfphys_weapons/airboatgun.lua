@@ -27,6 +27,7 @@ function simfphys.weapon:ValidClasses()
 	
 	local classes = {
 		"sim_fphys_jeep_armed2",
+		"sim_fphys_v8elite_armed2"
 	}
 	
 	return classes
@@ -57,17 +58,20 @@ end
 
 function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
 	local Aimang = ply:EyeAngles()
+	local AimRate = 250
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
-	Angles:Normalize()
 	
-	local Rate = 3
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + math.Clamp(Angles.y - vehicle.sm_pp_yaw,-Rate,Rate) ) or 0
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and ( vehicle.sm_pp_pitch + math.Clamp(Angles.p - vehicle.sm_pp_pitch,-Rate,Rate) ) or 0
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
 	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw )
-	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch )
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", -TargetAng.y )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", -TargetAng.p )
+	
+	return Aimang
 end
 
 function simfphys.weapon:Think( vehicle )

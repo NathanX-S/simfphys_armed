@@ -68,8 +68,6 @@ end
 function simfphys.weapon:Initialize( vehicle )
 	local class = vehicle:GetSpawn_List()
 	vehicle.neg = class == "sim_fphys_ratmobile" and 1 or -1
-	
-	vehicle.VehicleData["steerangle"] = 45
 
 	local data = {}
 	data.Attachment = "machinegun_ref"
@@ -81,6 +79,8 @@ function simfphys.weapon:Initialize( vehicle )
 end
 
 function simfphys.weapon:Think( vehicle )
+	vehicle.VehicleData["steerangle"] = 45
+	
 	local curtime = CurTime()
 	
 	local DriverSeat = vehicle:GetDriverSeat()
@@ -102,7 +102,7 @@ function simfphys.weapon:Think( vehicle )
 		return
 	end
 	
-	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	vehicle.wOldPos = vehicle.wOldPos or vehicle:GetPos()
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
 	vehicle.wOldPos = vehicle:GetPos()
 	

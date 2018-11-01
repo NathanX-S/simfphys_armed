@@ -52,17 +52,20 @@ function simfphys.weapon:Initialize( vehicle )
 	simfphys.RegisterCrosshair( pod )
 end
 
-function simfphys.weapon:AimWeapon( ply, vehicle, pod, Attachment )	
+function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
 	local Aimang = ply:EyeAngles()
+	local AimRate = 250
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
-	Angles:Normalize()
 	
-	vehicle.sm_dir = vehicle.sm_dir and (vehicle.sm_dir + (-Angles:Forward() - vehicle.sm_dir) * 0.1) or Vector(0,0,0)
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and (vehicle.sm_pp_pitch + (Angles.p - vehicle.sm_pp_pitch) * 0.2) or 0
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", vehicle.sm_dir:Angle().y - 180 )
-	vehicle:SetPoseParameter("vehicle_weapon_pitch", vehicle.sm_pp_pitch )
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
+	
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", TargetAng.y )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", TargetAng.p )
 	
 	return Aimang
 end
@@ -87,7 +90,7 @@ function simfphys.weapon:Think( vehicle )
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
 	
-	local Aimang = self:AimWeapon( ply, vehicle, pod, Attachment )
+	local Aimang = self:AimWeapon( ply, vehicle, pod )
 	
 	local tr = util.TraceLine( {
 		start = Attachment.Pos,

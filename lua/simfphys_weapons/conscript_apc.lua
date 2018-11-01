@@ -2,29 +2,6 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 
 	vehicle:EmitSound("apc_fire")
 	
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 3
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 50
-		bullet.Damage		= 15
-		bullet.HullSize		= 20
-		bullet.Attacker 	= ply
-		bullet.Callback = function(att, tr, dmginfo)
-			local effectdata = EffectData()
-				effectdata:SetOrigin( tr.HitPos )
-				util.Effect( "helicoptermegabomb", effectdata, true, true )
-				
-			util.BlastDamage( vehicle, ply, tr.HitPos,50,20)
-			
-		end
-		
-	vehicle:FireBullets( bullet )
-	
-	--[[
 	local projectile = {}
 		projectile.filter = vehicle.VehicleData["filter"]
 		projectile.shootOrigin = shootOrigin
@@ -39,7 +16,6 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.BlastEffect = "helicoptermegabomb"
 	
 	simfphys.FirePhysProjectile( projectile )
-	]]--
 end
 
 function simfphys.weapon:ValidClasses()
@@ -69,33 +45,20 @@ function simfphys.weapon:Initialize( vehicle )
 	end
 end
 
-
 function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
-	if not IsValid( pod ) then return end
-
-	local ID = vehicle:LookupAttachment( "muzzle_left" )
-	local Attachment = vehicle:GetAttachment( ID )
-	
 	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
+	local AimRate = 100
 	
-	local Angles = vehicle:WorldToLocalAngles( Aimang )
-	Angles:Normalize()
+	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
 	
-	vehicle.sm_dir  = vehicle.sm_dir or Vector(0,0,0)
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	local L_Right = Angle(0,Aimang.y,0):Right()
-	local La_Right = Angle(0,Attachment.Ang.y,0):Forward()
-	local AimRate = 60
-	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
 	
-	local TargetPitch = Angles.p
-	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
-	
-	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05
-	vehicle.sm_pitch = vehicle.sm_pitch and (vehicle.sm_pitch + (TargetPitch - vehicle.sm_pitch) * 0.05) or 0
-	
-	vehicle:SetPoseParameter("turret_yaw", vehicle.sm_dir:Angle().y )
-	vehicle:SetPoseParameter("turret_pitch", -vehicle.sm_pitch )
+	vehicle:SetPoseParameter("turret_yaw", TargetAng.y )
+	vehicle:SetPoseParameter("turret_pitch", -TargetAng.p )
 end
 
 function simfphys.weapon:Think( vehicle )
@@ -136,7 +99,7 @@ end
 function simfphys.weapon:PrimaryAttack( vehicle, ply )
 	if not self:CanPrimaryAttack( vehicle ) then return end
 	
-	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
+	vehicle.wOldPos = vehicle.wOldPos or vehicle:GetPos()
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
 	vehicle.wOldPos = vehicle:GetPos()
 

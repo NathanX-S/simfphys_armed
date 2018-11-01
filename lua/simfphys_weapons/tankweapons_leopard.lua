@@ -81,45 +81,6 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.BlastEffect = "simfphys_tankweapon_explosion"
 	
 	simfphys.FirePhysProjectile( projectile )
-	
-	--[[
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 0
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 6000
-		bullet.Damage		= 3000
-		bullet.HullSize		= 8
-		bullet.Attacker 	= ply
-		bullet.Callback = function(att, tr, dmginfo)
-			
-			net.Start( "simfphys_tank_do_effect" )
-				net.WriteEntity( vehicle )
-				net.WriteString( "Explosion" )
-				net.WriteVector( tr.HitPos )
-			net.Broadcast()
-			
-			util.BlastDamage( vehicle, ply, tr.HitPos,600,50)
-			
-			util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
-			
-			if tr.Entity ~= Entity(0) then
-				if simfphys.IsCar( tr.Entity ) then
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + shootDirection * tr.Entity:BoundingRadius() )
-						effectdata:SetNormal( shootDirection * 10 )
-					util.Effect( "manhacksparks", effectdata, true, true )
-				
-					sound.Play( Sound( "doors/vent_open"..math.random(1,3)..".wav" ), tr.HitPos, 140)
-				end
-			end
-		end
-		
-	vehicle:FireBullets( bullet )
-	]]--
 end
 
 function simfphys.weapon:ValidClasses()
@@ -205,49 +166,44 @@ end
 function simfphys.weapon:AimMachinegun( ply, vehicle, pod )	
 	if not IsValid( pod ) then return end
 
-	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() ) - Angle(0,90,0)
+	
+	local AimRate = 250
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
-	Angles:Normalize()
 	
-	local TargetPitch = Angles.p
-	local TargetYaw = Angles.y - 90
-	vehicle.sm_dir = vehicle.sm_dir or Vector(1,0,0)
-	if TargetYaw < -9 then
-		vehicle.FilterLeft = true
-	else
-		vehicle.FilterLeft = false
-	end
+	vehicle.sm_ppmg_yaw = vehicle.sm_ppmg_yaw and math.ApproachAngle( vehicle.sm_ppmg_yaw, Angles.y, AimRate * FrameTime() ) or 90
+	vehicle.sm_ppmg_pitch = vehicle.sm_ppmg_pitch and math.ApproachAngle( vehicle.sm_ppmg_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	vehicle:SetPoseParameter("mg_aim_yaw", TargetYaw - vehicle.sm_dir:Angle().y  )
-	vehicle:SetPoseParameter("mg_aim_pitch", -TargetPitch )
+	local TargetAng = Angle(vehicle.sm_ppmg_pitch,vehicle.sm_ppmg_yaw,0)
+	TargetAng:Normalize() 
+	
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw or 90
+	
+	vehicle:SetPoseParameter("mg_aim_yaw", TargetAng.y - vehicle.sm_pp_yaw + 90 )
+	vehicle:SetPoseParameter("mg_aim_pitch", -TargetAng.p )
 end
 
 function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )	
 	if not IsValid( pod ) then return end
 
 	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
+	Aimang:Normalize()
+	
+	local AimRate = 100
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
-	Angles:Normalize()
 	
-	vehicle.sm_dir  = vehicle.sm_dir or Vector(1,0,0)
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 90
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	local L_Right = Angle(0,Aimang.y,0):Right()
-	local La_Right = Angle(0,Attachment.Ang.y + 90,0):Right()
-	local AimRate = 30 * FrameTime() * 66.666
-	local Yaw_Diff = math.Clamp( math.acos( math.Clamp( L_Right:Dot( La_Right ) ,-1,1) ) * (180 / math.pi) - 90,-AimRate,AimRate )
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
+
+	vehicle:SetPoseParameter("cannon_aim_yaw", TargetAng.y - 90 )
 	
-	local TargetPitch = Angles.p
-	local TargetYaw = vehicle.sm_dir:Angle().y - Yaw_Diff
-	
-	vehicle.sm_dir = vehicle.sm_dir + (Angle(0,TargetYaw,0):Forward() - vehicle.sm_dir) * 0.05
-	vehicle.sm_pitch = vehicle.sm_pitch and (vehicle.sm_pitch + (TargetPitch - vehicle.sm_pitch) * 0.05) or 0
-	
-	vehicle:SetPoseParameter("cannon_aim_yaw", vehicle.sm_dir:Angle().y )
-	
-	local pclamp = math.Clamp( (math.sin( math.rad(vehicle.sm_dir:Angle().y - 90) ) - 0.7) * 6,0,1) ^ 2 * 15
-	vehicle:SetPoseParameter("cannon_aim_pitch", math.Clamp(-vehicle.sm_pitch,-15 + pclamp,20) )
+	local pclamp = math.Clamp( (math.cos( math.rad(TargetAng.y + 90) ) - 0.7) * 6,0,1) ^ 2 * 15
+	vehicle:SetPoseParameter("cannon_aim_pitch", math.Clamp(-TargetAng.p,-15 + pclamp,20) )
 end
 
 function simfphys.weapon:ControlTurret( vehicle, deltapos )

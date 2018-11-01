@@ -37,7 +37,8 @@ end
 function simfphys.weapon:ValidClasses()
 	
 	local classes = {
-		"sim_fphys_jeep_armed"
+		"sim_fphys_jeep_armed",
+		"sim_fphys_v8elite_armed"
 	}
 	
 	return classes
@@ -51,19 +52,22 @@ function simfphys.weapon:Initialize( vehicle )
 	simfphys.RegisterCrosshair( pod )
 end
 
-function simfphys.weapon:AimWeapon( ply, vehicle, pod )
+function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
 	local Aimang = ply:EyeAngles()
+	local AimRate = 250
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang ) - Angle(0,90,0)
-	Angles:Normalize()
 	
-	local Rate = 3
+	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and math.ApproachAngle( vehicle.sm_pp_yaw, Angles.y, AimRate * FrameTime() ) or 0
+	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and math.ApproachAngle( vehicle.sm_pp_pitch, Angles.p, AimRate * FrameTime() ) or 0
 	
-	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw and (vehicle.sm_pp_yaw + math.Clamp(Angles.y - vehicle.sm_pp_yaw,-Rate,Rate) ) or 0
-	vehicle.sm_pp_pitch = vehicle.sm_pp_pitch and ( vehicle.sm_pp_pitch + math.Clamp(Angles.p - vehicle.sm_pp_pitch,-Rate,Rate) ) or 0
+	local TargetAng = Angle(vehicle.sm_pp_pitch,vehicle.sm_pp_yaw,0)
+	TargetAng:Normalize() 
 	
-	vehicle:SetPoseParameter("vehicle_weapon_yaw", -vehicle.sm_pp_yaw )
-	vehicle:SetPoseParameter("vehicle_weapon_pitch", -vehicle.sm_pp_pitch )
+	vehicle:SetPoseParameter("vehicle_weapon_yaw", -TargetAng.y )
+	vehicle:SetPoseParameter("vehicle_weapon_pitch", -TargetAng.p )
+	
+	return Aimang
 end
 
 function simfphys.weapon:Think( vehicle )
@@ -95,7 +99,7 @@ function simfphys.weapon:Think( vehicle )
 	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
 	
 	local fire = ply:KeyDown( IN_ATTACK )
-	local alt_fire = ply:KeyDown( IN_ATTACK2 )
+	local alt_fire = ply:KeyDown( IN_ATTACK2 ) and self:CanPrimaryAttack( vehicle )
 	
 	vehicle.afire_pressed = vehicle.afire_pressed or false
 	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 100 or 0) - vehicle.gausscharge,0,1)) or 0
@@ -124,7 +128,7 @@ function simfphys.weapon:Think( vehicle )
 		else
 			vehicle.wpn_chr:Stop()
 			vehicle.wpn_chr = nil
-			GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 2)
+			GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 3)
 			vehicle.gausscharge = 0
 			
 			self:SetNextPrimaryFire( vehicle, CurTime() + 0.6 )
