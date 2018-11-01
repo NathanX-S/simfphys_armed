@@ -240,6 +240,10 @@ function simfphys.WeaponsGetAll()
 end
 
 function simfphys.RegisterEquipment( vehicle )
+	print("SIMFPHYS ARMED: RegisterEquipment() is no longer needed")
+end
+
+function simfphys.armedAutoRegister( vehicle )
 	if not IsValid( vehicle ) then return end
 	
 	local class = vehicle:GetSpawn_List()
@@ -271,9 +275,11 @@ end
 hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
 	if not simfphys.IsCar( vehicle ) then return end
 	
-	timer.Simple( 0.2, function()
-		simfphys.RegisterEquipment( vehicle )
-	end)
+	if not simfphys.VERSION or simfphys.VERSION < 1.0 then
+		timer.Simple( 0.2, function()
+			simfphys.armedAutoRegister( vehicle )
+		end)
+	end
 end)
 
 hook.Add("Think", "simfphys_weaponhandler", function()
