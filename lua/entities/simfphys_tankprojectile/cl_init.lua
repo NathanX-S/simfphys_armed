@@ -1,13 +1,5 @@
 include("shared.lua")
 
-local function RandVector(min,max)
-	min = min or -1
-	max = max or 1
-	
-	local vec = Vector(math.Rand(min,max),math.Rand(min,max),math.Rand(min,max))
-	return vec
-end
-
 function ENT:Initialize()	
 	self.PixVis = util.GetPixelVisibleHandle()
 	
@@ -31,6 +23,8 @@ function ENT:Initialize()
 	}
 	
 	self.OldPos = self:GetPos()
+	
+	self.emitter = ParticleEmitter(self.OldPos, false )
 end
 
 local mat = Material( "sprites/animglow02" )
@@ -50,49 +44,42 @@ function ENT:Think()
 end
 
 function ENT:doFX( newpos, oldpos )
+	if not self.emitter then return end
+	
 	local Sub = (newpos - oldpos)
 	local Dir = Sub:GetNormalized()
 	local Len = Sub:Length()
 	
 	for i = 1, Len, 15 do
 		local pos = oldpos + Dir * i
-		local emitter = ParticleEmitter(pos, false )
-		if emitter then
-			local particle = emitter:Add( self.Materials[math.random(1, table.Count(self.Materials) )], pos )
-			
-			if particle then
-				particle:SetGravity( Vector(0,0,100) + RandVector() * 50 ) 
-				particle:SetVelocity( -self:GetForward() * 500  )
-				particle:SetAirResistance( 600 ) 
-				particle:SetDieTime( math.Rand(0.1,0.5) )
-				particle:SetStartAlpha( 80 )
-				particle:SetStartSize( (math.Rand(6,12) / 20) * self:GetSize() )
-				particle:SetEndSize( (math.Rand(20,30) / 20) * self:GetSize() )
-				particle:SetRoll( math.Rand( -1, 1 ) )
-				particle:SetColor( 120,120,120 )
-				particle:SetCollide( false )
-			end
-			
-			emitter:Finish()
-		end
+	
+		local particle = self.emitter:Add( self.Materials[math.random(1, table.Count(self.Materials) )], pos )
 		
-		local emitter = ParticleEmitter( pos, false )
-		if emitter then
-			local particle = emitter:Add( mat, pos )
-			if particle then
-				particle:SetVelocity( -self:GetForward() * 300 + self:GetVelocity())
-				particle:SetDieTime( 0.1 )
-				particle:SetAirResistance( 0 ) 
-				particle:SetStartAlpha( 255 )
-				particle:SetStartSize( self:GetSize() )
-				particle:SetEndSize( 0 )
-				particle:SetRoll( math.Rand(-1,1) )
-				particle:SetColor( 255,255,255 )
-				particle:SetGravity( Vector( 0, 0, 0 ) )
-				particle:SetCollide( false )
-			end
-			
-			emitter:Finish()
+		if particle then
+			particle:SetGravity( Vector(0,0,100) + VectorRand() * 50 ) 
+			particle:SetVelocity( -self:GetForward() * 500  )
+			particle:SetAirResistance( 600 ) 
+			particle:SetDieTime( math.Rand(0.1,0.5) )
+			particle:SetStartAlpha( 80 )
+			particle:SetStartSize( (math.Rand(6,12) / 20) * self:GetSize() )
+			particle:SetEndSize( (math.Rand(20,30) / 20) * self:GetSize() )
+			particle:SetRoll( math.Rand( -1, 1 ) )
+			particle:SetColor( 120,120,120 )
+			particle:SetCollide( false )
+		end
+	
+		local particle = self.emitter:Add( mat, pos )
+		if particle then
+			particle:SetVelocity( -self:GetForward() * 300 + self:GetVelocity())
+			particle:SetDieTime( 0.1 )
+			particle:SetAirResistance( 0 ) 
+			particle:SetStartAlpha( 255 )
+			particle:SetStartSize( self:GetSize() )
+			particle:SetEndSize( 0 )
+			particle:SetRoll( math.Rand(-1,1) )
+			particle:SetColor( 255,255,255 )
+			particle:SetGravity( Vector( 0, 0, 0 ) )
+			particle:SetCollide( false )
 		end
 	end
 end
@@ -101,18 +88,20 @@ function ENT:OnRemove()
 	local effectdata = EffectData()
 		effectdata:SetOrigin( self:GetPos() )
 	util.Effect( self:GetBlastEffect(), effectdata )
+	
+	if self.emitter then
+		self.emitter:Finish()
+	end
 end
 
 function ENT:Explosion( pos )
-	local emitter = ParticleEmitter( pos, false )
-	
-	if not emitter then return end
+	if not self.emitter then return end
 	
 	for i = 0,60 do
-		local particle = emitter:Add( self.Materials[math.random(1,table.Count( self.Materials ))], pos )
+		local particle = self.emitter:Add( self.Materials[math.random(1,table.Count( self.Materials ))], pos )
 		
 		if particle then
-			particle:SetVelocity( RandVector(-1,1) * 600 )
+			particle:SetVelocity(  VectorRand() * 600 )
 			particle:SetDieTime( math.Rand(4,6) )
 			particle:SetAirResistance( math.Rand(200,600) ) 
 			particle:SetStartAlpha( 255 )
@@ -126,10 +115,10 @@ function ENT:Explosion( pos )
 	end
 	
 	for i = 0, 40 do
-		local particle = emitter:Add( "sprites/flamelet"..math.random(1,5), pos )
+		local particle = self.emitter:Add( "sprites/flamelet"..math.random(1,5), pos )
 		
 		if particle then
-			particle:SetVelocity( RandVector(-1,1) * 500 )
+			particle:SetVelocity( VectorRand() * 500 )
 			particle:SetDieTime( 0.14 )
 			particle:SetStartAlpha( 255 )
 			particle:SetStartSize( 10 )
@@ -140,8 +129,6 @@ function ENT:Explosion( pos )
 			particle:SetCollide( false )
 		end
 	end
-	
-	emitter:Finish()
 	
 	local dlight = DynamicLight( math.random(0,9999) )
 	if dlight then
