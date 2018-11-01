@@ -100,6 +100,8 @@ function simfphys.weapon:Initialize( vehicle )
 	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "machinegun", Type = 1 } )
 	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(0,-40,5), Vector(0,-40,50), true )
 	
+	simfphys.RegisterCamera( vehicle.pSeat[2], Vector(0,0,55), Vector(0,0,55), true )
+	
 	
 	timer.Simple( 1, function()
 		if not IsValid( vehicle ) then return end

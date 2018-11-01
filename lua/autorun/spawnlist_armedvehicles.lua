@@ -1179,6 +1179,10 @@ local V = {
 			{
 				pos = Vector(0,0,50),
 				ang = Angle(0,-90,0)
+			},
+			{
+				pos = Vector(0,0,50),
+				ang = Angle(0,-90,0)
 			}
 		},
 		
@@ -1306,7 +1310,7 @@ local V = {
 		
 		CustomSteerAngle = 60,
 		
-		SeatOffset = Vector(60,-20,55),
+		SeatOffset = Vector(60,-15,55),
 		SeatPitch = 0,
 		SeatYaw = 90,
 		
@@ -1328,7 +1332,11 @@ local V = {
 		
 		PassengerSeats = {
 			{
-				pos = Vector(50,-20,30),
+				pos = Vector(50,-15,30),
+				ang = Angle(0,-90,0)
+			},
+			{
+				pos = Vector(0,0,30),
 				ang = Angle(0,-90,0)
 			}
 		},

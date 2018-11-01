@@ -81,6 +81,8 @@ function simfphys.weapon:Initialize( vehicle )
 	simfphys.RegisterCrosshair( vehicle.pSeat[1] , { Attachment = "muzzle_machinegun", Type = 1 } )
 	simfphys.RegisterCamera( vehicle.pSeat[1], Vector(35,-105,-15), Vector(35,-105,25), true )
 	
+	simfphys.RegisterCamera( vehicle.pSeat[2], Vector(0,0,55), Vector(0,0,55), true )
+	
 	timer.Simple( 1, function()
 		if not IsValid( vehicle ) then return end
 		if not vehicle.VehicleData["filter"] then print("[simfphys Armed Vehicle Pack] ERROR:TRACE FILTER IS INVALID. PLEASE UPDATE SIMFPHYS BASE") return end
