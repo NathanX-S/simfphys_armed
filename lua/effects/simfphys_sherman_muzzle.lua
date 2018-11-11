@@ -21,7 +21,7 @@ local Materials = {
 function EFFECT:Init( data )
 	local vehicle = data:GetEntity()
 	
-	local ID = vehicle:LookupAttachment( "turret_c-annon" )
+	local ID = vehicle:LookupAttachment( "turret_cannon" )
 	if ID == 0 then return end
 	
 	local Attachment = vehicle:GetAttachment( ID )
