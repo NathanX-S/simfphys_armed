@@ -6,7 +6,7 @@ hook.Add( "CalcView", "zz_simfphys_gunner_view", function( ply, pos, ang )
 	if not IsValid( ply ) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
 	
 	local Vehicle = ply:GetVehicle()
-	local Base = Vehicle.vehiclebase
+	local Base = ply:GetSimfphys()
 	
 	if not IsValid( Vehicle ) or not IsValid( Base ) then return end
 	if not Vehicle:GetNWBool( "simfphys_SpecialCam" ) then return end
@@ -107,7 +107,7 @@ hook.Add( "HUDPaint", "zz_simfphys_brokencam_hint", function()
 	
 	if not IsValid( Parent ) then return end
 	
-	local Base = Pod.vehiclebase
+	local Base = ply:GetSimfphys()
 	
 	if not IsValid( Pod ) or not IsValid( Base ) then return end
 	if not Pod:GetNWBool( "simfphys_SpecialCam" ) then return end
