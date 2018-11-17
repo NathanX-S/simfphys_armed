@@ -166,7 +166,7 @@ end
 function simfphys.weapon:AimMachinegun( ply, vehicle, pod )	
 	if not IsValid( pod ) then return end
 
-	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() ) + Angle(0,180,0)
+	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
 	local AimRate = 250
 	
@@ -180,7 +180,7 @@ function simfphys.weapon:AimMachinegun( ply, vehicle, pod )
 	
 	vehicle.sm_pp_yaw = vehicle.sm_pp_yaw or 180
 	
-	vehicle:SetPoseParameter("mg_aim_yaw", TargetAng.y - vehicle.sm_pp_yaw + 180 )
+	vehicle:SetPoseParameter("mg_aim_yaw", TargetAng.y - vehicle.sm_pp_yaw  )
 	vehicle:SetPoseParameter("mg_aim_pitch", -TargetAng.p )
 end
 
