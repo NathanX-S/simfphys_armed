@@ -346,7 +346,7 @@ hook.Add( "HUDPaint", "simfphys_crosshair", function()
 	
 	if not HasCrosshair then return end
 	
-	local vehicle = ply:GetSimfphys()
+	local vehicle = ply.GetSimfphys and ply:GetSimfphys() or veh.vehiclebase
 	
 	if not IsValid( vehicle ) then return end
 	

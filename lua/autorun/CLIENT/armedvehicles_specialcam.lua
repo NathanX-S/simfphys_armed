@@ -6,9 +6,13 @@ hook.Add( "CalcView", "zz_simfphys_gunner_view", function( ply, pos, ang )
 	if not IsValid( ply ) or not ply:Alive() or not ply:InVehicle() or ply:GetViewEntity() ~= ply then return end
 	
 	local Vehicle = ply:GetVehicle()
-	local Base = ply:GetSimfphys()
 	
-	if not IsValid( Vehicle ) or not IsValid( Base ) then return end
+	if not IsValid( Vehicle ) then return end
+	
+	local Base = ply.GetSimfphys and ply:GetSimfphys() or Vehicle.vehiclebase
+	
+	if not IsValid( Base ) then return end
+	
 	if not Vehicle:GetNWBool( "simfphys_SpecialCam" ) then return end
 	
 	local view = {
@@ -103,18 +107,17 @@ hook.Add( "HUDPaint", "zz_simfphys_brokencam_hint", function()
 	if ply:GetViewEntity() ~= ply then return end
 	
 	local Pod = ply:GetVehicle()
-	local Parent = Pod:GetParent()
 	
-	if not IsValid( Parent ) then return end
+	if not IsValid( Pod ) then return end
 	
-	local Base = ply:GetSimfphys()
+	local Base = ply.GetSimfphys and ply:GetSimfphys() or Pod.vehiclebase
 	
-	if not IsValid( Pod ) or not IsValid( Base ) then return end
+	if not IsValid( Base ) then return end
 	if not Pod:GetNWBool( "simfphys_SpecialCam" ) then return end
 
-	if not Parent.ERRORSOUND then
+	if not Base.ERRORSOUND then
 		surface.PlaySound( "error.wav" )
-		Parent.ERRORSOUND = true
+		Base.ERRORSOUND = true
 	end
 	
 	local X = ScrW()
