@@ -10,7 +10,7 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.attackingent = vehicle
 		projectile.Damage = 15
 		projectile.Force = 50
-		projectile.Size = 2
+		projectile.Size = 3
 		projectile.BlastRadius = 50
 		projectile.BlastDamage = 20
 		projectile.BlastEffect = "helicoptermegabomb"

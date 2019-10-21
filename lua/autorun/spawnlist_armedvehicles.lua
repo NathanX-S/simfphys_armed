@@ -1096,7 +1096,11 @@ local V = {
 		AirFriction = 5,
 		Inertia = Vector(10000,80000,100000),
 		
-		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
 		
 		OnDestroyed = 
 			function(ent)
@@ -1107,7 +1111,9 @@ local V = {
 					ent.Gib:SetPoseParameter("turret_pitch", pitch )
 				end
 			end,
-		
+			
+		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
+
 		MaxHealth = 8000,
 		
 		IsArmored = true,
@@ -1176,6 +1182,10 @@ local V = {
 
 		
 		PassengerSeats = {
+			{
+				pos = Vector(0,0,50),
+				ang = Angle(0,-90,0)
+			},
 			{
 				pos = Vector(0,0,50),
 				ang = Angle(0,-90,0)
@@ -1268,7 +1278,11 @@ local V = {
 		AirFriction = 7,
 		Inertia = Vector(10000,80000,100000),
 		
-		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
 		
 		OnDestroyed = 
 			function(ent)
@@ -1279,6 +1293,8 @@ local V = {
 					ent.Gib:SetPoseParameter("turret_pitch", pitch )
 				end
 			end,
+			
+		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
 		
 		MaxHealth = 6000,
 		
@@ -1333,6 +1349,10 @@ local V = {
 		PassengerSeats = {
 			{
 				pos = Vector(50,-15,30),
+				ang = Angle(0,-90,0)
+			},
+			{
+				pos = Vector(0,0,30),
 				ang = Angle(0,-90,0)
 			},
 			{
@@ -1482,7 +1502,11 @@ local V = {
 		
 		LightsTable = "leopard",
 		
-		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		OnSpawn = 
+			function(ent)
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
 		
 		OnDestroyed = 
 			function(ent)
@@ -1493,6 +1517,8 @@ local V = {
 					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
 				end
 			end,
+		
+		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
 		
 		MaxHealth = 8200,
 		
@@ -1648,7 +1674,11 @@ local V = {
 		
 		LightsTable = "t90ms",
 		
-		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
 		
 		OnDestroyed = 
 			function(ent)
@@ -1659,6 +1689,8 @@ local V = {
 					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
 				end
 			end,
+		
+		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
 		
 		MaxHealth = 8200,
 		

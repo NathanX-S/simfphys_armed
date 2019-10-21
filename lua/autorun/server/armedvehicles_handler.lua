@@ -56,6 +56,15 @@ sound.Add( {
 } )
 
 sound.Add( {
+	name = "tiger_fire_mg_new",
+	channel = CHAN_STATIC,
+	volume = 1.0,
+	level = 110,
+	pitch = { 90, 110 },
+	sound = {"^simulated_vehicles/weapons/tiger_mg1.wav","^simulated_vehicles/weapons/tiger_mg2.wav","^simulated_vehicles/weapons/tiger_mg3.wav"}
+} )
+
+sound.Add( {
 	name = "tiger_reload",
 	channel = CHAN_STATIC,
 	volume = 1.0,
@@ -132,12 +141,14 @@ function simfphys.FirePhysProjectile( data )
 	if not isvector( data.shootDirection ) then return end
 	if not IsValid( data.attacker ) then return end
 	if not IsValid( data.attackingent ) then return end
+	if not isnumber( data.DeflectAng ) then data.DeflectAng = 0 end
 	
 	local projectile = ents.Create( "simfphys_tankprojectile" )
 	projectile:SetPos( data.shootOrigin )
 	projectile:SetAngles( data.shootDirection:Angle() )
 	projectile:SetOwner( data.attackingent )
 	projectile.Attacker = data.attacker
+	projectile.DeflectAng = data.DeflectAng
 	projectile.AttackingEnt = data.attackingent 
 	
 	local filter = data.filter 
@@ -153,6 +164,12 @@ function simfphys.FirePhysProjectile( data )
 	projectile:Spawn()
 	projectile:Activate()
 end
+
+local ImpactSounds = {
+	"physics/metal/metal_sheet_impact_bullet2.wav",
+	"physics/metal/metal_sheet_impact_hard2.wav",
+	"physics/metal/metal_sheet_impact_hard6.wav",
+}
 
 function simfphys.FireHitScan( data )
 	if not data then return end
@@ -179,7 +196,8 @@ function simfphys.FireHitScan( data )
 	bullet.Src 			= trace.HitPos - data.shootDirection * 5
 	bullet.Dir 			= data.shootDirection
 	bullet.Spread 		= Vector(0,0,0)
-	bullet.Tracer		= 0
+	bullet.TracerName	= "simfphys_tracer_hit"
+	bullet.Tracer		= 1
 	bullet.Force		= (data.Force and data.Force or 1)
 	bullet.Damage		= (data.Damage and data.Damage or 1)
 	bullet.HullSize		= data.HullSize
@@ -187,12 +205,8 @@ function simfphys.FireHitScan( data )
 	bullet.Callback = function(att, tr, dmginfo)
 		if tr.Entity ~= Entity(0) then
 			if simfphys.IsCar( tr.Entity ) then
-				local effectdata = EffectData()
-					effectdata:SetOrigin( tr.HitPos + tr.HitNormal )
-					effectdata:SetNormal( tr.HitNormal )
-				util.Effect( "stunstickimpact", effectdata, true, true )
-			
-				sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
+				--sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
+				sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, 140)
 			end
 		end
 	end
@@ -269,6 +283,196 @@ function simfphys.armedAutoRegister( vehicle )
 
 				tbldata.Initialize( tbldata, vehicle )
 			end
+		end
+	end
+end
+
+local function DamageVehicle( ent , damage, type )
+	if not simfphys.DamageEnabled then return end
+	
+	local MaxHealth = ent:GetMaxHealth()
+	local CurHealth = ent:GetCurHealth()
+	
+	local NewHealth = math.max( math.Round(CurHealth - damage,0) , 0 )
+	
+	if NewHealth <= (MaxHealth * 0.6) then
+		if NewHealth <= (MaxHealth * 0.3) then
+			ent:SetOnFire( true )
+			ent:SetOnSmoke( false )
+		else
+			ent:SetOnSmoke( true )
+		end
+	end
+	
+	if MaxHealth > 30 and NewHealth <= 31 then
+		if ent:EngineActive() then
+			ent:DamagedStall()
+		end
+	end
+	
+	if NewHealth <= 0 then
+		if type ~= DMG_GENERIC and type ~= DMG_CRUSH or damage > 400 then
+			
+			DestroyVehicle( ent )
+			
+			return
+		end
+		
+		if ent:EngineActive() then
+			ent:DamagedStall()
+		end
+		
+		return
+	end
+	
+	ent:SetCurHealth( NewHealth )
+end
+
+local function DestroyVehicle( ent )
+	if not IsValid( ent ) then return end
+	if ent.destroyed then return end
+	
+	ent.destroyed = true
+	
+	local ply = ent.EntityOwner
+	local skin = ent:GetSkin()
+	local Col = ent:GetColor()
+	Col.r = Col.r * 0.8
+	Col.g = Col.g * 0.8
+	Col.b = Col.b * 0.8
+	
+	local bprop = ents.Create( "gmod_sent_vehicle_fphysics_gib" )
+	bprop:SetModel( ent:GetModel() )			
+	bprop:SetPos( ent:GetPos() )
+	bprop:SetAngles( ent:GetAngles() )
+	bprop:Spawn()
+	bprop:Activate()
+	bprop:GetPhysicsObject():SetVelocity( ent:GetVelocity() + Vector(math.random(-5,5),math.random(-5,5),math.random(150,250)) ) 
+	bprop:GetPhysicsObject():SetMass( ent.Mass * 0.75 )
+	bprop.DoNotDuplicate = true
+	bprop.MakeSound = true
+	bprop:SetColor( Col )
+	bprop:SetSkin( skin )
+	
+	ent.Gib = bprop
+	
+	simfphys.SetOwner( ply , bprop )
+	
+	if IsValid( ply ) then
+		undo.Create( "Gib" )
+		undo.SetPlayer( ply )
+		undo.AddEntity( bprop )
+		undo.SetCustomUndoText( "Undone Gib" )
+		undo.Finish( "Gib" )
+		ply:AddCleanup( "Gibs", bprop )
+	end
+	
+	if ent.CustomWheels == true and not ent.NoWheelGibs then
+		for i = 1, table.Count( ent.GhostWheels ) do
+			local Wheel = ent.GhostWheels[i]
+			if IsValid(Wheel) then
+				local prop = ents.Create( "gmod_sent_vehicle_fphysics_gib" )
+				prop:SetModel( Wheel:GetModel() )			
+				prop:SetPos( Wheel:LocalToWorld( Vector(0,0,0) ) )
+				prop:SetAngles( Wheel:LocalToWorldAngles( Angle(0,0,0) ) )
+				prop:SetOwner( bprop )
+				prop:Spawn()
+				prop:Activate()
+				prop:GetPhysicsObject():SetVelocity( ent:GetVelocity() + Vector(math.random(-5,5),math.random(-5,5),math.random(0,25)) )
+				prop:GetPhysicsObject():SetMass( 20 )
+				prop.DoNotDuplicate = true
+				bprop:DeleteOnRemove( prop )
+				
+				simfphys.SetOwner( ply , prop )
+			end
+		end
+	end
+	
+	local Driver = ent:GetDriver()
+	if IsValid( Driver ) then
+		if ent.RemoteDriver ~= Driver then
+			Driver:TakeDamage( Driver:Health() + Driver:Armor(), ent.LastAttacker or Entity(0), ent.LastInflictor or Entity(0) )
+		end
+	end
+	
+	if ent.PassengerSeats then
+		for i = 1, table.Count( ent.PassengerSeats ) do
+			local Passenger = ent.pSeat[i]:GetDriver()
+			if IsValid( Passenger ) then
+				Passenger:TakeDamage( Passenger:Health() + Passenger:Armor(), ent.LastAttacker or Entity(0), ent.LastInflictor or Entity(0) )
+			end
+		end
+	end
+	
+	ent:Extinguish() 
+	
+	ent:OnDestroyed()
+	
+	ent:Remove()
+end
+
+local function bcDamage( vehicle , position , cdamage )
+	if not simfphys.DamageEnabled then return end
+	
+	cdamage = cdamage or false
+	net.Start( "simfphys_spritedamage" )
+		net.WriteEntity( vehicle )
+		net.WriteVector( position ) 
+		net.WriteBool( cdamage ) 
+	net.Broadcast()
+end
+
+function simfphys.TankDamageSystem(ent, dmginfo)
+	if not ent:IsInitialized() then return end
+	
+	local Damage = dmginfo:GetDamage() 
+	local DamagePos = dmginfo:GetDamagePosition() 
+	local Type = dmginfo:GetDamageType()
+	local Driver = ent:GetDriver()
+	
+	ent.LastAttacker = dmginfo:GetAttacker() 
+	ent.LastInflictor = dmginfo:GetInflictor()
+	
+	bcDamage( ent , ent:WorldToLocal( DamagePos ) )
+	
+	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC then
+		if simfphys.DamageEnabled then
+			local MaxHealth = ent:GetMaxHealth()
+			local CurHealth = ent:GetCurHealth()
+			
+			local NewHealth = math.max( math.Round(CurHealth - Damage,0) , 0 )
+			
+			if NewHealth <= (MaxHealth * 0.6) then
+				if NewHealth <= (MaxHealth * 0.3) then
+					ent:SetOnFire( true )
+					ent:SetOnSmoke( false )
+				else
+					ent:SetOnSmoke( true )
+				end
+			end
+			
+			if MaxHealth > 30 and NewHealth <= 31 then
+				if ent:EngineActive() then
+					ent:DamagedStall()
+				end
+			end
+			
+			if NewHealth <= 0 then
+				if type ~= DMG_GENERIC and type ~= DMG_CRUSH or Damage > 400 then
+					
+					DestroyVehicle( ent )
+					
+					return
+				end
+				
+				if ent:EngineActive() then
+					ent:DamagedStall()
+				end
+				
+				return
+			end
+			
+			ent:SetCurHealth( NewHealth )
 		end
 	end
 end

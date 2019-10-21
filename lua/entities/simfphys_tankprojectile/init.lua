@@ -2,6 +2,10 @@ AddCSLuaFile( "shared.lua" )
 AddCSLuaFile( "cl_init.lua" )
 include('shared.lua')
 
+local ImpactSounds = {
+	"physics/metal/metal_sheet_impact_bullet1.wav",
+	"weapons/rpg/shotdown.wav",
+}
 function ENT:SpawnFunction( ply, tr, ClassName )
 
 	if ( !tr.Hit ) then return end
@@ -46,7 +50,9 @@ function ENT:Think()
 		endpos = self:GetPos() + self.Vel * FixTick,
 		maxs = Size,
 		mins = -Size,
-		filter = self.Filter
+		filter = function( ent )
+			if ent:GetClass() ~= "gmod_sent_vehicle_fphysics_wheel" and not table.HasValue( self.Filter, ent ) then return true end
+		end
 	} )
 	
 	if trace.Hit then
@@ -54,44 +60,76 @@ function ENT:Think()
 		
 		local shootDirection = self:GetForward()
 		
-		local bullet = {}
-			bullet.Num 			= 1
-			bullet.Src 			= self:GetPos() - shootDirection * 10
-			bullet.Dir 			= shootDirection
-			bullet.Spread 		= Vector(0,0,0)
-			bullet.Tracer		= 0
-			bullet.TracerName	= "simfphys_tracer"
-			bullet.Force		= self.Force
-			bullet.Damage		= self.Damage
-			bullet.HullSize		= self:GetSize()
-			bullet.Attacker 	= self.Attacker
-			bullet.Callback = function(att, tr, dmginfo)
-				dmginfo:SetDamageType(DMG_AIRBOAT)
-				local attackingEnt = IsValid( self.AttackingEnt ) and self.AttackingEnt or self
-				util.BlastDamage( attackingEnt, self.Attacker, tr.HitPos,self.BlastRadius,self.BlastDamage)
-				
-				util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
-				
-				if tr.Entity ~= Entity(0) then
-					if simfphys.IsCar( tr.Entity ) then
-						local effectdata = EffectData()
-							effectdata:SetOrigin( tr.HitPos + shootDirection * tr.Entity:BoundingRadius() )
-							effectdata:SetNormal( shootDirection * 10 )
-						util.Effect( "manhacksparks", effectdata, true, true )
+		local hitangle = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) ) - 90
+		
+		self.DeflectAng = self.DeflectAng or 0
+		
+		if hitangle < self.DeflectAng and not self.Bounced and (simfphys.IsCar( trace.Entity ) or trace.Entity:GetClass() == "gmod_sent_vehicle_fphysics_wheel") then
+			
+			local thVel = self.Vel:Length()
+			
+			local Ax = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) )
+			local Fx = math.cos( math.rad( Ax ) ) * thVel
+			
+			self.Vel = (shootDirection * (thVel - math.abs(Fx)) - trace.HitNormal * Fx * 2) * 0.2
+			
+			trace.Entity:GetPhysicsObject():ApplyForceOffset( shootDirection * thVel * 1000, trace.HitPos ) 
+			
+			self:SetPos( self:GetPos() + self.Vel * FixTick )
+			
+			self.Vel = self.Vel - Vector(0,0,0.15) * FixTick
+			
+			local effectdata = EffectData()
+				effectdata:SetOrigin( trace.HitPos )
+				effectdata:SetNormal( self.Vel:GetNormalized() * 10 )
+			util.Effect( "manhacksparks", effectdata, true, true )
+			
+			sound.Play( Sound( "simulated_vehicles/weapons/physproj_rico.wav" ), trace.HitPos, 140)
+			
+			self.Bounced = true -- only bounce once
+		else
+			local bullet = {}
+				bullet.Num 			= 1
+				bullet.Src 			= self:GetPos() - shootDirection * 10
+				bullet.Dir 			= shootDirection
+				bullet.Spread 		= Vector(0,0,0)
+				bullet.Tracer		= 0
+				bullet.TracerName	= "simfphys_tracer"
+				bullet.Force		= self.Force
+				bullet.Damage		= self.Damage
+				bullet.HullSize		= self:GetSize()
+				bullet.Attacker 	= self.Attacker
+				bullet.Callback = function(att, tr, dmginfo)
+					dmginfo:SetDamageType(DMG_GENERIC)
+					local attackingEnt = IsValid( self.AttackingEnt ) and self.AttackingEnt or self
+					util.BlastDamage( attackingEnt, self.Attacker, tr.HitPos,self.BlastRadius,self.BlastDamage)
 					
-						sound.Play( Sound( "doors/vent_open"..math.random(1,3)..".wav" ), tr.HitPos, 140)
+					util.Decal("scorch", tr.HitPos - tr.HitNormal, tr.HitPos + tr.HitNormal)
+					
+					if tr.Entity ~= Entity(0) then
+						if simfphys.IsCar( tr.Entity ) then
+							local effectdata = EffectData()
+								effectdata:SetOrigin( tr.HitPos + shootDirection * tr.Entity:BoundingRadius() )
+								effectdata:SetNormal( shootDirection * 10 )
+							util.Effect( "manhacksparks", effectdata, true, true )
+							
+							sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, 140)
+						end
 					end
 				end
-			end
-			
-		self:FireBullets( bullet )
+				
+			self:FireBullets( bullet )
 		
-		
-		self:Remove()
+			self:Remove()
+		end
 	else
 		self:SetPos( self:GetPos() + self.Vel * FixTick )
 		
-		self.Vel = self.Vel - Vector(0,0,0.15) * FixTick
+		local Rate = FrameTime() * 30
+		
+		self.smVal = self.smVal and self.smVal + math.Clamp(15 - self.smVal,-Rate,Rate)  or 0
+		
+		self.Vel = self.Vel - Vector(0,0,self.smVal / 100) * FixTick
 	end
 	
 	if (self.SpawnTime + 12) < curtime then
