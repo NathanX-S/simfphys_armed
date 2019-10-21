@@ -39,7 +39,7 @@ hook.Add( "HUDShouldDraw", "HideHUD", function( name )
 
 	local ply = LocalPlayer()
 	
-	if not ply:InVehicle() or not ply.GetSimfphys then return end
+	if not ply.GetSimfphys then return end
 	
 	local Ent = ply:GetSimfphys()
 	
