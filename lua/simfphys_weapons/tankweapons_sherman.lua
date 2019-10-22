@@ -330,7 +330,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	
 	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	
-	local AimRate = 80
+	local AimRate = 50
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	

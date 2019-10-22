@@ -23,7 +23,7 @@ function EFFECT:Init( data )
 	
 	self:Explosion( Pos )
 	
-	sound.Play( "ambient/explosions/explode_"..math.random(1,5)..".wav", Pos, 95, 230, 0.5 )
+	sound.Play( "ambient/explosions/explode_4.wav", Pos, 95, 200, 0.5 )
 end
 
 function EFFECT:Explosion( pos )
