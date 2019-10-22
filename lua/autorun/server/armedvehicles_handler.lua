@@ -336,7 +336,7 @@ end
 function simfphys.TankApplyDamage(ent, Damage, Type)
 	if not IsValid( ent ) or not isnumber( Damage ) or not isnumber( Type ) then return end
 	
-	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC then
+	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC or Type == DMG_DIRECT then
 		local MaxHealth = ent:GetMaxHealth()
 		local CurHealth = ent:GetCurHealth()
 		
@@ -358,7 +358,7 @@ function simfphys.TankApplyDamage(ent, Damage, Type)
 		end
 		
 		if NewHealth <= 0 then
-			if type ~= DMG_GENERIC and type ~= DMG_CRUSH or Damage > 400 then
+			if (Type ~= DMG_GENERIC and Type ~= DMG_CRUSH) or Damage > MaxHealth then
 				
 				ent:ExplodeVehicle()
 				
@@ -368,6 +368,8 @@ function simfphys.TankApplyDamage(ent, Damage, Type)
 			if ent:EngineActive() then
 				ent:DamagedStall()
 			end
+			
+			ent:SetCurHealth( 0 )
 			
 			return
 		end

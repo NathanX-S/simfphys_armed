@@ -115,7 +115,7 @@ function ENT:Think()
 					if tr.Entity:GetClass():lower() == "npc_helicopter" then
 						dmginfo:SetDamageType(DMG_AIRBOAT)
 					else
-						dmginfo:SetDamageType(DMG_GENERIC)
+						dmginfo:SetDamageType(DMG_DIRECT)
 					end
 					
 					local attackingEnt = IsValid( self.AttackingEnt ) and self.AttackingEnt or self
