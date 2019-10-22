@@ -1,3 +1,23 @@
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+
 resource.AddWorkshop("831680603")
 
 simfphys = istable( simfphys ) and simfphys or {}
@@ -6,13 +26,24 @@ simfphys.ManagedVehicles = istable( simfphys.ManagedVehicles ) and simfphys.Mana
 simfphys.Weapons = {}
 simfphys.weapon = {}
 
-util.AddNetworkString( "simfphys_register_tank" )
 util.AddNetworkString( "simfphys_tank_do_effect" )
 util.AddNetworkString( "simfphys_update_tracks" )
 
+resource.AddSingleFile( "materials/effects/simfphys_armed/gauss_beam.vmt" )
+resource.AddSingleFile( "materials/effects/simfphys_armed/gauss_beam.vtf" )
+resource.AddSingleFile( "materials/effects/simfphys_armed/spark.vmt" )
+resource.AddSingleFile( "materials/effects/simfphys_armed/spark.vtf" )
+resource.AddSingleFile( "materials/effects/simfphys_armed/spark_brightness.vtf" )
+
+local ImpactSounds = {
+	"physics/metal/metal_sheet_impact_bullet2.wav",
+	"physics/metal/metal_sheet_impact_hard2.wav",
+	"physics/metal/metal_sheet_impact_hard6.wav",
+}
+
 sound.Add( {
 	name = "apc_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 110,
 	pitch = { 90, 110 },
@@ -21,7 +52,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "tiger_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -30,7 +61,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "leopard_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -38,8 +69,17 @@ sound.Add( {
 } )
 
 sound.Add( {
+	name = "leopard_fire_mg",
+	channel = CHAN_WEAPON,
+	volume = 1.0,
+	level = 110,
+	pitch = { 90, 100 },
+	sound = {"^simulated_vehicles/weapons/leopard_mg1.wav","^simulated_vehicles/weapons/leopard_mg2.wav","^simulated_vehicles/weapons/leopard_mg3.wav"}
+} )
+
+sound.Add( {
 	name = "t90ms_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -48,7 +88,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "tiger_fire_mg",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 110,
 	pitch = { 90, 110 },
@@ -57,7 +97,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "tiger_fire_mg_new",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 110,
 	pitch = { 90, 110 },
@@ -75,7 +115,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "sherman_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -84,7 +124,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "sherman_fire_mg",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 110,
 	pitch = { 90, 110 },
@@ -111,14 +151,31 @@ sound.Add( {
 
 sound.Add( {
 	name = "taucannon_fire",
-	channel = CHAN_STATIC,
+	channel = CHAN_WEAPON,
 	volume = 1.0,
 	level = 80,
 	pitch = { 95, 105 },
 	sound = "weapons/gauss/fire1.wav"
 } )
 
+-- seriously guys, you are not supposed to copy this script. I had to create this workaround because people keep stealing the entire code.
+function simfphys.FireHitScan( data )
+	simfphys.FireBullet( data )
+end
+
+function simfphys.FirePhysProjectile( data )
+	simfphys.FirePhysBullet( data )
+end
+
+function simfphys.RegisterCrosshair( ent, data )
+	simfphys.xhairRegister( ent, data )
+end
+
 function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
+	simfphys.CameraRegister( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
+end
+
+function simfphys.CameraRegister( ent, offset_firstperson, offset_thirdperson, bLocalAng, attachment )
 	if not IsValid( ent ) then return end
 	
 	offset_firstperson = isvector( offset_firstperson ) and offset_firstperson or Vector(0,0,0)
@@ -134,7 +191,7 @@ function simfphys.RegisterCamera( ent, offset_firstperson, offset_thirdperson, b
 	end
 end
 
-function simfphys.FirePhysProjectile( data )
+function simfphys.FirePhysBullet( data )
 	if not data then return end
 	if not istable( data.filter ) then return end
 	if not isvector( data.shootOrigin ) then return end
@@ -165,13 +222,7 @@ function simfphys.FirePhysProjectile( data )
 	projectile:Activate()
 end
 
-local ImpactSounds = {
-	"physics/metal/metal_sheet_impact_bullet2.wav",
-	"physics/metal/metal_sheet_impact_hard2.wav",
-	"physics/metal/metal_sheet_impact_hard6.wav",
-}
-
-function simfphys.FireHitScan( data )
+function simfphys.FireBullet( data )
 	if not data then return end
 	if not istable( data.filter ) then return end
 	if not isvector( data.shootOrigin ) then return end
@@ -205,7 +256,6 @@ function simfphys.FireHitScan( data )
 	bullet.Callback = function(att, tr, dmginfo)
 		if tr.Entity ~= Entity(0) then
 			if simfphys.IsCar( tr.Entity ) then
-				--sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
 				sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, 140)
 			end
 		end
@@ -226,7 +276,7 @@ function simfphys.FireHitScan( data )
 	end
 end
 
-function simfphys.RegisterCrosshair( ent, data )
+function simfphys.xhairRegister( ent, data )
 	if not IsValid( ent ) then return end
 	
 	local data = istable( data ) and data or {}
@@ -247,22 +297,12 @@ function simfphys.RegisterCrosshair( ent, data )
 	end
 end
 
-function simfphys.WeaponsGetAll()
-	local weapons = file.Find("simfphys_weapons/*.lua", "LUA")
-	
-	return weapons
-end
-
-function simfphys.RegisterEquipment( vehicle )
-	print("SIMFPHYS ARMED: RegisterEquipment() is no longer needed")
-end
-
-function simfphys.armedAutoRegister( vehicle )
+function simfphys.WeaponSystemRegister( vehicle )
 	if not IsValid( vehicle ) then return end
 	
 	simfphys.Weapons = istable( simfphys.Weapons ) and table.Empty( simfphys.Weapons ) or {}
 	
-	for k,v in pairs( simfphys.WeaponsGetAll() ) do
+	for k,v in pairs( file.Find("simfphys_weapons/*.lua", "LUA") ) do
 		local name = string.Explode( ".", v )[1]
 		
 		include("simfphys_weapons/"..v)
@@ -287,209 +327,50 @@ function simfphys.armedAutoRegister( vehicle )
 	end
 end
 
-local function DamageVehicle( ent , damage, type )
-	if not simfphys.DamageEnabled then return end
-	
-	local MaxHealth = ent:GetMaxHealth()
-	local CurHealth = ent:GetCurHealth()
-	
-	local NewHealth = math.max( math.Round(CurHealth - damage,0) , 0 )
-	
-	if NewHealth <= (MaxHealth * 0.6) then
-		if NewHealth <= (MaxHealth * 0.3) then
-			ent:SetOnFire( true )
-			ent:SetOnSmoke( false )
-		else
-			ent:SetOnSmoke( true )
-		end
-	end
-	
-	if MaxHealth > 30 and NewHealth <= 31 then
-		if ent:EngineActive() then
-			ent:DamagedStall()
-		end
-	end
-	
-	if NewHealth <= 0 then
-		if type ~= DMG_GENERIC and type ~= DMG_CRUSH or damage > 400 then
-			
-			DestroyVehicle( ent )
-			
-			return
-		end
-		
-		if ent:EngineActive() then
-			ent:DamagedStall()
-		end
-		
-		return
-	end
-	
-	ent:SetCurHealth( NewHealth )
-end
-
-local function DestroyVehicle( ent )
-	if not IsValid( ent ) then return end
-	if ent.destroyed then return end
-	
-	ent.destroyed = true
-	
-	local ply = ent.EntityOwner
-	local skin = ent:GetSkin()
-	local Col = ent:GetColor()
-	Col.r = Col.r * 0.8
-	Col.g = Col.g * 0.8
-	Col.b = Col.b * 0.8
-	
-	local bprop = ents.Create( "gmod_sent_vehicle_fphysics_gib" )
-	bprop:SetModel( ent:GetModel() )			
-	bprop:SetPos( ent:GetPos() )
-	bprop:SetAngles( ent:GetAngles() )
-	bprop:Spawn()
-	bprop:Activate()
-	bprop:GetPhysicsObject():SetVelocity( ent:GetVelocity() + Vector(math.random(-5,5),math.random(-5,5),math.random(150,250)) ) 
-	bprop:GetPhysicsObject():SetMass( ent.Mass * 0.75 )
-	bprop.DoNotDuplicate = true
-	bprop.MakeSound = true
-	bprop:SetColor( Col )
-	bprop:SetSkin( skin )
-	
-	ent.Gib = bprop
-	
-	simfphys.SetOwner( ply , bprop )
-	
-	if IsValid( ply ) then
-		undo.Create( "Gib" )
-		undo.SetPlayer( ply )
-		undo.AddEntity( bprop )
-		undo.SetCustomUndoText( "Undone Gib" )
-		undo.Finish( "Gib" )
-		ply:AddCleanup( "Gibs", bprop )
-	end
-	
-	if ent.CustomWheels == true and not ent.NoWheelGibs then
-		for i = 1, table.Count( ent.GhostWheels ) do
-			local Wheel = ent.GhostWheels[i]
-			if IsValid(Wheel) then
-				local prop = ents.Create( "gmod_sent_vehicle_fphysics_gib" )
-				prop:SetModel( Wheel:GetModel() )			
-				prop:SetPos( Wheel:LocalToWorld( Vector(0,0,0) ) )
-				prop:SetAngles( Wheel:LocalToWorldAngles( Angle(0,0,0) ) )
-				prop:SetOwner( bprop )
-				prop:Spawn()
-				prop:Activate()
-				prop:GetPhysicsObject():SetVelocity( ent:GetVelocity() + Vector(math.random(-5,5),math.random(-5,5),math.random(0,25)) )
-				prop:GetPhysicsObject():SetMass( 20 )
-				prop.DoNotDuplicate = true
-				bprop:DeleteOnRemove( prop )
-				
-				simfphys.SetOwner( ply , prop )
-			end
-		end
-	end
-	
-	local Driver = ent:GetDriver()
-	if IsValid( Driver ) then
-		if ent.RemoteDriver ~= Driver then
-			Driver:TakeDamage( Driver:Health() + Driver:Armor(), ent.LastAttacker or Entity(0), ent.LastInflictor or Entity(0) )
-		end
-	end
-	
-	if ent.PassengerSeats then
-		for i = 1, table.Count( ent.PassengerSeats ) do
-			local Passenger = ent.pSeat[i]:GetDriver()
-			if IsValid( Passenger ) then
-				Passenger:TakeDamage( Passenger:Health() + Passenger:Armor(), ent.LastAttacker or Entity(0), ent.LastInflictor or Entity(0) )
-			end
-		end
-	end
-	
-	ent:Extinguish() 
-	
-	ent:OnDestroyed()
-	
-	ent:Remove()
-end
-
-local function bcDamage( vehicle , position , cdamage )
-	if not simfphys.DamageEnabled then return end
-	
-	cdamage = cdamage or false
-	net.Start( "simfphys_spritedamage" )
-		net.WriteEntity( vehicle )
-		net.WriteVector( position ) 
-		net.WriteBool( cdamage ) 
-	net.Broadcast()
-end
-
-function simfphys.TankDamageSystem(ent, dmginfo)
-	if not ent:IsInitialized() then return end
-	
-	local Damage = dmginfo:GetDamage() 
-	local DamagePos = dmginfo:GetDamagePosition() 
-	local Type = dmginfo:GetDamageType()
-	local Driver = ent:GetDriver()
-	
-	ent.LastAttacker = dmginfo:GetAttacker() 
-	ent.LastInflictor = dmginfo:GetInflictor()
-	
-	bcDamage( ent , ent:WorldToLocal( DamagePos ) )
+function simfphys.TankApplyDamage(ent, Damage, Type)
+	if not IsValid( ent ) or not isnumber( Damage ) or not isnumber( Type ) then return end
 	
 	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC then
-		if simfphys.DamageEnabled then
-			local MaxHealth = ent:GetMaxHealth()
-			local CurHealth = ent:GetCurHealth()
-			
-			local NewHealth = math.max( math.Round(CurHealth - Damage,0) , 0 )
-			
-			if NewHealth <= (MaxHealth * 0.6) then
-				if NewHealth <= (MaxHealth * 0.3) then
-					ent:SetOnFire( true )
-					ent:SetOnSmoke( false )
-				else
-					ent:SetOnSmoke( true )
-				end
+		local MaxHealth = ent:GetMaxHealth()
+		local CurHealth = ent:GetCurHealth()
+		
+		local NewHealth = math.max( math.Round(CurHealth - Damage,0) , 0 )
+		
+		if NewHealth <= (MaxHealth * 0.6) then
+			if NewHealth <= (MaxHealth * 0.3) then
+				ent:SetOnFire( true )
+				ent:SetOnSmoke( false )
+			else
+				ent:SetOnSmoke( true )
 			end
-			
-			if MaxHealth > 30 and NewHealth <= 31 then
-				if ent:EngineActive() then
-					ent:DamagedStall()
-				end
+		end
+		
+		if MaxHealth > 30 and NewHealth <= 31 then
+			if ent:EngineActive() then
+				ent:DamagedStall()
 			end
-			
-			if NewHealth <= 0 then
-				if type ~= DMG_GENERIC and type ~= DMG_CRUSH or Damage > 400 then
-					
-					DestroyVehicle( ent )
-					
-					return
-				end
+		end
+		
+		if NewHealth <= 0 then
+			if type ~= DMG_GENERIC and type ~= DMG_CRUSH or Damage > 400 then
 				
-				if ent:EngineActive() then
-					ent:DamagedStall()
-				end
+				ent:ExplodeVehicle()
 				
 				return
 			end
 			
-			ent:SetCurHealth( NewHealth )
+			if ent:EngineActive() then
+				ent:DamagedStall()
+			end
+			
+			return
 		end
+		
+		ent:SetCurHealth( NewHealth )
 	end
 end
 
-hook.Add("PlayerSpawnedVehicle","simfphys_armedvehicles", function( ply, vehicle )
-	if not simfphys.IsCar( vehicle ) then return end
-	
-	if not simfphys.VERSION or simfphys.VERSION < 1.0 then
-		print("SIMFPHYS ARMED: please update simfphys base")
-		
-		timer.Simple( 0.2, function()
-			simfphys.armedAutoRegister( vehicle )
-		end)
-	end
-end)
-
-hook.Add("Think", "simfphys_weaponhandler", function()
+hook.Add("Think", "zzz_simfphys_weaponhandler", function()
 	if simfphys.ManagedVehicles then
 		for k, v in pairs( simfphys.ManagedVehicles ) do
 			if IsValid( v.entity ) then

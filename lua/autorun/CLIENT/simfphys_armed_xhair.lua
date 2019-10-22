@@ -1,3 +1,23 @@
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+
 CreateClientConVar( "cl_simfphys_crosshair", "1", true, false )
 
 local show_crosshair = false
@@ -254,92 +274,124 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
 		
 	elseif Type == 4 then
-		local scrW = ScrW() / 2
-		local scrH = ScrH() / 2
-		local safemode =  vehicle:GetNWBool( "TurretSafeMode", true )
-		
-		if not safemode then
-			surface.SetDrawColor( 20, 180, 20, 50 )
-		else
-			local sz = scrH * 0.6
-			local alpha = math.abs( math.cos( CurTime() * 1 ) )
-			
-			--draw.RoundedBox( 8, scrW + scrH * 0.4 - sz * 0.5,ScrH() - scrH * 0.05 - sz * 0.2, sz, sz * 0.2, Color( 0, 0, 0, 80 * alpha ) )
-			draw.SimpleText( "Press IN_WALK (Alt) to activate turret!", "simfphysfont", scrW + scrH * 0.4, ScrH() - scrH * 0.05 - sz * 0.1, Color( 20, 180, 20, 255 * alpha ), 1, 1)
-			
-			surface.SetDrawColor( 20, 100, 20, 50 ) 
-		end
-		
 		local X = scr.x
 		local Y = scr.y
+
 		local Scale = 0.75
-		
+
 		local scrW = ScrW() / 2
 		local scrH = ScrH() / 2
 		local Z = scrW * Scale
-		
-		--DrawCircle( scr.x, scr.y, scrH * 0.98 )
-		local pL1 = scrH * 0.98
-		local pL2 = scrH * 1
-		for i = 0, 360, 1.25 do
-			local pX = math.cos( math.rad( i ) )
-			local pY = math.sin( math.rad( i ) )
-			local pp1 = scr.y + pY * pL1
-			if pp1 < (Y + Z * 0.25) and pp1 > (Y - Z * 0.25) then
-				surface.DrawLine(scr.x + pX * pL1, scr.y + pY * pL1, scr.x + pX * pL2, scr.y + pY * pL2 )
-			end
-		end
-		
+
+		local safemode =  vehicle:GetNWBool( "TurretSafeMode", true )
+
 		if not safemode then
-			surface.SetDrawColor( 20, 180, 20, 255 )
+			surface.SetDrawColor( 20, 255, 20, 180 )
 		else
-			surface.SetDrawColor( 20, 200, 20, 50 ) 
+			local alpha = math.abs( math.cos( CurTime() * 3 ) )
+			
+			draw.SimpleText( "press ''alt'' to activate turret! (bind alt +walk)", "simfphysfont", scrW, ScrH() - scrH * 0.04, Color( 20, 255, 20, 255 * alpha ), 1, 1)
+
+			surface.SetDrawColor( 20, 255, 20, 50 ) 
 		end
-		
+
 		local rOuter = scrW * 0.03 * Scale
 		local rInner = scrW * 0.005 * Scale
-		
-		DrawCircle( X, Y, rOuter )
-		DrawCircle( X, Y, rInner )
-		
-		surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
-		surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
-		surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
-		surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
-		
-		surface.DrawLine( X + Z * 0.3, Y - Z * 0.35, X + Z * 0.6, Y - Z * 0.35 )
-		surface.DrawLine( X + Z * 0.6, Y - Z * 0.35, X + Z * 0.7, Y - Z * 0.25 )
-		surface.DrawLine( X - Z * 0.3, Y - Z * 0.35, X - Z * 0.6, Y - Z * 0.35 )
-		surface.DrawLine( X - Z * 0.6, Y - Z * 0.35, X - Z * 0.7, Y - Z * 0.25 )
-		
-		surface.DrawLine( X + Z * 0.3, Y + Z * 0.35, X + Z * 0.6, Y + Z * 0.35 )
-		surface.DrawLine( X + Z * 0.6, Y + Z * 0.35, X + Z * 0.7, Y + Z * 0.25 )
-		surface.DrawLine( X - Z * 0.3, Y + Z * 0.35, X - Z * 0.6, Y + Z * 0.35 )
-		surface.DrawLine( X - Z * 0.6, Y + Z * 0.35, X - Z * 0.7, Y + Z * 0.25 )
-		
-		--surface.DrawLine(scr.x - scrH * 0.4, scr.y, scr.x - scrH * 0.07, scr.y )
-		--surface.DrawLine(scr.x - scrH * 0.4, scr.y + 1 , scr.x - scrH * 0.15, scr.y + 1 )
-		--surface.DrawLine(scr.x - scrH * 0.4, scr.y - 1, scr.x - scrH * 0.15, scr.y - 1 )
-		
-		--surface.DrawLine(scr.x + scrH * 0.4, scr.y, scr.x + scrH * 0.07, scr.y )
-		--surface.DrawLine(scr.x + scrH * 0.4, scr.y + 1 , scr.x + scrH * 0.15, scr.y + 1 )
-		--surface.DrawLine(scr.x + scrH * 0.4, scr.y - 1, scr.x + scrH * 0.15, scr.y - 1 )
-		
-		--surface.DrawLine(scr.x, scr.y + scrH * 0.4, scr.x, scr.y + scrH * 0.01 )
-		--surface.DrawLine(scr.x - 1, scr.y + scrH * 0.4, scr.x - 1, scr.y + scrH * 0.1 )
-		--surface.DrawLine(scr.x + 1, scr.y + scrH * 0.4, scr.x + 1, scr.y + scrH * 0.1 )
-		
+
+		if vehicle:GetNWBool( "SpecialCam_Loader", false ) then
+			surface.DrawLine( X, Y + rInner, X, Y + Z * 0.15)
+
+			surface.DrawLine( X, Y + Z * 0.025, X - Z * 0.01, Y + Z * 0.025)
+			
+			surface.DrawLine( X, Y + Z * 0.05, X - Z * 0.015, Y + Z * 0.05)
+			draw.SimpleText( "1", "simfphysfont", X - Z * 0.02, Y + Z * 0.05 , Color( 20, 255, 20, 180 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+			surface.DrawLine( X, Y + Z * 0.075, X - Z * 0.01, Y + Z * 0.075)
+			
+			surface.DrawLine( X, Y + Z * 0.1, X - Z * 0.015, Y + Z * 0.1)
+			draw.SimpleText( "2", "simfphysfont", X - Z * 0.02, Y + Z * 0.1 , Color( 20, 255, 20, 180 ), TEXT_ALIGN_RIGHT, TEXT_ALIGN_CENTER)
+			surface.DrawLine( X, Y + Z * 0.125, X - Z * 0.01, Y + Z * 0.125)
+			
+			surface.DrawLine( X + rInner, Y - rInner, X + rOuter, Y - rOuter )
+			surface.DrawLine( X - rInner, Y - rInner, X - rOuter, Y - rOuter )
+
+			local LoaderTime = vehicle:GetNWFloat( "SpecialCam_LoaderTime", 0 )
+			local FireNext = math.max(vehicle:GetNWFloat( "SpecialCam_LoaderNext", 0 ) - CurTime(),0)
+			
+			local CProgress = ((LoaderTime - FireNext) / LoaderTime)
+			
+			local pL1 = scrH * 0.25
+			local pL2 = scrH * 0.23
+			local pL3 = scrH * 0.24
+			
+			for i = 0, 355, 5 do
+				local angCos = math.cos( math.rad( i ) )
+				local angSin = math.sin( math.rad( i ) )
+				
+				if i > (CProgress * 360) then
+					pL2 = pL3
+					surface.SetDrawColor( 255, 0, 0, 255 )
+				end
+				
+				local pX1 = angCos * pL1
+				local pY1 = angSin * pL1
+				
+				local pX2 = angCos * pL2
+				local pY2 = angSin * pL2
+				
+				surface.DrawLine( X + pX1, Y + pY1, X + pX2, Y + pY2 )
+				surface.DrawLine( X + pX1, Y + pY1, X + pX2, Y + pY2 )
+			end
+			
+			if vehicle:GetNWBool( "simfphys_NoHud", false ) then
+				local fuel = vehicle:GetFuel() / vehicle:GetMaxFuel()
+				local fueltype = vehicle:GetFuelType()
+				local Cruise = vehicle:GetIsCruiseModeOn() and " (cruise)" or ""
+				draw.SimpleText( "THR", "SIMFPHYS_ARMED_HUDFONT", 10, 10, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				draw.SimpleText( math.Round(vehicle:GetThrottle() * 100).."%"..Cruise , "SIMFPHYS_ARMED_HUDFONT", 120, 10, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				
+				draw.SimpleText( "SPD", "SIMFPHYS_ARMED_HUDFONT", 10, 35, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				draw.SimpleText(  math.Round(vehicle:GetVelocity():Length() * 0.09144,0).."km/h" , "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				
+				draw.SimpleText( "FUEL", "SIMFPHYS_ARMED_HUDFONT", 10, 60, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				draw.SimpleText( math.Round(vehicle:GetFuel()).."/"..vehicle:GetMaxFuel().."L", "SIMFPHYS_ARMED_HUDFONT", 120, 60, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			end
+		else
+			DrawCircle( X, Y, rOuter )
+			DrawCircle( X, Y, rInner )
+
+			surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
+			surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
+			surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
+			surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
+
+			surface.DrawLine( X + Z * 0.3, Y - Z * 0.35, X + Z * 0.6, Y - Z * 0.35 )
+			surface.DrawLine( X + Z * 0.6, Y - Z * 0.35, X + Z * 0.7, Y - Z * 0.25 )
+			surface.DrawLine( X - Z * 0.3, Y - Z * 0.35, X - Z * 0.6, Y - Z * 0.35 )
+			surface.DrawLine( X - Z * 0.6, Y - Z * 0.35, X - Z * 0.7, Y - Z * 0.25 )
+
+			surface.DrawLine( X + Z * 0.3, Y + Z * 0.35, X + Z * 0.6, Y + Z * 0.35 )
+			surface.DrawLine( X + Z * 0.6, Y + Z * 0.35, X + Z * 0.7, Y + Z * 0.25 )
+			surface.DrawLine( X - Z * 0.3, Y + Z * 0.35, X - Z * 0.6, Y + Z * 0.35 )
+			surface.DrawLine( X - Z * 0.6, Y + Z * 0.35, X - Z * 0.7, Y + Z * 0.25 )
+		end
+
+		if not safemode then
+			surface.SetDrawColor( 20, 255, 20, 180 )
+		else
+			surface.SetDrawColor( 20, 255, 20, 50 ) 
+		end
+
 		local Yaw = vehicle:GetPoseParameter( "cannon_aim_yaw" ) * 360 - 90
-		
+
 		local dX = math.cos( math.rad( -Yaw ) )
 		local dY = math.sin( math.rad( -Yaw ) )
 		local len = scrH * 0.04
-		
+
 		DrawCircle( scrW, scrH * 1.85, len )
 		surface.DrawLine( scrW + dX * len, scrH * 1.85 + dY * len, scrW + dX * len * 3, scrH * 1.85 + dY * len * 3 )
-		
-		surface.SetDrawColor( 20, 180, 20, 255 )
-		
+
+		surface.SetDrawColor( 20, 255, 20, 180 )
+
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW - len * 1.25, scrH * 1.85 + len * 2 )
 		surface.DrawLine( scrW + len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
@@ -358,17 +410,11 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		local rOuter = scrW * 0.03 * Scale
 		local rInner = scrW * 0.005 * Scale
 		
-		surface.SetDrawColor( 20, 180, 20, 255 )
+		surface.SetDrawColor( 20, 255, 20, 255 )
 		
 		DrawCircle( X, Y, rOuter )
-		DrawCircle( X, Y, rInner )
-		
-		surface.DrawLine( X + rOuter, Y, X + rOuter * 2, Y )
-		surface.DrawLine( X - rOuter, Y, X - rOuter * 2, Y )
-		surface.DrawLine( X, Y + rOuter, X, Y + rOuter * 2 )
-		surface.DrawLine( X, Y - rOuter, X, Y - rOuter * 2)
 
-		surface.SetDrawColor( 10, 100, 10, 200 )
+		surface.SetDrawColor( 20, 255, 20, 50 )
 		
 		local Yaw = vehicle:GetPoseParameter( "cannon_aim_yaw" ) * 360 - 90
 		

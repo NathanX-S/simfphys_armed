@@ -1,4 +1,4 @@
-EFFECT.Mat = Material( "effects/beam_generic01" )
+EFFECT.Mat = Material( "effects/simfphys_armed/gauss_beam" )
 
 function EFFECT:Init( data )
 

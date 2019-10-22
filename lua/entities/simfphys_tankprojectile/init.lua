@@ -6,6 +6,14 @@ local ImpactSounds = {
 	"physics/metal/metal_sheet_impact_bullet1.wav",
 	"weapons/rpg/shotdown.wav",
 }
+
+local DeflectSounds = {
+	"simulated_vehicles/weapons/physproj_rico.wav",
+	"simulated_vehicles/weapons/physproj_rico1.wav",
+	"simulated_vehicles/weapons/physproj_rico2.wav",
+	"simulated_vehicles/weapons/physproj_rico3.wav",
+}
+
 function ENT:SpawnFunction( ply, tr, ClassName )
 
 	if ( !tr.Hit ) then return end
@@ -82,9 +90,13 @@ function ENT:Think()
 			local effectdata = EffectData()
 				effectdata:SetOrigin( trace.HitPos )
 				effectdata:SetNormal( self.Vel:GetNormalized() * 10 )
-			util.Effect( "manhacksparks", effectdata, true, true )
+			util.Effect( "simfphys_tracer_hit", effectdata, true, true )
 			
-			sound.Play( Sound( "simulated_vehicles/weapons/physproj_rico.wav" ), trace.HitPos, 140)
+			if Size >= 5 then
+				sound.Play( Sound( DeflectSounds[ math.random(1,table.Count( DeflectSounds )) ] ), trace.HitPos, 140)
+			else
+				sound.Play( Sound( "simulated_vehicles/weapons/physproj_rico"..math.random(1,3)..".wav" ), trace.HitPos, 140)
+			end
 			
 			self.Bounced = true -- only bounce once
 		else
@@ -100,7 +112,12 @@ function ENT:Think()
 				bullet.HullSize		= self:GetSize()
 				bullet.Attacker 	= self.Attacker
 				bullet.Callback = function(att, tr, dmginfo)
-					dmginfo:SetDamageType(DMG_GENERIC)
+					if tr.Entity:GetClass():lower() == "npc_helicopter" then
+						dmginfo:SetDamageType(DMG_AIRBOAT)
+					else
+						dmginfo:SetDamageType(DMG_GENERIC)
+					end
+					
 					local attackingEnt = IsValid( self.AttackingEnt ) and self.AttackingEnt or self
 					util.BlastDamage( attackingEnt, self.Attacker, tr.HitPos,self.BlastRadius,self.BlastDamage)
 					
@@ -109,8 +126,8 @@ function ENT:Think()
 					if tr.Entity ~= Entity(0) then
 						if simfphys.IsCar( tr.Entity ) then
 							local effectdata = EffectData()
-								effectdata:SetOrigin( tr.HitPos + shootDirection * tr.Entity:BoundingRadius() )
-								effectdata:SetNormal( shootDirection * 10 )
+								effectdata:SetOrigin( tr.HitPos )
+								effectdata:SetNormal( tr.HitNormal )
 							util.Effect( "manhacksparks", effectdata, true, true )
 							
 							sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, 140)

@@ -67,13 +67,8 @@ function simfphys.weapon:ValidClasses()
 end
 
 function simfphys.weapon:Initialize( vehicle )
-	net.Start( "simfphys_register_tank" )
-		net.WriteEntity( vehicle )
-		net.WriteString( "tiger" )
-	net.Broadcast()
-	
 	vehicle:SetNWBool( "SpecialCam_Loader", true )
-	vehicle:SetNWFloat( "SpecialCam_LoaderTime", 7 )
+	vehicle:SetNWFloat( "SpecialCam_LoaderTime", 5 )
 	
 	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), { Direction = Vector(0,0,1), Type = 2 } )
 	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(20,0,-130), Vector(0,60,75), true, "muzzle" )
@@ -172,8 +167,8 @@ function simfphys.weapon:ControlTurret( vehicle, deltapos )
 		self:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
 	end
 	
-	local Rate = FrameTime() / 5
-	vehicle.smTmpHMG = vehicle.smTmpHMG and vehicle.smTmpHMG + math.Clamp((fire2 and 1 or 0) - vehicle.smTmpHMG,-Rate * 5,Rate) or 0
+	local Rate = FrameTime() / 8
+	vehicle.smTmpHMG = vehicle.smTmpHMG and vehicle.smTmpHMG + math.Clamp((fire2 and 1 or 0) - vehicle.smTmpHMG,-Rate * 4,Rate) or 0
 	
 	if fire2 then
 		self:SecondaryAttack( vehicle, ply, shootOrigin - Attachment.Ang:Up() * 155 - Attachment.Ang:Forward() * 20, Attachment.Ang )
@@ -201,8 +196,8 @@ function simfphys.weapon:ControlMachinegun( vehicle, deltapos )
 	
 	local fire = ply:KeyDown( IN_ATTACK )
 
-	local Rate = FrameTime() / 5
-	vehicle.smTmpMG = vehicle.smTmpMG and vehicle.smTmpMG + math.Clamp((fire and 1 or 0) - vehicle.smTmpMG,-Rate * 5,Rate) or 0
+	local Rate = FrameTime() / 8
+	vehicle.smTmpMG = vehicle.smTmpMG and vehicle.smTmpMG + math.Clamp((fire and 1 or 0) - vehicle.smTmpMG,-Rate * 4,Rate) or 0
 	
 	if fire then
 		self:TertiaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
@@ -341,7 +336,7 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
 	
 	cannon_fire( ply, vehicle, shootOrigin, Attachment.Ang:Up() )
 	
-	self:SetNextPrimaryFire( vehicle, CurTime() + 7 )
+	self:SetNextPrimaryFire( vehicle, CurTime() + 5 )
 end
 
 function simfphys.weapon:SecondaryAttack( vehicle, ply, shootOrigin, shootDir )
@@ -356,14 +351,6 @@ end
 function simfphys.weapon:TertiaryAttack( vehicle, ply, shootOrigin, Attachment, ID )
 	
 	if not self:CanTertiaryAttack( vehicle ) then return end
-	
-	local effectdata = EffectData()
-		effectdata:SetOrigin( shootOrigin )
-		effectdata:SetAngles( Attachment.Ang )
-		effectdata:SetEntity( vehicle )
-		effectdata:SetAttachment( ID )
-		effectdata:SetScale( 4 )
-	util.Effect( "CS_MuzzleFlash", effectdata, true, true )
 	
 	mg_fire( ply, vehicle, shootOrigin, Attachment.Ang:Forward() )
 	

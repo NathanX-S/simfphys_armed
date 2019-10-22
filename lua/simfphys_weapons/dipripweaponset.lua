@@ -1,57 +1,31 @@
 local function hmgfire(ply,vehicle,shootOrigin,shootDirection)
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0,0,0)
-		bullet.Tracer		= 5
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 12
-		bullet.Damage		= 30
-		bullet.HullSize		= 5
-		bullet.Attacker 	= ply
-		bullet.Callback = function(att, tr, dmginfo)
-			if tr.Entity ~= Entity(0) then
-				if simfphys.IsCar( tr.Entity ) then
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + tr.HitNormal )
-						effectdata:SetNormal( tr.HitNormal )
-					util.Effect( "stunstickimpact", effectdata, true, true )
-				
-					sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
-				end
-			end
-		end
-		
-	vehicle:FireBullets( bullet )
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.Tracer	= 1
+		projectile.Spread = Vector(0.015,0.015,0.015)
+		projectile.HullSize = 5
+		projectile.attackingent = vehicle
+		projectile.Damage = 30
+		projectile.Force = 12
+	simfphys.FireHitScan( projectile )
 end
 
 local function minigunfire(ply,vehicle,shootOrigin,shootDirection)
-	local bullet = {}
-		bullet.Num 			= 1
-		bullet.Src 			= shootOrigin + shootDirection * 50
-		bullet.Dir 			= shootDirection
-		bullet.Spread 		= Vector(0.06,0.06,0)
-		bullet.Tracer		= 1
-		bullet.TracerName	= "simfphys_tracer"
-		bullet.Force		= 4
-		bullet.Damage		= 25
-		bullet.HullSize		= 10
-		bullet.Attacker 	= ply
-		bullet.Callback = function(att, tr, dmginfo)
-			if tr.Entity ~= Entity(0) then
-				if simfphys.IsCar( tr.Entity ) then
-					local effectdata = EffectData()
-						effectdata:SetOrigin( tr.HitPos + tr.HitNormal )
-						effectdata:SetNormal( tr.HitNormal )
-					util.Effect( "stunstickimpact", effectdata, true, true )
-				
-					sound.Play( Sound( "weapons/fx/rics/ric"..math.random(1,5)..".wav" ), tr.HitPos, 60)
-				end
-			end
-		end
-		
-	vehicle:FireBullets( bullet )
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.Tracer	= 1
+		projectile.Spread = Vector(0.015,0.015,0.015)
+		projectile.HullSize = 5
+		projectile.attackingent = vehicle
+		projectile.Damage = 40
+		projectile.Force = 12
+	simfphys.FireHitScan( projectile )
 end
 
 function simfphys.weapon:ValidClasses()
@@ -142,43 +116,32 @@ function simfphys.weapon:Think( vehicle )
 
 	vehicle:SetPoseParameter("vehicle_minigun_pitch", Angles.p * vehicle.neg )
 	
-	vehicle.missle_ammo = vehicle.missle_ammo or 6
-	vehicle.mg_ammo = vehicle.mg_ammo or 600
-	
-	local keyattack = ply:KeyDown( IN_ATTACK ) and vehicle.mg_ammo > 0
+	local keyattack = ply:KeyDown( IN_ATTACK )
 	local alt_fire = ply:KeyDown( IN_ATTACK2 )
-	local reload = ply:KeyDown( IN_RELOAD )
 	
-	if reload and (vehicle.missle_ammo ~= 6 or vehicle.mg_ammo ~= 320)  then
-		vehicle:EmitSound("vehicles/tank_readyfire1.wav")
-		
-		vehicle.missle_ammo = 6
-		vehicle.mg_ammo = 320
-		vehicle.lockweapons = true
-		
-		vehicle.NextSecondaryShoot = curtime + 2
-		vehicle:SetIsCruiseModeOn( false )
-		
-		timer.Simple( 2, function()
-			if not IsValid( vehicle ) then return end
-			vehicle.lockweapons = false
-			vehicle:SetIsCruiseModeOn( false )
-		end)
-	end
+	vehicle.FireMode = vehicle.FireMode or 0
 	
-	local inrange = math.abs( Angles.y ) <= 10
-	
-	local fire = false
-	local fire2 = false
-	if not vehicle.lockweapons then
-		if inrange then
-			fire = false
-			fire2 = keyattack
-		else
-			fire = keyattack
-			fire2 = false
+	if alt_fire ~= vehicle.afire_pressed then
+		vehicle.afire_pressed = alt_fire
+		if alt_fire then
+			vehicle.FireMode = vehicle.FireMode + 1
+			if vehicle.FireMode >= 3 then
+				vehicle.FireMode = 0
+			end
+			
+			if vehicle.FireMode == 0 then
+				vehicle:EmitSound("weapons/smg1/switch_burst.wav")
+			elseif vehicle.FireMode == 1 then
+				vehicle:EmitSound("weapons/357/357_spin1.wav")
+			else
+				vehicle:EmitSound("weapons/shotgun/shotgun_cock.wav")
+			end
 		end
 	end
+	
+	local fire = vehicle.FireMode == 0 and keyattack
+	local fire2 = vehicle.FireMode == 1 and keyattack
+	local fire3 = vehicle.FireMode == 2 and keyattack
 	
 	vehicle.smoothaltfire = vehicle.smoothaltfire and (vehicle.smoothaltfire + ((fire2 and 20 or 0) - vehicle.smoothaltfire) * 0.1) or 0
 	vehicle.minigunspin = vehicle.minigunspin and (vehicle.minigunspin + vehicle.smoothaltfire) or 0
@@ -188,8 +151,6 @@ function simfphys.weapon:Think( vehicle )
 	
 	if fire then
 		if vehicle.NextShoot < curtime then
-			
-			vehicle.mg_ammo = vehicle.mg_ammo - 1
 			
 			if vehicle.swapMuzzle then
 				vehicle.swapMuzzle = false
@@ -204,14 +165,6 @@ function simfphys.weapon:Think( vehicle )
 			
 			local shootOrigin = Attachment.Pos + offset
 			local shootDirection = Attachment.Ang:Forward()
-		
-			local effectdata = EffectData()
-				effectdata:SetOrigin( shootOrigin )
-				effectdata:SetAngles( Attachment.Ang )
-				effectdata:SetEntity( vehicle )
-				effectdata:SetAttachment( AttachmentID )
-				effectdata:SetScale( 3 )
-			util.Effect( "CS_MuzzleFlash", effectdata, true, true )
 			
 			hmgfire( ply, vehicle, shootOrigin, Attachment.Ang:Forward() )
 			
@@ -221,8 +174,6 @@ function simfphys.weapon:Think( vehicle )
 	
 	if fire2 then
 		if vehicle.NextShoot < curtime then
-			
-			vehicle.mg_ammo = vehicle.mg_ammo - 2
 			
 			local offset = deltapos * engine.TickInterval()
 			
@@ -237,14 +188,6 @@ function simfphys.weapon:Think( vehicle )
 				local shootOrigin = Attachment.Pos + offset
 				local shootDirection = Attachment.Ang:Forward()
 				
-				local effectdata = EffectData()
-					effectdata:SetOrigin( shootOrigin )
-					effectdata:SetAngles( Attachment.Ang )
-					effectdata:SetEntity( vehicle )
-					effectdata:SetAttachment( AttachmentID )
-					effectdata:SetScale( 5 )
-				util.Effect( "CS_MuzzleFlash", effectdata, true, true )
-				
 				minigunfire( ply, vehicle, shootOrigin, shootDirection )
 			end
 			
@@ -252,62 +195,10 @@ function simfphys.weapon:Think( vehicle )
 		end
 	end
 	
-	vehicle.NextSecondaryShoot = vehicle.NextSecondaryShoot or 0
-	if alt_fire ~= vehicle.afire_pressed then
-		vehicle.afire_pressed = alt_fire
-		if alt_fire then
-			if vehicle.NextSecondaryShoot < curtime then
-				if not IsValid(vehicle.missle) then
-					if vehicle.missle_ammo > 0 then
-						vehicle:EmitSound("simulated_vehicles/weapons/diprip/rocket.wav")
-						
-						vehicle.missle_ammo = vehicle.missle_ammo - 1
-						
-						if vehicle.swapMuzzle then
-							vehicle.swapMuzzle = false
-						else
-							vehicle.swapMuzzle = true
-						end
-						
-						local attach = vehicle.swapMuzzle and vehicle:GetAttachment( vehicle:LookupAttachment( "rocket_barell_right" ) ) or vehicle:GetAttachment( vehicle:LookupAttachment( "rocket_barell_left" ) )
-						
-						vehicle.missle = ents.Create( "rpg_missile" )
-						vehicle.missle:SetPos( attach.Pos + attach.Ang:Up() * 25 )
-						vehicle.missle:SetAngles( attach.Ang - Angle(10,0,0) )
-						vehicle.missle:SetOwner( vehicle )
-						vehicle.missle:SetSaveValue( "m_flDamage", 120 )
-						vehicle.missle:Spawn()
-						vehicle.missle:Activate()
-						
-						vehicle.missle.DirVector = vehicle.missle:GetAngles():Forward()
-						
-						vehicle.NextSecondaryShoot = curtime + 0.5
-						vehicle.UnlockMissle = curtime + 0.5
-					else
-						vehicle:EmitSound("Weapon_Shotgun.Empty")
-					end
-				end
-			end
-		end
-	end
-	
-	if IsValid(vehicle.missle) then
-		if vehicle.UnlockMissle < curtime then
-			local targetdir = Aimpos - vehicle.missle:GetPos()
-			targetdir:Normalize()
-			
-			vehicle.missle.DirVector = vehicle.missle.DirVector + (targetdir - vehicle.missle.DirVector) * 0.1
-			
-			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 2500 + vehicle:GetVelocity()
-			
-			vehicle.missle:SetVelocity( vel )
-			vehicle.missle:SetAngles( vehicle.missle.DirVector:Angle() )
-		end
-	end
-	
-	
 	vehicle.OldFire = vehicle.OldFire or false
 	vehicle.OldFire2 = vehicle.OldFire2 or false
+	vehicle.OldFire3 = vehicle.OldFire3 or false
+	
 	if vehicle.OldFire ~= fire then
 		vehicle.OldFire = fire
 		if fire then
@@ -319,9 +210,6 @@ function simfphys.weapon:Think( vehicle )
 				end
 			end)
 		else
-			if vehicle.mg_ammo <= 0 then
-				vehicle:EmitSound("Weapon_Shotgun.Empty")
-			end
 			if vehicle.wpn then
 				vehicle.wpn:Stop()
 				vehicle.wpn = nil
@@ -340,13 +228,59 @@ function simfphys.weapon:Think( vehicle )
 				end
 			end)
 		else
-			if vehicle.mg_ammo <= 0 then
-				vehicle:EmitSound("Weapon_Shotgun.Empty")
-			end
 			if vehicle.wpn2 then
 				vehicle.wpn2:Stop()
 				vehicle.wpn2 = nil
 			end
+		end
+	end
+	
+	
+	if vehicle.OldFire3 ~= fire3 then
+		vehicle.OldFire3 = fire3
+		if fire3 then
+			if vehicle.NextShoot < curtime then
+				if not IsValid(vehicle.missle) then
+					vehicle:EmitSound("simulated_vehicles/weapons/diprip/rocket.wav")
+					
+					if vehicle.swapMuzzle then
+						vehicle.swapMuzzle = false
+					else
+						vehicle.swapMuzzle = true
+					end
+					
+					local attach = vehicle.swapMuzzle and vehicle:GetAttachment( vehicle:LookupAttachment( "rocket_barell_right" ) ) or vehicle:GetAttachment( vehicle:LookupAttachment( "rocket_barell_left" ) )
+					
+					vehicle.missle = ents.Create( "rpg_missile" )
+					vehicle.missle:SetPos( attach.Pos + attach.Ang:Up() * 25 )
+					vehicle.missle:SetAngles( attach.Ang - Angle(10,0,0) )
+					vehicle.missle:SetOwner( vehicle )
+					vehicle.missle:SetSaveValue( "m_flDamage", 120 )
+					vehicle.missle:Spawn()
+					vehicle.missle:Activate()
+					
+					vehicle.missle.DirVector = vehicle.missle:GetAngles():Forward()
+					
+					vehicle.NextShoot = curtime + 0.5
+					vehicle.UnlockMissle = curtime + 0.5
+				else
+					vehicle:EmitSound("Weapon_Shotgun.Empty")
+				end
+			end
+		end
+	end
+	
+	if IsValid(vehicle.missle) then
+		if vehicle.UnlockMissle < curtime then
+			local targetdir = Aimpos - vehicle.missle:GetPos()
+			targetdir:Normalize()
+			
+			vehicle.missle.DirVector = vehicle.missle.DirVector + (targetdir - vehicle.missle.DirVector) * 0.1
+			
+			local vel = -vehicle.missle:GetVelocity() + vehicle.missle.DirVector * 2500 + vehicle:GetVelocity()
+			
+			vehicle.missle:SetVelocity( vel )
+			vehicle.missle:SetAngles( vehicle.missle.DirVector:Angle() )
 		end
 	end
 end

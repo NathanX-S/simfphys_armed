@@ -1,3 +1,23 @@
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+
 local light_table = {	
 	ems_sounds = {"ambient/alarms/apc_alarm_loop1.wav"},
 }
@@ -47,6 +67,15 @@ local V = {
 		LightsTable = "capc_siren",
 		
 		IsArmored = true,
+		
+		GibModels = {
+			"models/combine_apc_destroyed_gib01.mdl",
+			"models/combine_apc_destroyed_gib02.mdl",
+			"models/combine_apc_destroyed_gib03.mdl",
+			"models/combine_apc_destroyed_gib04.mdl",
+			"models/combine_apc_destroyed_gib05.mdl",
+			"models/combine_apc_destroyed_gib06.mdl",
+		},
 		
 		FrontWheelRadius = 28,
 		RearWheelRadius = 28,
@@ -466,6 +495,23 @@ local V = {
 		
 		IsArmored = true,
 		
+		GibModels = {
+			"models/blu/conscript_apc.mdl",
+			"models/props_vehicles/apc_tire001.mdl",
+			"models/props_vehicles/apc_tire001.mdl",
+			"models/props_vehicles/apc_tire001.mdl",
+			"models/props_vehicles/apc_tire001.mdl",
+			"models/props_c17/TrapPropeller_Engine.mdl",
+			"models/gibs/helicopter_brokenpiece_01.mdl",
+			"models/gibs/manhack_gib01.mdl",
+			"models/gibs/manhack_gib02.mdl",
+			"models/gibs/manhack_gib03.mdl",
+			"models/combine_apc_destroyed_gib02.mdl",
+			"models/combine_apc_destroyed_gib03.mdl",
+			"models/combine_apc_destroyed_gib04.mdl",
+			"models/combine_apc_destroyed_gib05.mdl",
+		},
+		
 		EnginePos = Vector(-16.1,-81.68,47.25),
 		
 		LightsTable = "conapc",
@@ -719,6 +765,12 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,-5),
 
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		ExhaustPositions = {
 			{
 				pos = Vector(6.54,44.25,13.19),
@@ -849,6 +901,12 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,0),
 
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		ExhaustPositions = {
 			{
 				pos = Vector(-73.69,21.88,21.45),
@@ -980,6 +1038,12 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,2),
 
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		ExhaustPositions = {
 			{
 				pos = Vector(-77.06,11.36,43.69),
@@ -1101,18 +1165,17 @@ local V = {
 				ent:SetNWBool( "simfphys_NoRacingHud", true )
 				ent:SetNWBool( "simfphys_NoHud", true ) 
 			end,
-		
-		OnDestroyed = 
-			function(ent)
-				if IsValid( ent.Gib ) then 
-					local yaw = ent.sm_pp_yaw or 0
-					local pitch = ent.sm_pp_pitch or 0
-					ent.Gib:SetPoseParameter("turret_yaw", yaw )
-					ent.Gib:SetPoseParameter("turret_pitch", pitch )
-				end
-			end,
 			
-		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
+		ApplyDamage = function( ent, damage, type ) 
+			simfphys.TankApplyDamage(ent, damage, type)
+		end,
+		
+		GibModels = {
+			"models/blu/tanks/tiger_gib_1.mdl",
+			"models/blu/tanks/tiger_gib_2.mdl",
+			"models/blu/tanks/tiger_gib_3.mdl",
+			"models/blu/tanks/tiger_gib_4.mdl",
+		},
 
 		MaxHealth = 8000,
 		
@@ -1283,18 +1346,19 @@ local V = {
 				ent:SetNWBool( "simfphys_NoRacingHud", true )
 				ent:SetNWBool( "simfphys_NoHud", true ) 
 			end,
-		
-		OnDestroyed = 
-			function(ent)
-				if IsValid( ent.Gib ) then 
-					local yaw = ent.sm_pp_yaw or 0
-					local pitch = ent.sm_pp_pitch or 0
-					ent.Gib:SetPoseParameter("turret_yaw", yaw )
-					ent.Gib:SetPoseParameter("turret_pitch", pitch )
-				end
-			end,
 			
-		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
+		ApplyDamage = function( ent, damage, type ) 
+			simfphys.TankApplyDamage(ent, damage, type)
+		end,
+
+		GibModels = {
+			"models/blu/tanks/sherman_gib_1.mdl",
+			"models/blu/tanks/sherman_gib_2.mdl",
+			"models/blu/tanks/sherman_gib_3.mdl",
+			"models/blu/tanks/sherman_gib_4.mdl",
+			"models/blu/tanks/sherman_gib_6.mdl",
+			"models/blu/tanks/sherman_gib_7.mdl",
+		},
 		
 		MaxHealth = 6000,
 		
@@ -1443,7 +1507,13 @@ local light_table = {
 		Vector(-122.5,-33.02,25.81),
 		Vector(-122.5,33.02,25.81)
 	},
-
+	
+	Rearlight_sprites = {
+		Vector(150.06,-55.65,36.7),
+	},
+	Brakelight_sprites = {
+		Vector(150.06,-55.65,36.7),
+	},
 }
 list.Set( "simfphys_lights", "t90ms", light_table)
 
@@ -1468,7 +1538,9 @@ local light_table = {
 	},
 	Brakelight_sprites = {
 		Vector(-54.66,-154.5,47.43),
-		Vector(54.66,-154.5,47.43)
+		Vector(54.66,-154.5,47.43),
+		Vector(28.12,-145.85,29.81),
+		Vector(-28.12,-145.85,29.81),
 	},
 	
 	Turnsignal_sprites = {
@@ -1508,19 +1580,20 @@ local V = {
 				ent:SetNWBool( "simfphys_NoHud", true ) 
 			end,
 		
-		OnDestroyed = 
-			function(ent)
-				if IsValid( ent.Gib ) then 
-					local yaw = ent.sm_pp_yaw or 0
-					local pitch = ent.sm_pp_pitch or 0
-					ent.Gib:SetPoseParameter("cannon_aim_yaw", yaw - 90 )
-					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
-				end
-			end,
+		ApplyDamage = function( ent, damage, type ) 
+			simfphys.TankApplyDamage(ent, damage, type)
+		end,
 		
-		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
+		GibModels = {
+			"models/blu/tanks/leopard2a7_gib_1.mdl",
+			"models/blu/tanks/leopard2a7_gib_2.mdl",
+			"models/blu/tanks/leopard2a7_gib_3.mdl",
+			"models/blu/tanks/leopard2a7_gib_4.mdl",
+			"models/props_c17/pulleywheels_small01.mdl",
+			"models/props_c17/pulleywheels_small01.mdl",
+		},
 		
-		MaxHealth = 8200,
+		MaxHealth = 10000,
 		
 		IsArmored = true,
 		
@@ -1585,7 +1658,11 @@ local V = {
 				ang = Angle(0,0,0)
 			},
 			{
-				pos = Vector(25,-5,45),
+				pos = Vector(0,0,50),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(0,0,50),
 				ang = Angle(0,0,0)
 			}
 		},
@@ -1679,20 +1756,19 @@ local V = {
 				ent:SetNWBool( "simfphys_NoRacingHud", true )
 				ent:SetNWBool( "simfphys_NoHud", true ) 
 			end,
+
+		ApplyDamage = function( ent, damage, type ) 
+			simfphys.TankApplyDamage(ent, damage, type)
+		end,
 		
-		OnDestroyed = 
-			function(ent)
-				if IsValid( ent.Gib ) then 
-					local yaw = ent.sm_pp_yaw or 0
-					local pitch = ent.sm_pp_pitch or 0
-					ent.Gib:SetPoseParameter("cannon_aim_yaw", yaw - 180 )
-					ent.Gib:SetPoseParameter("cannon_aim_pitch", -pitch )
-				end
-			end,
+		GibModels = {
+			"models/blu/tanks/t90ms_gib_1.mdl",
+			"models/blu/tanks/t90ms_gib_2.mdl",
+			"models/blu/tanks/t90ms_gib_3.mdl",
+			"models/blu/tanks/t90ms_gib_4.mdl",
+		},
 		
-		OnTakeDamage = function( ent, dmginfo) simfphys.TankDamageSystem(ent, dmginfo) end,
-		
-		MaxHealth = 8200,
+		MaxHealth = 10000,
 		
 		IsArmored = true,
 		
@@ -1742,13 +1818,21 @@ local V = {
 				ang = Angle(115,-90,0)
 			},
 			{
-				pos = Vector(69,-75,30.4),
-				ang = Angle(115,-90,0)
+				pos = Vector(0,0,50),
+				ang = Angle(0,-90,0)
 			},
+			{
+				pos = Vector(0,0,50),
+				ang = Angle(0,-90,0)
+			}
 		},
 		
 		
 		PassengerSeats = {
+			{
+				pos = Vector(0,0,0),
+				ang = Angle(0,90,0)
+			},
 			{
 				pos = Vector(0,0,0),
 				ang = Angle(0,90,0)

@@ -1,66 +1,22 @@
-local next_think = 0
-local next_find = 0
-local tigers = {}
-local shermans = {}
-local leopards = {}
-local t90s = {}
-
-local function TigersGetAll()
-	local tiger_tanks = {}
-	
-	for i, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
-		local class = ent:GetSpawn_List()
-		
-		if class == "sim_fphys_tank" then
-			table.insert(tiger_tanks, ent)
-		end
-	end
-	
-	return tiger_tanks 
-end
-
-local function LeopardsGetAll()
-	local leopard_tanks = {}
-	
-	for i, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
-		local class = ent:GetSpawn_List()
-		
-		if class == "sim_fphys_tank3" then
-			table.insert(leopard_tanks, ent)
-		end
-	end
-	
-	return leopard_tanks 
-end
-
-local function T90sGetAll()
-	local t90_tanks = {}
-	
-	for i, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
-		local class = ent:GetSpawn_List()
-		
-		if class == "sim_fphys_tank4" then
-			table.insert(t90_tanks, ent)
-		end
-	end
-	
-	return t90_tanks 
-end
-
-local function ShermansGetAll()
-	local sherman_tanks = {}
-	
-	for i, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
-		local class = ent:GetSpawn_List()
-		
-		if class == "sim_fphys_tank2" then
-			table.insert(sherman_tanks, ent)
-		end
-	end
-	
-	return sherman_tanks
-end
-
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
+-- DO NOT EDIT OR REUPLOAD THIS SCRIPT
 
 local function GetTrackPos( ent, div, smoother )
 	local FT =  FrameTime()
@@ -132,7 +88,6 @@ local function UpdateLeopardScrollTexture( ent )
 	ent:SetSubMaterial( 3, "!l_trackmat_"..id.."_right" )
 end
 
-
 local function UpdateT90ScrollTexture( ent )
 	local id = ent:EntIndex()
 
@@ -152,67 +107,53 @@ local function UpdateT90ScrollTexture( ent )
 	ent:SetSubMaterial( 1, "!t90_trackmat_"..id.."_right" )
 end
 
-local function UpdateTracks()
-	if tigers then
-		for index, ent in pairs( tigers ) do
-			if IsValid( ent ) then
-				UpdateTigerScrollTexture( ent )
-			else
-				tigers[index] = nil
-			end
-		end
-	end
-	
-	if shermans then
-		for index, ent in pairs( shermans ) do
-			if IsValid( ent ) then
-				UpdateShermanScrollTexture( ent )
-			else
-				shermans[index] = nil
-			end
-		end
-	end
-	
-	if leopards then
-		for index, ent in pairs( leopards ) do
-			if IsValid( ent ) then
-				UpdateLeopardScrollTexture( ent )
-			else
-				leopards[index] = nil
-			end
-		end
-	end
-	
-	if t90s then
-		for index, ent in pairs( t90s ) do
-			if IsValid( ent ) then
-				UpdateT90ScrollTexture( ent )
-			else
-				t90s[index] = nil
-			end
-		end
-	end
-end
+local TrackData = {
+	sim_fphys_tank =  function( ent ) UpdateTigerScrollTexture( ent ) end,
+	sim_fphys_tank2 = function( ent ) UpdateShermanScrollTexture( ent ) end,
+	sim_fphys_tank3 = function( ent ) UpdateLeopardScrollTexture( ent ) end,
+	sim_fphys_tank4 = function( ent ) UpdateT90ScrollTexture( ent ) end,
+}
 
-net.Receive( "simfphys_register_tank", function( length )
-	local tank = net.ReadEntity()
-	local type = net.ReadString()
+local next_think = 0
+local next_find = 0
+local tanks = {}
+
+hook.Add( "Think", "simfphys_armed_trackupdater", function()
+	local curtime = CurTime()
 	
-	if not IsValid( tank ) then return end
-	
-	if type == "tiger" then
-		table.insert(tigers, tank)
+	if curtime > next_find then
+		next_find = curtime + 2
 		
-	elseif type == "sherman" then
-		table.insert(shermans, tank)
+		table.Empty( tanks )
 		
-	elseif type == "leopard" then
-		table.insert(leopards, tank)
-		
-	elseif type == "t90ms" then
-		table.insert(t90s, tank)
+		for _, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
+			local class = ent:GetSpawn_List()
+			
+			if isfunction( TrackData[class] ) then
+				local Data = {}
+				Data.Entity = ent
+				Data.Func = TrackData[class]
+				
+				table.insert( tanks, Data )
+				
+			end
+		end
 	end
-end)
+	
+	if curtime > next_think then
+		next_think = curtime + 0.02
+		
+		if tanks then
+			for index, data in pairs( tanks ) do
+				if IsValid( data.Entity ) then
+					data.Func( data.Entity )
+				else
+					tanks[index] = nil
+				end
+			end
+		end
+	end
+end )
 
 net.Receive( "simfphys_tank_do_effect", function( length )
 	local tank = net.ReadEntity()
@@ -235,7 +176,6 @@ net.Receive( "simfphys_tank_do_effect", function( length )
 			effectdata:SetEntity( tank )
 		util.Effect( "simfphys_leopard_muzzle", effectdata )
 		
-		
 	elseif effect == "Explosion" then
 		local effectdata = EffectData()
 			effectdata:SetOrigin( net.ReadVector() )
@@ -245,6 +185,11 @@ net.Receive( "simfphys_tank_do_effect", function( length )
 		local effectdata = EffectData()
 			effectdata:SetOrigin( net.ReadVector() )
 		util.Effect( "simfphys_tankweapon_explosion_small", effectdata )
+		
+	elseif effect == "BulletImpact" then
+		local effectdata = EffectData()
+			effectdata:SetOrigin( net.ReadVector() )
+		util.Effect( "simfphys_tracer_hit", effectdata )
 	end
 end)
 
@@ -254,35 +199,4 @@ net.Receive( "simfphys_update_tracks", function( length )
 	
 	tank.trackspin_r = net.ReadFloat() 
 	tank.trackspin_l = net.ReadFloat() 
-	
 end)
-
-local NumCycl = 0
-hook.Add( "Think", "simfphys_manage_tanks", function()
-	local curtime = CurTime()
-	
-	if curtime > next_find then
-		next_find = curtime + 30
-		
-		NumCycl = NumCycl + 1
-		if NumCycl == 1 then
-			tigers = TigersGetAll()
-			
-		elseif NumCycl == 2 then
-			shermans = ShermansGetAll()
-		
-		elseif NumCycl >= 3 then
-			leopards = LeopardsGetAll()
-			
-		elseif NumCycl >= 4 then
-			t90s = T90sGetAll()
-			NumCycl = 0
-		end
-	end
-	
-	if curtime > next_think then
-		next_think = curtime + 0.02
-		
-		UpdateTracks()
-	end
-end )

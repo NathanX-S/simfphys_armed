@@ -31,7 +31,7 @@ local function GaussFire(ply,vehicle,shootOrigin,Attachment,damage)
 		
 	vehicle:FireBullets( bullet )
 	
-	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * damage * 1000, shootOrigin ) 
+	vehicle:GetPhysicsObject():ApplyForceOffset( -Attachment.Ang:Forward() * damage * 100, shootOrigin ) 
 end
 
 function simfphys.weapon:ValidClasses()
@@ -78,19 +78,19 @@ function simfphys.weapon:Think( vehicle )
 	
 	local curtime = CurTime()
 	
-	if not IsValid( ply ) then 
-		if vehicle.wpn then
-			vehicle.wpn:Stop()
-			vehicle.wpn = nil
-		end
-		
-		return
+	local fire = false
+	local alt_fire = false
+	
+	if IsValid( ply ) then 
+		self:AimWeapon( ply, vehicle, pod )
+		fire = ply:KeyDown( IN_ATTACK )
+		alt_fire = ply:KeyDown( IN_ATTACK2 ) and self:CanPrimaryAttack( vehicle )
+	else
+		ply = NULL
 	end
 	
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	local Attachment = vehicle:GetAttachment( ID )
-	
-	self:AimWeapon( ply, vehicle, pod )
 	
 	vehicle.wOldPos = vehicle.wOldPos or Vector(0,0,0)
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
@@ -98,16 +98,13 @@ function simfphys.weapon:Think( vehicle )
 
 	local shootOrigin = Attachment.Pos + deltapos * engine.TickInterval()
 	
-	local fire = ply:KeyDown( IN_ATTACK )
-	local alt_fire = ply:KeyDown( IN_ATTACK2 ) and self:CanPrimaryAttack( vehicle )
-	
 	vehicle.afire_pressed = vehicle.afire_pressed or false
-	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 100 or 0) - vehicle.gausscharge,0,1)) or 0
+	vehicle.gausscharge = vehicle.gausscharge and (vehicle.gausscharge + math.Clamp((alt_fire and 200 or 0) - vehicle.gausscharge,0, FrameTime() * 100)) or 0
 	
 	if vehicle.wpn_chr then
-		vehicle.wpn_chr:ChangePitch(100 + vehicle.gausscharge * 1.5)
+		vehicle.wpn_chr:ChangePitch(100 + vehicle.gausscharge * 0.75)
 		
-		vehicle.gaus_pp_spin = vehicle.gaus_pp_spin and (vehicle.gaus_pp_spin + vehicle.gausscharge / 2) or 0
+		vehicle.gaus_pp_spin = vehicle.gaus_pp_spin and (vehicle.gaus_pp_spin + vehicle.gausscharge / 4) or 0
 		vehicle:SetPoseParameter("gun_spin", vehicle.gaus_pp_spin)
 	end
 	
@@ -128,7 +125,7 @@ function simfphys.weapon:Think( vehicle )
 		else
 			vehicle.wpn_chr:Stop()
 			vehicle.wpn_chr = nil
-			GaussFire(ply,vehicle,shootOrigin,Attachment,12 + vehicle.gausscharge * 3)
+			GaussFire(ply,vehicle,shootOrigin,Attachment,250 + vehicle.gausscharge * 4)
 			vehicle.gausscharge = 0
 			
 			self:SetNextPrimaryFire( vehicle, CurTime() + 0.6 )

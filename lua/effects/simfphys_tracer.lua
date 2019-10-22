@@ -1,6 +1,6 @@
 --DO NOT EDIT OR REUPLOAD THIS FILE
 
-EFFECT.Mat = Material( "effects/spark" )
+EFFECT.Mat = Material( "effects/simfphys_armed/spark" )
 
 local Materials = {
 	"particle/smokesprites_0001",

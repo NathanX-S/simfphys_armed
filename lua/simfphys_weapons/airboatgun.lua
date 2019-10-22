@@ -12,6 +12,8 @@ local function AirboatFire(ply,vehicle,shootOrigin,Attachment,damage)
 		bullet.HullSize		= 1
 		bullet.DisableOverride = true
 		bullet.Callback = function(att, tr, dmginfo)
+			dmginfo:SetDamageType(DMG_AIRBOAT)
+			
 			local effectdata = EffectData()
 				effectdata:SetOrigin(  tr.HitPos + tr.HitNormal )
 				effectdata:SetNormal( tr.HitNormal )

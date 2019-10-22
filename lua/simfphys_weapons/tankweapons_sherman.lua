@@ -69,7 +69,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.Damage = 1500
 		projectile.Force = 6000
 		projectile.Size = 10
-		projectile.DeflectAng = 30
+		projectile.DeflectAng = 40
 		projectile.BlastRadius = 150
 		projectile.BlastDamage = 500
 		projectile.BlastEffect = "simfphys_tankweapon_explosion_small"
@@ -87,11 +87,6 @@ function simfphys.weapon:ValidClasses()
 end
 
 function simfphys.weapon:Initialize( vehicle )
-	net.Start( "simfphys_register_tank" )
-		net.WriteEntity( vehicle )
-		net.WriteString( "sherman" )
-	net.Broadcast()
-	
 	vehicle:SetNWBool( "SpecialCam_Loader", true )
 	vehicle:SetNWFloat( "SpecialCam_LoaderTime", 3.5 )
 	
@@ -249,8 +244,8 @@ function simfphys.weapon:ControlMachinegun( vehicle, deltapos )
 	
 	local fire = ply:KeyDown( IN_ATTACK )
 
-	local Rate = FrameTime() / 5
-	vehicle.smTmpMG = vehicle.smTmpMG and vehicle.smTmpMG + math.Clamp((fire and 1 or 0) - vehicle.smTmpMG,-Rate * 5,Rate) or 0
+	local Rate = FrameTime() / 8
+	vehicle.smTmpMG = vehicle.smTmpMG and vehicle.smTmpMG + math.Clamp((fire and 1 or 0) - vehicle.smTmpMG,-Rate * 4,Rate) or 0
 	
 	if fire then
 		self:Attack( vehicle, ply, shootOrigin, Attachment, ID )
@@ -288,8 +283,8 @@ function simfphys.weapon:ControlTurret( vehicle, deltapos )
 	local fire = ply:KeyDown( IN_ATTACK )
 	local fire2 = ply:KeyDown( IN_ATTACK2 )
 
-	local Rate = FrameTime() / 5
-	vehicle.smTmpHMG = vehicle.smTmpHMG and vehicle.smTmpHMG + math.Clamp((fire2 and 1 or 0) - vehicle.smTmpHMG,-Rate * 5,Rate) or 0
+	local Rate = FrameTime() / 8
+	vehicle.smTmpHMG = vehicle.smTmpHMG and vehicle.smTmpHMG + math.Clamp((fire2 and 1 or 0) - vehicle.smTmpHMG,-Rate * 4,Rate) or 0
 	
 	if fire then
 		self:PrimaryAttack( vehicle, ply, shootOrigin, Attachment )
