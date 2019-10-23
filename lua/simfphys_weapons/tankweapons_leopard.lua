@@ -13,7 +13,7 @@ for i = 1,7 do
 	}
 end
 
-local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
+local function hmg_fire(ply,vehicle,shootOrigin,shootDirection)
 
 	vehicle:EmitSound("leopard_fire_mg")
 	
@@ -25,8 +25,27 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.Tracer	= 1
 		projectile.HullSize = 6
 		projectile.attackingent = vehicle
+		projectile.Spread = Vector(0.01,0.01,0.01)
+		projectile.Damage = 100
+		projectile.Force = 12
+	
+	simfphys.FireHitScan( projectile )
+end
+
+local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
+
+	vehicle:EmitSound("tiger_fire_mg_new")
+
+	local projectile = {}
+		projectile.filter = vehicle.VehicleData["filter"]
+		projectile.shootOrigin = shootOrigin
+		projectile.shootDirection = shootDirection
+		projectile.attacker = ply
+		projectile.Tracer	= 1
+		projectile.HullSize = 5
+		projectile.attackingent = vehicle
 		projectile.Spread = Vector(0.008,0.008,0.008)
-		projectile.Damage = 75
+		projectile.Damage = 80
 		projectile.Force = 12
 	
 	simfphys.FireHitScan( projectile )
@@ -273,9 +292,9 @@ function simfphys.weapon:Attack( vehicle, ply, shootOrigin, Attachment, ID )
 	
 	local shootDirection = Attachment.Ang:Forward()
 	
-	mg_fire( ply, vehicle, shootOrigin, shootDirection )
+	hmg_fire( ply, vehicle, shootOrigin, shootDirection )
 	
-	self:SetNextFire( vehicle, CurTime() + 0.05 + (vehicle.smTmpMG ^ 5) * 0.5 )
+	self:SetNextFire( vehicle, CurTime() + 0.1 + (vehicle.smTmpMG ^ 5) * 0.5 )
 end
 
 function simfphys.weapon:CanAttack( vehicle )
@@ -322,10 +341,10 @@ function simfphys.weapon:SecondaryAttack( vehicle, ply, deltapos, cPos, cAng )
 		endpos = cPos + cAng:Forward() * 50000,
 		filter = vehicle.VehicleData["filter"]
 	} )
-
+	
 	mg_fire( ply, vehicle, Attachment.Pos, (trace.HitPos - Attachment.Pos):GetNormalized() )
 	
-	self:SetNextSecondaryFire( vehicle, CurTime() + 0.05 + (vehicle.smTmpHMG ^ 5) * 0.5 )
+	self:SetNextSecondaryFire( vehicle, CurTime() + 0.07 + (vehicle.smTmpHMG ^ 5) * 0.5 )
 end
 
 function simfphys.weapon:CanSecondaryAttack( vehicle )
