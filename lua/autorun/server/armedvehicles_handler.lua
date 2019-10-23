@@ -336,7 +336,7 @@ end
 function simfphys.TankApplyDamage(ent, Damage, Type)
 	if not IsValid( ent ) or not isnumber( Damage ) or not isnumber( Type ) then return end
 	
-	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC or Type == DMG_DIRECT then
+	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC or Type == DMG_DIRECT or Type == DMG_SLOWBURN or Type == DMG_BURN then
 		local MaxHealth = ent:GetMaxHealth()
 		local CurHealth = ent:GetCurHealth()
 		
