@@ -52,7 +52,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "tiger_fire",
-	channel = CHAN_WEAPON,
+	channel = CHAN_ITEM,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -61,7 +61,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "leopard_fire",
-	channel = CHAN_WEAPON,
+	channel = CHAN_ITEM,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -79,7 +79,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "t90ms_fire",
-	channel = CHAN_WEAPON,
+	channel = CHAN_ITEM,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -106,7 +106,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "tiger_reload",
-	channel = CHAN_STATIC,
+	channel = CHAN_STREAM,
 	volume = 1.0,
 	level = 70,
 	pitch = { 90, 110 },
@@ -115,7 +115,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "sherman_fire",
-	channel = CHAN_WEAPON,
+	channel = CHAN_ITEM,
 	volume = 1.0,
 	level = 140,
 	pitch = { 90, 110 },
@@ -133,7 +133,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "sherman_reload",
-	channel = CHAN_STATIC,
+	channel = CHAN_STREAM,
 	volume = 1.0,
 	level = 70,
 	pitch = { 90, 110 },
@@ -142,7 +142,7 @@ sound.Add( {
 
 sound.Add( {
 	name = "t90ms_reload",
-	channel = CHAN_STATIC,
+	channel = CHAN_STREAM,
 	volume = 1.0,
 	level = 70,
 	pitch = { 90, 110 },
