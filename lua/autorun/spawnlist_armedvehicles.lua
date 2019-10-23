@@ -753,6 +753,12 @@ local V = {
 		
 		IsArmored = true,
 		
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		EnginePos = Vector(20,0,0),
 		
 		MaxHealth = 5000,
@@ -765,12 +771,6 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,-5),
 
-		OnSpawn = 
-			function(ent) 
-				ent:SetNWBool( "simfphys_NoRacingHud", true )
-				ent:SetNWBool( "simfphys_NoHud", true ) 
-			end,
-		
 		ExhaustPositions = {
 			{
 				pos = Vector(6.54,44.25,13.19),
@@ -889,6 +889,12 @@ local V = {
 		
 		IsArmored = true,
 		
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		EnginePos = Vector(49.98,0,14.16),
 		
 		MaxHealth = 5000,
@@ -901,12 +907,6 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,0),
 
-		OnSpawn = 
-			function(ent) 
-				ent:SetNWBool( "simfphys_NoRacingHud", true )
-				ent:SetNWBool( "simfphys_NoHud", true ) 
-			end,
-		
 		ExhaustPositions = {
 			{
 				pos = Vector(-73.69,21.88,21.45),
@@ -1026,6 +1026,12 @@ local V = {
 		
 		IsArmored = true,
 		
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		EnginePos = Vector(-83.52,0,30.16),
 		
 		MaxHealth = 5000,
@@ -1038,12 +1044,6 @@ local V = {
 		
 		CustomMassCenter = Vector(0,0,2),
 
-		OnSpawn = 
-			function(ent) 
-				ent:SetNWBool( "simfphys_NoRacingHud", true )
-				ent:SetNWBool( "simfphys_NoHud", true ) 
-			end,
-		
 		ExhaustPositions = {
 			{
 				pos = Vector(-77.06,11.36,43.69),

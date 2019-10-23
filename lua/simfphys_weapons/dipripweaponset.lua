@@ -50,6 +50,8 @@ function simfphys.weapon:Initialize( vehicle )
 	data.Attach_Start_Right = "machinegun_barell_left"
 
 	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
+	
+	vehicle:SetNWString( "WeaponMode", "Machine Gun Turret" )
 end
 
 function simfphys.weapon:Think( vehicle )
@@ -116,10 +118,45 @@ function simfphys.weapon:Think( vehicle )
 
 	vehicle:SetPoseParameter("vehicle_minigun_pitch", Angles.p * vehicle.neg )
 	
-	local keyattack = ply:KeyDown( IN_ATTACK )
+	local keyattack = ply:KeyDown( IN_ATTACK ) and not vehicle.lockweapons and (vehicle:GetNWInt( "CurWPNAmmo", -1 ) > 0)
 	local alt_fire = ply:KeyDown( IN_ATTACK2 )
+	local reload = ply:KeyDown( IN_RELOAD )
 	
 	vehicle.FireMode = vehicle.FireMode or 0
+	
+	vehicle.missle_ammo = vehicle.missle_ammo or 6
+	vehicle.mg_ammo = vehicle.mg_ammo or 1500
+	vehicle.rac_ammo = vehicle.rac_ammo or 300
+	
+	if vehicle.FireMode == 0 then
+		vehicle:SetNWInt( "CurWPNAmmo", vehicle.mg_ammo )
+		
+	elseif vehicle.FireMode == 1 then
+		vehicle:SetNWInt( "CurWPNAmmo", vehicle.rac_ammo )
+		
+	else
+		vehicle:SetNWInt( "CurWPNAmmo", vehicle.missle_ammo )
+	end
+	
+	if reload and (vehicle.missle_ammo ~= 6 or vehicle.mg_ammo ~= 1500 or vehicle.rac_ammo ~= 300)  then
+		vehicle:EmitSound("weapons/ar2/npc_ar2_reload.wav")
+		
+		vehicle.missle_ammo = 6
+		vehicle.mg_ammo = 1500
+		vehicle.rac_ammo = 300
+	
+		vehicle.lockweapons = true
+		
+		vehicle:SetIsCruiseModeOn( false )
+		
+		timer.Simple( 3, function()
+			if not IsValid( vehicle ) then return end
+			vehicle.lockweapons = false
+			vehicle:SetIsCruiseModeOn( false )
+			
+			vehicle:EmitSound("simulated_vehicles/weapons/leopard_ready.wav")
+		end)
+	end
 	
 	if alt_fire ~= vehicle.afire_pressed then
 		vehicle.afire_pressed = alt_fire
@@ -131,10 +168,15 @@ function simfphys.weapon:Think( vehicle )
 			
 			if vehicle.FireMode == 0 then
 				vehicle:EmitSound("weapons/smg1/switch_burst.wav")
+				vehicle:SetNWString( "WeaponMode", "Machine Gun Turret" )
+				
 			elseif vehicle.FireMode == 1 then
 				vehicle:EmitSound("weapons/357/357_spin1.wav")
+				vehicle:SetNWString( "WeaponMode", "Minigun" )
+				
 			else
 				vehicle:EmitSound("weapons/shotgun/shotgun_cock.wav")
+				vehicle:SetNWString( "WeaponMode", "Missiles" )
 			end
 		end
 	end
@@ -151,6 +193,8 @@ function simfphys.weapon:Think( vehicle )
 	
 	if fire then
 		if vehicle.NextShoot < curtime then
+			
+			vehicle.mg_ammo = vehicle.mg_ammo - 1
 			
 			if vehicle.swapMuzzle then
 				vehicle.swapMuzzle = false
@@ -174,6 +218,8 @@ function simfphys.weapon:Think( vehicle )
 	
 	if fire2 then
 		if vehicle.NextShoot < curtime then
+		
+			vehicle.rac_ammo = vehicle.rac_ammo - 1
 			
 			local offset = deltapos * engine.TickInterval()
 			
@@ -243,6 +289,8 @@ function simfphys.weapon:Think( vehicle )
 				if not IsValid(vehicle.missle) then
 					vehicle:EmitSound("simulated_vehicles/weapons/diprip/rocket.wav")
 					
+					vehicle.missle_ammo = vehicle.missle_ammo - 1
+					
 					if vehicle.swapMuzzle then
 						vehicle.swapMuzzle = false
 					else
@@ -263,8 +311,6 @@ function simfphys.weapon:Think( vehicle )
 					
 					vehicle.NextShoot = curtime + 0.5
 					vehicle.UnlockMissle = curtime + 0.5
-				else
-					vehicle:EmitSound("Weapon_Shotgun.Empty")
 				end
 			end
 		end
