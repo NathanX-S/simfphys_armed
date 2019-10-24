@@ -204,7 +204,7 @@ function simfphys.FirePhysBullet( data )
 	if not isvector( data.shootDirection ) then return end
 	if not IsValid( data.attacker ) then return end
 	if not IsValid( data.attackingent ) then return end
-	if not isnumber( data.DeflectAng ) then data.DeflectAng = 0 end
+	if not isnumber( data.DeflectAng ) then data.DeflectAng = 30 end
 	
 	local projectile = ents.Create( "simfphys_tankprojectile" )
 	projectile:SetPos( data.shootOrigin )
