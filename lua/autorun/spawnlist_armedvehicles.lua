@@ -342,6 +342,8 @@ local V = {
 		FastSteeringAngle = 10,
 		SteeringFadeFastSpeed = 535,
 		
+		ForceTransmission = 1,
+		
 		TurnSpeed = 8,
 		
 		MaxGrip = 44,
@@ -436,6 +438,8 @@ local V = {
 		
 		FastSteeringAngle = 10,
 		SteeringFadeFastSpeed = 535,
+		
+		ForceTransmission = 1,
 		
 		TurnSpeed = 8,
 		
