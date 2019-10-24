@@ -25,7 +25,7 @@ local function hmg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.Spread = Vector(0.01,0.01,0.01)
 		projectile.HullSize = 5
 		projectile.attackingent = vehicle
-		projectile.Damage = 80
+		projectile.Damage = 20
 		projectile.Force = 12
 	
 	simfphys.FireHitScan( projectile )
@@ -43,7 +43,7 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.Spread = Vector(0.015,0.015,0.015)
 		projectile.HullSize = 5
 		projectile.attackingent = vehicle
-		projectile.Damage = 60
+		projectile.Damage = 15
 		projectile.Force = 12
 	simfphys.FireHitScan( projectile )
 end
@@ -313,7 +313,7 @@ function simfphys.weapon:Attack( vehicle, ply, shootOrigin, Attachment, ID )
 	
 	mg_fire( ply, vehicle, shootOrigin, shootDirection )
 	
-	self:SetNextFire( vehicle, CurTime() + 0.07 + (vehicle.smTmpMG ^ 5) * 0.5 )
+	self:SetNextFire( vehicle, CurTime() + 0.07 + (vehicle.smTmpMG ^ 5) * 0.08 )
 end
 
 function simfphys.weapon:CanAttack( vehicle )
@@ -364,7 +364,7 @@ function simfphys.weapon:SecondaryAttack( vehicle, ply, shootOrigin )
 	
 	hmg_fire( ply, vehicle, Attachment.Pos, (Attachment.Ang - Angle(0,0.5,0)):Up() )
 	
-	self:SetNextSecondaryFire( vehicle, CurTime() + 0.07 + (vehicle.smTmpHMG ^ 5) * 0.5 )
+	self:SetNextSecondaryFire( vehicle, CurTime() + 0.07 + (vehicle.smTmpHMG ^ 5) * 0.08 )
 end
 
 function simfphys.weapon:CanSecondaryAttack( vehicle )

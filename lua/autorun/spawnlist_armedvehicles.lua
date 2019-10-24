@@ -516,7 +516,11 @@ local V = {
 		
 		LightsTable = "conapc",
 		
-		OnSpawn = function(ent) ent:SetNWBool( "simfphys_NoRacingHud", true ) end,
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
 		
 		CustomWheels = true,
 		CustomSuspensionTravel = 10,

@@ -335,10 +335,32 @@ function simfphys.WeaponSystemRegister( vehicle )
 	end
 end
 
+local DMG_PROPEXPLOSION = 134217792
+
+local IsValidDMGType = {
+	[DMG_PROPEXPLOSION] = true,
+	[DMG_BLAST] = true,
+	[DMG_BLAST_SURFACE] = true,
+	[DMG_ENERGYBEAM] = true,
+	[DMG_SHOCK] = true,
+	[DMG_CRUSH] = true,
+	[DMG_GENERIC] = true,
+	[DMG_DIRECT] = true,
+	[DMG_SLOWBURN] = true,
+	[DMG_BURN] = true,
+	[DMG_NEVERGIB] = true,
+	[DMG_ALWAYSGIB] = true,
+	[DMG_SNIPER] = true,
+	[DMG_CLUB] = true,
+	[DMG_MISSILEDEFENSE] = true,
+}
+
 function simfphys.TankApplyDamage(ent, Damage, Type)
 	if not IsValid( ent ) or not isnumber( Damage ) or not isnumber( Type ) then return end
 	
-	if Type == DMG_BLAST or Type == DMG_CRUSH or Type == DMG_GENERIC or Type == DMG_DIRECT or Type == DMG_SLOWBURN or Type == DMG_BURN then
+	if Type == DMG_PROPEXPLOSION then Damage = Damage * 10 end
+	
+	if IsValidDMGType[ Type ] or (Type == DMG_BULLET and Damage >= 500) then
 		local MaxHealth = ent:GetMaxHealth()
 		local CurHealth = ent:GetCurHealth()
 		

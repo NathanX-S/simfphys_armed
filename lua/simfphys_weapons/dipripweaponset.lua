@@ -139,7 +139,7 @@ function simfphys.weapon:Think( vehicle )
 	end
 	
 	if reload and (vehicle.missle_ammo ~= 6 or vehicle.mg_ammo ~= 1500 or vehicle.rac_ammo ~= 300)  then
-		vehicle:EmitSound("weapons/ar2/npc_ar2_reload.wav")
+		vehicle:EmitSound("simulated_vehicles/weapons/apc_reload.wav")
 		
 		vehicle.missle_ammo = 6
 		vehicle.mg_ammo = 1500

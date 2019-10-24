@@ -8,7 +8,7 @@ local function mg_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.shootDirection = shootDirection
 		projectile.attacker = ply
 		projectile.attackingent = vehicle
-		projectile.Damage = 150
+		projectile.Damage = 100
 		projectile.Force = 50
 		projectile.Size = 3
 		projectile.BlastRadius = 50
@@ -36,6 +36,9 @@ function simfphys.weapon:Initialize( vehicle )
 	data.Attach_Start_Right = "muzzle_left"
 	data.Type = 3
 
+	vehicle.MaxMag = 30
+	vehicle:SetNWString( "WeaponMode", tostring( vehicle.MaxMag ) )
+	
 	simfphys.RegisterCrosshair( vehicle:GetDriverSeat(), data )
 	simfphys.RegisterCamera( vehicle:GetDriverSeat(), Vector(13,45,50), Vector(13,45,50), true )
 	
@@ -82,13 +85,46 @@ function simfphys.weapon:Think( vehicle )
 	self:AimWeapon( ply, vehicle, pod )
 	
 	local fire = ply:KeyDown( IN_ATTACK )
+	local reload = ply:KeyDown( IN_RELOAD )
 	
 	if fire then
 		self:PrimaryAttack( vehicle, ply, shootOrigin )
 	end
+	
+	if reload then
+		self:ReloadPrimary( vehicle )
+	end
+end
+
+function simfphys.weapon:ReloadPrimary( vehicle )
+	if not IsValid( vehicle ) then return end
+	if vehicle.CurMag == vehicle.MaxMag then return end
+	
+	vehicle.CurMag = vehicle.MaxMag
+	
+	vehicle:EmitSound("simulated_vehicles/weapons/apc_reload.wav")
+	
+	self:SetNextPrimaryFire( vehicle, CurTime() + 2 )
+	
+	vehicle:SetNWString( "WeaponMode", tostring( vehicle.CurMag ) )
+	
+	vehicle:SetIsCruiseModeOn( false )
+end
+
+function simfphys.weapon:TakePrimaryAmmo( vehicle )
+	vehicle.CurMag = isnumber( vehicle.CurMag ) and vehicle.CurMag - 1 or vehicle.MaxMag
+	
+	vehicle:SetNWString( "WeaponMode", tostring( vehicle.CurMag ) )
 end
 
 function simfphys.weapon:CanPrimaryAttack( vehicle )
+	vehicle.CurMag = isnumber( vehicle.CurMag ) and vehicle.CurMag or vehicle.MaxMag
+	
+	if vehicle.CurMag <= 0 then
+		self:ReloadPrimary( vehicle )
+		return false
+	end
+	
 	vehicle.NextShoot = vehicle.NextShoot or 0
 	return vehicle.NextShoot < CurTime()
 end
@@ -103,7 +139,7 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply )
 	vehicle.wOldPos = vehicle.wOldPos or vehicle:GetPos()
 	local deltapos = vehicle:GetPos() - vehicle.wOldPos
 	vehicle.wOldPos = vehicle:GetPos()
-
+	
 	if vehicle.swapMuzzle then
 		vehicle.swapMuzzle = false
 	else
@@ -125,6 +161,8 @@ function simfphys.weapon:PrimaryAttack( vehicle, ply )
 	util.Effect( "CS_MuzzleFlash", effectdata, true, true )
 	
 	mg_fire( ply, vehicle, shootOrigin, shootDirection )
+	
+	self:TakePrimaryAmmo( vehicle )
 	
 	self:SetNextPrimaryFire( vehicle, CurTime() + 0.2 )
 end
