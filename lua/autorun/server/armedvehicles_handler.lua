@@ -311,6 +311,8 @@ function simfphys.WeaponSystemRegister( vehicle )
 	for k,v in pairs( file.Find("simfphys_weapons/*.lua", "LUA") ) do
 		local name = string.Explode( ".", v )[1]
 		
+		table.Empty( simfphys.weapon )
+		
 		include("simfphys_weapons/"..v)
 		
 		simfphys.Weapons[ name ] = table.Copy( simfphys.weapon )
