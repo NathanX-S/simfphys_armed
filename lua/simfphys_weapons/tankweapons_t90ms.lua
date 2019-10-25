@@ -77,7 +77,7 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		projectile.Damage = 3500
 		projectile.Force = 8000
 		projectile.Size = 15
-		projectile.DeflectAng = 20
+		projectile.DeflectAng = 45
 		projectile.BlastRadius = 300
 		projectile.BlastDamage = 1000
 		projectile.BlastEffect = "simfphys_tankweapon_explosion"
@@ -190,7 +190,7 @@ function simfphys.weapon:AimCannon( ply, vehicle, pod, Attachment )
 	local Aimang = pod:WorldToLocalAngles( ply:EyeAngles() )
 	Aimang:Normalize()
 	
-	local AimRate = 60
+	local AimRate = 40
 	
 	local Angles = vehicle:WorldToLocalAngles( Aimang )
 	

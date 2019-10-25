@@ -204,7 +204,7 @@ function simfphys.FirePhysBullet( data )
 	if not isvector( data.shootDirection ) then return end
 	if not IsValid( data.attacker ) then return end
 	if not IsValid( data.attackingent ) then return end
-	if not isnumber( data.DeflectAng ) then data.DeflectAng = 25 end
+	if not isnumber( data.DeflectAng ) then data.DeflectAng = 30 end
 	
 	local projectile = ents.Create( "simfphys_tankprojectile" )
 	projectile:SetPos( data.shootOrigin )
@@ -402,7 +402,7 @@ function simfphys.TankApplyDamage(ent, Damage, Type)
 	end
 end
 
-hook.Add("Think", "simfphys_weaponhandler", function()
+hook.Add("Think", "zzz_simfphys_weaponhandler", function()
 	if simfphys.ManagedVehicles then
 		for k, v in pairs( simfphys.ManagedVehicles ) do
 			if IsValid( v.entity ) then

@@ -70,7 +70,7 @@ function ENT:Think()
 		
 		local hitangle = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) ) - 90
 		
-		self.DeflectAng = self.DeflectAng or 25
+		self.DeflectAng = self.DeflectAng or 30
 		
 		if hitangle < self.DeflectAng and not self.Bounced and (simfphys.IsCar( trace.Entity ) or trace.Entity:GetClass() == "gmod_sent_vehicle_fphysics_wheel") then
 			
