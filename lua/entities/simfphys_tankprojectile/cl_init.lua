@@ -1,8 +1,9 @@
 include("shared.lua")
 
+ENT.mat = Material( "sprites/animglow02" )
+ENT.mat2 = Material( "effects/simfphys_armed/spark" )
+
 function ENT:Initialize()	
-	self.PixVis = util.GetPixelVisibleHandle()
-	
 	self.Materials = {
 		"particle/smokesprites_0001",
 		"particle/smokesprites_0002",
@@ -23,16 +24,21 @@ function ENT:Initialize()
 	}
 	
 	self.OldPos = self:GetPos()
-	
 	self.emitter = ParticleEmitter(self.OldPos, false )
 end
 
-local mat = Material( "sprites/animglow02" )
 function ENT:Draw()
+	if not self.Dir or not self.Size then return end
+	
+	if self.Size > 5 then return end
+	
+	local pos = self:GetPos()
+	
+	render.SetMaterial( self.mat2 )
+	render.DrawBeam( pos, self.OldPos - self.Dir * 250, self.Size * 5, 1, 0, Color( 255, 255, 255, 255 ) )
 end
 
 function ENT:Think()
-	local curtime = CurTime()
 	local pos = self:GetPos()
 	
 	if pos ~= self.OldPos then
@@ -50,36 +56,41 @@ function ENT:doFX( newpos, oldpos )
 	local Dir = Sub:GetNormalized()
 	local Len = Sub:Length()
 	
+	self.Dir = Dir
+	self.Size = self:GetSize()
+	
 	for i = 1, Len, 15 do
 		local pos = oldpos + Dir * i
-	
+		
 		local particle = self.emitter:Add( self.Materials[math.random(1, table.Count(self.Materials) )], pos )
 		
 		if particle then
 			particle:SetGravity( Vector(0,0,100) + VectorRand() * 50 ) 
-			particle:SetVelocity( -self:GetForward() * 500  )
+			particle:SetVelocity( -Dir * 500  )
 			particle:SetAirResistance( 600 ) 
 			particle:SetDieTime( math.Rand(0.1,0.5) )
 			particle:SetStartAlpha( 80 )
-			particle:SetStartSize( (math.Rand(6,12) / 20) * self:GetSize() )
-			particle:SetEndSize( (math.Rand(20,30) / 20) * self:GetSize() )
+			particle:SetStartSize( (math.Rand(6,12) / 20) * self.Size )
+			particle:SetEndSize( (math.Rand(20,30) / 20) * self.Size )
 			particle:SetRoll( math.Rand( -1, 1 ) )
 			particle:SetColor( 120,120,120 )
 			particle:SetCollide( false )
 		end
-	
-		local particle = self.emitter:Add( mat, pos )
-		if particle then
-			particle:SetVelocity( -self:GetForward() * 300 + self:GetVelocity())
-			particle:SetDieTime( 0.1 )
-			particle:SetAirResistance( 0 ) 
-			particle:SetStartAlpha( 255 )
-			particle:SetStartSize( self:GetSize() )
-			particle:SetEndSize( 0 )
-			particle:SetRoll( math.Rand(-1,1) )
-			particle:SetColor( 255,255,255 )
-			particle:SetGravity( Vector( 0, 0, 0 ) )
-			particle:SetCollide( false )
+		
+		if self.Size > 5 then
+			local particle = self.emitter:Add( self.mat, pos )
+			if particle then
+				particle:SetVelocity( -Dir * 300 + self:GetVelocity())
+				particle:SetDieTime( 0.1 )
+				particle:SetAirResistance( 0 ) 
+				particle:SetStartAlpha( 255 )
+				particle:SetStartSize( self.Size )
+				particle:SetEndSize( 0 )
+				particle:SetRoll( math.Rand(-1,1) )
+				particle:SetColor( 255,255,255 )
+				particle:SetGravity( Vector( 0, 0, 0 ) )
+				particle:SetCollide( false )
+			end
 		end
 	end
 end

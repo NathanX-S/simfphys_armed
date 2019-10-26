@@ -31,7 +31,8 @@ function EFFECT:Init( data )
 	self:SetRenderBoundsWS( self.StartPos, self.EndPos )
 
 	self.TracerTime = math.min( 1, self.StartPos:Distance( self.EndPos ) / 15000 )
-	self.Length = math.Rand( 0.1, 0.15 )
+	
+	self.Length = math.Rand( 0.05, 0.1 )
 
 	-- Die when it reaches its target
 	self.DieTime = CurTime() + self.TracerTime
