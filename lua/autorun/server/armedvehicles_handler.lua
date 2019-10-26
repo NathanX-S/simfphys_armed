@@ -335,7 +335,13 @@ function simfphys.WeaponSystemRegister( vehicle )
 	end
 end
 
-local DMG_PROPEXPLOSION = 134217792
+local DMG_PROPEXPLOSION = 134217792 -- why didnt this dmg type exist on gmod wiki or valve wiki???
+local DMG_LUABULLET = 8194 -- why didnt this dmg type exist on gmod wiki or valve wiki???
+
+local DMGTypeException = {
+	[DMG_LUABULLET] = true,
+	[DMG_BULLET] = true,
+}
 
 local IsValidDMGType = {
 	[DMG_PROPEXPLOSION] = true,
@@ -360,7 +366,7 @@ function simfphys.TankApplyDamage(ent, Damage, Type)
 	
 	if Type == DMG_PROPEXPLOSION then Damage = Damage * 10 end
 	
-	if IsValidDMGType[ Type ] or (Type == DMG_BULLET and Damage >= 500) then
+	if IsValidDMGType[ Type ] or (DMGTypeException[ Type ] and Damage >= 500) then
 		local MaxHealth = ent:GetMaxHealth()
 		local CurHealth = ent:GetCurHealth()
 		
