@@ -105,7 +105,7 @@ function ENT:Shoot()
 		projectile.filter = {self}
 		projectile.shootOrigin = self:GetPos()
 		projectile.shootDirection = self:GetUp()
-		projectile.attacker = self
+		projectile.attacker = IsValid( self.Attacker ) and self.Attacker or self
 		projectile.attackingent = self
 		projectile.Damage = self:GetDamage()
 		projectile.Force = self:GetForce()

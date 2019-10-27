@@ -90,6 +90,8 @@ if SERVER then
 		turret:SetAngles( Angle(0,0,0) )
 		turret:Spawn()
 		
+		turret.Attacker = ply
+		
 		self:UpdateTurret( turret )
 
 		ply:AddCount( "simfphysturrets", turret )
