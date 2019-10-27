@@ -28,14 +28,14 @@ function ENT:Initialize()
 end
 
 function ENT:Draw()
-	if not self.Dir or not self.Size then return end
+	if not self.Dir or not self.Size or not self.Len then return end
 	
 	if self.Size > 5 then return end
 	
 	local pos = self:GetPos()
 	
 	render.SetMaterial( self.mat2 )
-	render.DrawBeam( pos, self.OldPos - self.Dir * 250, self.Size * 5, 1, 0, Color( 255, 255, 255, 255 ) )
+	render.DrawBeam( pos +  self.Dir * self.Len, self.OldPos - self.Dir * self.Len, self.Size * 5, 1, 0, Color( 255, 255, 255, 255 ) )
 end
 
 function ENT:Think()
@@ -56,6 +56,7 @@ function ENT:doFX( newpos, oldpos )
 	local Dir = Sub:GetNormalized()
 	local Len = Sub:Length()
 	
+	self.Len = Len
 	self.Dir = Dir
 	self.Size = self:GetSize()
 	
@@ -96,10 +97,6 @@ function ENT:doFX( newpos, oldpos )
 end
 
 function ENT:OnRemove()
-	local effectdata = EffectData()
-		effectdata:SetOrigin( self:GetPos() )
-	util.Effect( self:GetBlastEffect(), effectdata )
-	
 	if self.emitter then
 		self.emitter:Finish()
 	end

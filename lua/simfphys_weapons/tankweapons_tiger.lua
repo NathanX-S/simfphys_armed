@@ -33,10 +33,9 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 	vehicle:EmitSound("tiger_fire")
 	vehicle:EmitSound("tiger_reload")
 	
-	net.Start( "simfphys_tank_do_effect" )
-		net.WriteEntity( vehicle )
-		net.WriteString( "Muzzle" )
-	net.Broadcast()
+	local effectdata = EffectData()
+		effectdata:SetEntity( vehicle )
+	util.Effect( "simfphys_tiger_muzzle", effectdata )
 	
 	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 400000, shootOrigin ) 
 	

@@ -155,7 +155,15 @@ hook.Add( "Think", "simfphys_armed_trackupdater", function()
 	end
 end )
 
-net.Receive( "simfphys_tank_do_effect", function( length )
+net.Receive( "simfphys_update_tracks", function( length )
+	local tank = net.ReadEntity()
+	if not IsValid( tank ) then return end
+	
+	tank.trackspin_r = net.ReadFloat() 
+	tank.trackspin_l = net.ReadFloat() 
+end)
+
+net.Receive( "simfphys_tank_do_effect", function( length ) -- we need to keep this for backwards compatibility
 	local tank = net.ReadEntity()
 	if not IsValid( tank ) then return end
 	
@@ -185,18 +193,5 @@ net.Receive( "simfphys_tank_do_effect", function( length )
 		local effectdata = EffectData()
 			effectdata:SetOrigin( net.ReadVector() )
 		util.Effect( "simfphys_tankweapon_explosion_small", effectdata )
-		
-	elseif effect == "BulletImpact" then
-		local effectdata = EffectData()
-			effectdata:SetOrigin( net.ReadVector() )
-		util.Effect( "simfphys_tracer_hit", effectdata )
 	end
-end)
-
-net.Receive( "simfphys_update_tracks", function( length )
-	local tank = net.ReadEntity()
-	if not IsValid( tank ) then return end
-	
-	tank.trackspin_r = net.ReadFloat() 
-	tank.trackspin_l = net.ReadFloat() 
 end)

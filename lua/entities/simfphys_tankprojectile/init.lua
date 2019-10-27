@@ -87,7 +87,7 @@ function ENT:Think()
 			
 			self.Vel = (shootDirection * (thVel - math.abs(Fx)) - trace.HitNormal * Fx * 2) * 0.2
 			
-			trace.Entity:GetPhysicsObject():ApplyForceOffset( shootDirection * thVel * 1000, trace.HitPos ) 
+			trace.Entity:GetPhysicsObject():ApplyForceOffset( shootDirection * thVel * self.Force * 0.5, trace.HitPos ) 
 			
 			self:SetPos( self:GetPos() + self.Vel * FixTick )
 			
@@ -172,4 +172,10 @@ function ENT:OnTakeDamage( dmginfo )
 end
 
 function ENT:Use( activator, caller )
+end
+
+function ENT:OnRemove()
+	local effectdata = EffectData()
+		effectdata:SetOrigin( self:GetPos() )
+	util.Effect( self:GetBlastEffect(), effectdata )
 end

@@ -51,12 +51,11 @@ end
 local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 	vehicle:EmitSound("sherman_fire")
 	vehicle:EmitSound("sherman_reload")
-	
-	net.Start( "simfphys_tank_do_effect" )
-		net.WriteEntity( vehicle )
-		net.WriteString( "Muzzle2" )
-	net.Broadcast()
-	
+
+	local effectdata = EffectData()
+		effectdata:SetEntity( vehicle )
+	util.Effect( "simfphys_sherman_muzzle", effectdata )
+
 	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 300000, shootOrigin ) 
 	
 	

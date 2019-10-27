@@ -26,7 +26,7 @@ simfphys.ManagedVehicles = istable( simfphys.ManagedVehicles ) and simfphys.Mana
 simfphys.Weapons = {}
 simfphys.weapon = {}
 
-util.AddNetworkString( "simfphys_tank_do_effect" )
+util.AddNetworkString( "simfphys_tank_do_effect" ) -- some people still use this so we have to keep it
 util.AddNetworkString( "simfphys_update_tracks" )
 
 resource.AddSingleFile( "materials/effects/simfphys_armed/gauss_beam.vmt" )

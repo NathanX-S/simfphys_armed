@@ -61,11 +61,10 @@ local function cannon_fire(ply,vehicle,shootOrigin,shootDirection)
 		end
 	end)
 	
-	net.Start( "simfphys_tank_do_effect" )
-		net.WriteEntity( vehicle )
-		net.WriteString( "Muzzle3" )
-	net.Broadcast()
-	
+	local effectdata = EffectData()
+		effectdata:SetEntity( vehicle )
+	util.Effect( "simfphys_leopard_muzzle", effectdata )
+
 	vehicle:GetPhysicsObject():ApplyForceOffset( -shootDirection * 500000, shootOrigin ) 
 	
 	local projectile = {}
