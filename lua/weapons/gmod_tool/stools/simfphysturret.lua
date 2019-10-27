@@ -90,7 +90,7 @@ if SERVER then
 		turret:SetAngles( Angle(0,0,0) )
 		turret:Spawn()
 		
-		self:UpdateTurret( ent )
+		self:UpdateTurret( turret )
 
 		ply:AddCount( "simfphysturrets", turret )
 		ply:AddCleanup( "simfphysturrets", turret )
