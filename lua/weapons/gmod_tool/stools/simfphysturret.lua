@@ -120,7 +120,7 @@ function TOOL.BuildCPanel( CPanel )
 	CPanel:AddControl( "Slider",  { Label	= "Force",
 									Type	= "Float",
 									Min		= 0,
-									Max		= 500000,
+									Max		= 10000,
 									Command = "simfphysturret_force" }	 )
 
 	CPanel:AddControl( "Slider",  { Label	= "Size",
