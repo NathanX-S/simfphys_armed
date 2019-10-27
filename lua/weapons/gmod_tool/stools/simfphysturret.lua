@@ -1,12 +1,10 @@
-if not istable( WireLib ) then return end
-
 TOOL.Category		= "simfphys"
 TOOL.Name		= "#tool.simfphysturret.name"
 TOOL.Command		= nil
 TOOL.ConfigName		= ""
 
 cleanup.Register( "simfphysturrets" )
-CreateConVar("sbox_max_simfphysturrets", 2, "FCVAR_NOTIFY")
+CreateConVar("sbox_maxsimfphysturrets", 1, "FCVAR_NOTIFY")
 
 TOOL.ClientConVar[ "delay" ] 		= "0.2"
 TOOL.ClientConVar[ "damage" ] 		= "100"
@@ -17,10 +15,15 @@ TOOL.ClientConVar[ "blastdamage" ] 	= "50"
 TOOL.ClientConVar[ "blasteffect" ] 	= "simfphys_tankweapon_explosion_micro"
 
 if CLIENT then
-	language.Add( "tool.simfphysturret.name", "Wire Projectile Turret" )
+	language.Add( "tool.simfphysturret.name", "Projectile Turret" )
 	language.Add( "tool.simfphysturret.desc", "A Tool used to spawn Turrets" )
 	language.Add( "tool.simfphysturret.0", "Left click to spawn or update a turret" )
 	language.Add( "tool.simfphysturret.1", "Left click to spawn or update a turret" )
+	
+	language.Add( "Cleanup_simfphysturrets", "simfphys Projectile Turret" )
+	language.Add( "Cleaned_simfphysturrets", "Cleaned up all simfphys Projectile Turrets" )
+	
+	language.Add( "SBoxLimit_simfphysturrets", "You've reached the Projectile Turret limit!" )
 end
 
 function TOOL:LeftClick( trace )
@@ -29,6 +32,11 @@ function TOOL:LeftClick( trace )
 	
 	local ply = self:GetOwner()
 
+	if not istable( WireLib ) then
+		ply:PrintMessage( HUD_PRINTTALK, "[SIMFPHYS ARMED]: WIREMOD REQUIRED" )
+		ply:SendLua( "gui.OpenURL( 'https://steamcommunity.com/sharedfiles/filedetails/?id=160250458' )") 
+	end
+	
 	if IsValid( trace.Entity ) and trace.Entity:GetClass():lower() == "simfphys_turret" then 
 		self:UpdateTurret( trace.Entity )
 	else
@@ -60,7 +68,7 @@ if SERVER then
 	
 		ent:SetShootDelay( math.Clamp(self:GetClientNumber( "delay" ),0.2,2) )
 		ent:SetDamage( math.Clamp(self:GetClientNumber( "damage" ),0,5000) )
-		ent:SetForce( math.Clamp(self:GetClientNumber( "force" ),0,500000) )
+		ent:SetForce( math.Clamp(self:GetClientNumber( "force" ),0,10000) )
 		ent:SetSize( math.Clamp(self:GetClientNumber( "size" ),3,15) )
 		ent:SetDeflectAng( math.Clamp(self:GetClientNumber( "deflectang" ),0,45) )
 		ent:SetBlastDamage( math.Clamp(self:GetClientNumber( "blastdamage" ),0,1500) )

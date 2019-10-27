@@ -35,7 +35,7 @@ function ENT:SetupDataTables()
 	
 	self:NetworkVar( "Float",1, "ShootDelay", { KeyName = "Shoot Delay", Edit = { type = "Float", order = 1,min = 0.2, max = 2, category = "Options"} } )
 	self:NetworkVar( "Float",2, "Damage", { KeyName = "Damage", Edit = { type = "Float", order = 2,min = 0, max = 5000, category = "Options"} } )
-	self:NetworkVar( "Float",3, "Force", { KeyName = "Force", Edit = { type = "Float", order = 3,min = 0, max = 500000, category = "Options"} } )
+	self:NetworkVar( "Float",3, "Force", { KeyName = "Force", Edit = { type = "Float", order = 3,min = 0, max = 10000, category = "Options"} } )
 	self:NetworkVar( "Float",4, "Size", { KeyName = "Size", Edit = { type = "Float", order = 4,min = 3, max = 15, category = "Options"} } )
 	self:NetworkVar( "Float",5, "DeflectAng", { KeyName = "DeflectAng", Edit = { type = "Float", order = 5,min = 0, max = 45, category = "Options"} } )
 	self:NetworkVar( "Float",6, "BlastDamage", { KeyName = "Blast Damage", Edit = { type = "Float", order = 6,min = 0, max = 1500, category = "Options"} } )
