@@ -21,7 +21,15 @@
 CreateClientConVar( "cl_simfphys_crosshair", "1", true, false )
 
 local show_crosshair = false
+local Hudmph = false
+local Hudreal = false
+
 cvars.AddChangeCallback( "cl_simfphys_crosshair", function( convar, oldValue, newValue ) show_crosshair = tonumber( newValue )~=0 end)
+cvars.AddChangeCallback( "cl_simfphys_hudmph", function( convar, oldValue, newValue ) Hudmph = tonumber( newValue )~=0 end)
+cvars.AddChangeCallback( "cl_simfphys_hudrealspeed", function( convar, oldValue, newValue ) Hudreal = tonumber( newValue )~=0 end)
+
+Hudmph = GetConVar( "cl_simfphys_hudmph" ):GetBool()
+Hudreal = GetConVar( "cl_simfphys_hudrealspeed" ):GetBool()
 show_crosshair = GetConVar( "cl_simfphys_crosshair" ):GetBool()
 
 local xhair = Material( "sprites/hud/v_crosshair1" )
@@ -94,6 +102,11 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 
 	surface.SetDrawColor( 240, 200, 0, 255 ) 
 
+	local velocity = vehicle:GetVelocity():Length()
+	local mph = Hudreal and math.Round(velocity * 0.0568182,0) or math.Round(velocity * 0.0568182 * 0.75,0)
+	local kmh = Hudreal and math.Round(velocity * 0.09144,0) or math.Round(velocity * 0.09144 * 0.75,0)
+	local printspeed = Hudmph and tostring(mph).."mph" or tostring(kmh).."km/h"
+	
 	if Type == 0 then
 		surface.SetMaterial( xhair )
 		surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
@@ -105,7 +118,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 			draw.SimpleText( math.Round(vehicle:GetThrottle() * 100).."%"..Cruise , "SIMFPHYS_ARMED_HUDFONT", 120, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			
 			draw.SimpleText( "SPD", "SIMFPHYS_ARMED_HUDFONT", 10, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			draw.SimpleText(  math.Round(vehicle:GetVelocity():Length() * 0.09144,0).."km/h" , "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			draw.SimpleText( printspeed, "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			
 			draw.SimpleText( "FUEL", "SIMFPHYS_ARMED_HUDFONT", 10, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			draw.SimpleText( math.Round(vehicle:GetFuel()).."/"..vehicle:GetMaxFuel().."L", "SIMFPHYS_ARMED_HUDFONT", 120, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -230,7 +243,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 				draw.SimpleText( math.Round(vehicle:GetThrottle() * 100).."%"..Cruise , "SIMFPHYS_ARMED_HUDFONT", 120, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				
 				draw.SimpleText( "SPD", "SIMFPHYS_ARMED_HUDFONT", 10, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-				draw.SimpleText(  math.Round(vehicle:GetVelocity():Length() * 0.09144,0).."km/h" , "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				draw.SimpleText(  printspeed, "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				
 				draw.SimpleText( "FUEL", "SIMFPHYS_ARMED_HUDFONT", 10, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				draw.SimpleText( math.Round(vehicle:GetFuel()).."/"..vehicle:GetMaxFuel().."L", "SIMFPHYS_ARMED_HUDFONT", 120, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -305,7 +318,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 			draw.SimpleText( math.Round(vehicle:GetThrottle() * 100).."%"..Cruise , "SIMFPHYS_ARMED_HUDFONT", 120, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			
 			draw.SimpleText( "SPD", "SIMFPHYS_ARMED_HUDFONT", 10, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-			draw.SimpleText(  math.Round(vehicle:GetVelocity():Length() * 0.09144,0).."km/h" , "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+			draw.SimpleText(  printspeed, "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			
 			draw.SimpleText( "FUEL", "SIMFPHYS_ARMED_HUDFONT", 10, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 			draw.SimpleText( math.Round(vehicle:GetFuel()).."/"..vehicle:GetMaxFuel().."L", "SIMFPHYS_ARMED_HUDFONT", 120, 60, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -400,7 +413,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 				draw.SimpleText( math.Round(vehicle:GetThrottle() * 100).."%"..Cruise , "SIMFPHYS_ARMED_HUDFONT", 120, 10, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				
 				draw.SimpleText( "SPD", "SIMFPHYS_ARMED_HUDFONT", 10, 35, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
-				draw.SimpleText(  math.Round(vehicle:GetVelocity():Length() * 0.09144,0).."km/h" , "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
+				draw.SimpleText( printspeed, "SIMFPHYS_ARMED_HUDFONT", 120, 35, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				
 				draw.SimpleText( "FUEL", "SIMFPHYS_ARMED_HUDFONT", 10, 60, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
 				draw.SimpleText( math.Round(vehicle:GetFuel()).."/"..vehicle:GetMaxFuel().."L", "SIMFPHYS_ARMED_HUDFONT", 120, 60, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
