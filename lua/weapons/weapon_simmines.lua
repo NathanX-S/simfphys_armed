@@ -137,6 +137,10 @@ function SWEP:ThrowMine()
 		
 		ent:SetAttacker( ply )
 		
+		if CPPI then
+			ent:CPPISetOwner( ply )
+		end
+		
 		local PhysObj = ent:GetPhysicsObject()
 		if IsValid( PhysObj ) then
 			PhysObj:SetVelocityInstantaneous( EyeAng:Forward() * 200 + Vector(0,0,150) )
