@@ -50,6 +50,12 @@ function simfphys.weapon:Initialize( vehicle )
 	local pod = vehicle:GetDriverSeat()
 	
 	simfphys.RegisterCrosshair( pod )
+	
+	if not istable( vehicle.PassengerSeats ) or not istable( vehicle.pSeat ) then return end
+	
+	for i = 1, table.Count( vehicle.pSeat ) do
+		simfphys.RegisterCamera( vehicle.pSeat[ i ], Vector(0,30,60), Vector(0,-20,60) )
+	end
 end
 
 function simfphys.weapon:AimWeapon( ply, vehicle, pod )	

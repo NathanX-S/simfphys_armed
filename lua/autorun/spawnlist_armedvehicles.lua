@@ -68,6 +68,12 @@ local V = {
 		
 		IsArmored = true,
 		
+		OnSpawn = 
+			function(ent) 
+				ent:SetNWBool( "simfphys_NoRacingHud", true )
+				ent:SetNWBool( "simfphys_NoHud", true ) 
+			end,
+		
 		GibModels = {
 			"models/combine_apc_destroyed_gib01.mdl",
 			"models/combine_apc_destroyed_gib02.mdl",
@@ -84,6 +90,22 @@ local V = {
 		SeatPitch = 0,
 		
 		PassengerSeats = {
+			{
+				pos = Vector(0,-30,50),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(0,-30,50),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(0,-30,50),
+				ang = Angle(0,0,0)
+			},
+			{
+				pos = Vector(0,-30,50),
+				ang = Angle(0,0,0)
+			},
 		},
 		
 		FrontHeight = 10,
