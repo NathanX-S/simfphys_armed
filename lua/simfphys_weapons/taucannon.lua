@@ -125,10 +125,10 @@ function simfphys.weapon:Think( vehicle )
 		else
 			vehicle.wpn_chr:Stop()
 			vehicle.wpn_chr = nil
-			GaussFire(ply,vehicle,shootOrigin,Attachment,250 + vehicle.gausscharge * 4)
+			GaussFire(ply,vehicle,shootOrigin,Attachment,250 + vehicle.gausscharge * 3)
 			vehicle.gausscharge = 0
 			
-			self:SetNextPrimaryFire( vehicle, CurTime() + 0.6 )
+			self:SetNextPrimaryFire( vehicle, CurTime() + 1 )
 		end
 	end
 end
