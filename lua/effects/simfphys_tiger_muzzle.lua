@@ -20,6 +20,8 @@ local Materials = {
 function EFFECT:Init( data )
 	local vehicle = data:GetEntity()
 	
+	if not IsValid( vehicle ) then return end
+	
 	local ID = vehicle:LookupAttachment( "muzzle" )
 	if ID == 0 then return end
 	
