@@ -20,6 +20,10 @@
 
 CreateClientConVar( "cl_simfphys_crosshair", "1", true, false )
 
+local ShowHud = false
+cvars.AddChangeCallback( "cl_simfphys_hud", function( convar, oldValue, newValue ) ShowHud = tonumber( newValue )~=0 end)
+ShowHud = GetConVar( "cl_simfphys_hud" ):GetBool()
+
 local show_crosshair = false
 local Hudmph = false
 local Hudreal = false
@@ -111,7 +115,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		surface.SetMaterial( xhair )
 		surface.DrawTexturedRect( scr.x - 17,scr.y - 17, 34, 34)
 		
-		if vehicle:GetNWBool( "simfphys_NoRacingHud", false ) then
+		if vehicle:GetNWBool( "simfphys_NoRacingHud", false ) and ShowHud then
 			local fuel = vehicle:GetFuel() / vehicle:GetMaxFuel()
 			local Cruise = vehicle:GetIsCruiseModeOn() and " (cruise)" or ""
 			draw.SimpleText( "THR", "SIMFPHYS_ARMED_HUDFONT", 10, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -236,7 +240,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 				surface.DrawLine( X + pX1, Y + pY1, X + pX2, Y + pY2 )
 			end
 			
-			if vehicle:GetNWBool( "simfphys_NoHud", false ) then
+			if vehicle:GetNWBool( "simfphys_NoHud", false ) and ShowHud then
 				local fuel = vehicle:GetFuel() / vehicle:GetMaxFuel()
 				local Cruise = vehicle:GetIsCruiseModeOn() and " (cruise)" or ""
 				draw.SimpleText( "THR", "SIMFPHYS_ARMED_HUDFONT", 10, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -311,7 +315,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 - len * 2, scrW + len * 1.25, scrH * 1.85 - len * 2 )
 		surface.DrawLine( scrW - len * 1.25, scrH * 1.85 + len * 2, scrW + len * 1.25, scrH * 1.85 + len * 2 )
 		
-		if vehicle:GetNWBool( "simfphys_NoRacingHud", false ) then
+		if vehicle:GetNWBool( "simfphys_NoRacingHud", false ) and ShowHud then
 			local fuel = vehicle:GetFuel() / vehicle:GetMaxFuel()
 			local Cruise = vehicle:GetIsCruiseModeOn() and " (cruise)" or ""
 			draw.SimpleText( "THR", "SIMFPHYS_ARMED_HUDFONT", 10, 10, Color( 255, 235, 0, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
@@ -406,7 +410,7 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 				surface.DrawLine( X + pX1, Y + pY1, X + pX2, Y + pY2 )
 			end
 			
-			if vehicle:GetNWBool( "simfphys_NoHud", false ) then
+			if vehicle:GetNWBool( "simfphys_NoHud", false ) and ShowHud then
 				local fuel = vehicle:GetFuel() / vehicle:GetMaxFuel()
 				local Cruise = vehicle:GetIsCruiseModeOn() and " (cruise)" or ""
 				draw.SimpleText( "THR", "SIMFPHYS_ARMED_HUDFONT", 10, 10, Color( 20, 255, 20, 255 ), TEXT_ALIGN_LEFT, TEXT_ALIGN_TOP )
