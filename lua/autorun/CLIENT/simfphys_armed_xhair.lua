@@ -188,7 +188,10 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		else
 			local alpha = math.abs( math.cos( CurTime() * 3 ) )
 			
-			draw.SimpleText( "press ''alt'' to activate turret! (bind alt +walk)", "simfphysfont", scrW, ScrH() - scrH * 0.04, Color( 255, 235, 0, 255 * alpha ), 1, 1)
+			local Key = input.LookupBinding( "+walk" )
+			if not isstring( Key ) then Key = "[+walk is not bound to a key]" end
+			
+			draw.SimpleText( "press "..Key.." to activate turret!", "simfphysfont", scrW, ScrH() - scrH * 0.04, Color( 255, 235, 0, 255 * alpha ), 1, 1)
 		
 			surface.SetDrawColor( 240, 200, 0, 50 ) 
 		end
@@ -358,7 +361,10 @@ local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
 		else
 			local alpha = math.abs( math.cos( CurTime() * 3 ) )
 			
-			draw.SimpleText( "press ''alt'' to activate turret! (bind alt +walk)", "simfphysfont", scrW, ScrH() - scrH * 0.04, Color( 20, 255, 20, 255 * alpha ), 1, 1)
+			local Key = input.LookupBinding( "+walk" )
+			if not isstring( Key ) then Key = "[+walk is not bound to a key]" end
+			
+			draw.SimpleText( "press "..Key.." to activate turret!", "simfphysfont", scrW, ScrH() - scrH * 0.04, Color( 20, 255, 20, 255 * alpha ), 1, 1)
 
 			surface.SetDrawColor( 20, 255, 20, 50 ) 
 		end
