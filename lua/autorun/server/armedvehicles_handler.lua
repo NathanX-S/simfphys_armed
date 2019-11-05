@@ -213,17 +213,13 @@ function simfphys.FirePhysBullet( data )
 	projectile.Attacker = data.attacker
 	projectile.DeflectAng = data.DeflectAng
 	projectile.AttackingEnt = data.attackingent 
-	
-	local filter = data.filter 
-	table.insert( filter, projectile )
-	
 	projectile.Force = data.Force and data.Force or 100
 	projectile.Damage = data.Damage and data.Damage or 100
 	projectile.BlastRadius = data.BlastRadius and data.BlastRadius or 200
 	projectile.BlastDamage = data.BlastDamage and data.BlastDamage or 50
 	projectile:SetBlastEffect( isstring( data.BlastEffect ) and data.BlastEffect or "simfphys_tankweapon_explosion" )
 	projectile:SetSize( data.Size and data.Size or 1 )
-	projectile.Filter = filter
+	projectile.Filter = table.Copy( data.filter )
 	projectile:Spawn()
 	projectile:Activate()
 end
@@ -262,7 +258,7 @@ function simfphys.FireBullet( data )
 	bullet.Callback = function(att, tr, dmginfo)
 		if tr.Entity ~= Entity(0) then
 			if simfphys.IsCar( tr.Entity ) then
-				sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, 140)
+				sound.Play( Sound( ImpactSounds[ math.random(1,table.Count( ImpactSounds )) ] ), tr.HitPos, SNDLVL_90dB)
 			end
 		end
 	end

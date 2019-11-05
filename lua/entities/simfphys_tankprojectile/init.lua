@@ -65,7 +65,7 @@ function ENT:Think()
 		maxs = Size,
 		mins = -Size,
 		filter = function( ent )
-			if ent:GetClass() ~= "gmod_sent_vehicle_fphysics_wheel" and not table.HasValue( self.Filter, ent ) then return true end
+			if ent ~= self and ent:GetClass() ~= "gmod_sent_vehicle_fphysics_wheel" and not table.HasValue( self.Filter, ent ) then return true end
 		end
 	} )
 	
@@ -85,9 +85,11 @@ function ENT:Think()
 			local Ax = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) )
 			local Fx = math.cos( math.rad( Ax ) ) * thVel
 			
-			self.Vel = (shootDirection * (thVel - math.abs(Fx)) - trace.HitNormal * Fx * 2) * 0.2
+			self.Vel = (shootDirection * thVel - trace.HitNormal * Fx * 2) * math.max((1 - hitangle / 45) * 0.5,0.2)
 			
 			trace.Entity:GetPhysicsObject():ApplyForceOffset( shootDirection * thVel * self.Force * 0.5, trace.HitPos ) 
+			
+			table.insert( self.Filter, trace.Entity )
 			
 			self:SetPos( self:GetPos() + self.Vel * FixTick )
 			
