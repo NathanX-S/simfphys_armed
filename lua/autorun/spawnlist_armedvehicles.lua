@@ -1598,7 +1598,7 @@ local V = {
 
 	Members = {
 		Mass = 20000,
-		AirFriction = 120,
+		AirFriction = 7,
 		--Inertia = Vector(14017.5,46543,47984.5),
 		Inertia = Vector(80000,20000,100000),
 		
