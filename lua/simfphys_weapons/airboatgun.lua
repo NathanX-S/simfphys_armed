@@ -37,7 +37,7 @@ end
 
 function simfphys.weapon:Initialize( vehicle )
 	--vehicle:SetBodygroup(1,1)
-	
+
 	local ID = vehicle:LookupAttachment( "gun_ref" )
 	local attachmentdata = vehicle:GetAttachment( ID )
 
@@ -46,16 +46,15 @@ function simfphys.weapon:Initialize( vehicle )
 	prop:SetPos( attachmentdata.Pos )
 	prop:SetAngles( attachmentdata.Ang )
 	prop:SetModelScale( 0.5 ) 
-	prop:SetOwner( self )
 	prop:Spawn()
 	prop:Activate()
 	prop:SetNotSolid( true )
 	prop:SetParent( vehicle, ID )
 	prop.DoNotDuplicate = true
+
+	simfphys.RegisterCrosshair( vehicle:GetDriverSeat() )
 	
-	local pod = vehicle:GetDriverSeat()
-	
-	simfphys.RegisterCrosshair( pod )
+	simfphys.SetOwner( vehicle.EntityOwner, prop )
 end
 
 function simfphys.weapon:AimWeapon( ply, vehicle, pod )	
