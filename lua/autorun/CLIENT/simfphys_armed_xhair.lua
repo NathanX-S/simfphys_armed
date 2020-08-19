@@ -67,8 +67,10 @@ surface.CreateFont( "SIMFPHYS_ARMED_HUDFONT", {
 	outline = false,
 } )
 
-hook.Add( "HUDShouldDraw", "HideHUD", function( name )
-
+hook.Add( "HUDShouldDraw", "simfphys_armed_xhair", function( name )
+	
+	if name ~= "CHudZoom" then return end
+		
 	local ply = LocalPlayer()
 	
 	if not ply.GetSimfphys then return end
@@ -83,7 +85,7 @@ hook.Add( "HUDShouldDraw", "HideHUD", function( name )
 	
 	if not veh:GetNWBool( "HasCrosshair", false ) then return end
 	
-	if name == "CHudZoom" then return false end
+	return false
 end )
 
 local function traceAndDrawCrosshair( startpos, endpos, vehicle, pod )
