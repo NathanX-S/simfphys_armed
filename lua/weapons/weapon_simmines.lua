@@ -1,5 +1,7 @@
 AddCSLuaFile()
 
+CreateConVar( "sv_simfphys_maxmines", "3", {FCVAR_REPLICATED , FCVAR_ARCHIVE},"max mines" )
+
 SWEP.Category				= "simfphys"
 SWEP.Spawnable			= true
 SWEP.AdminSpawnable		= false
@@ -123,20 +125,43 @@ function SWEP:ThrowMine()
 	
 	local ent = ents.Create( "simfphys_antitankmine" )
 	local ply = self.Owner
-	
+
 	ply:EmitSound( "npc/zombie/claw_miss1.wav" )
-	
+
+	local Num = 0
+	local TimeOldest = 99999999999999
+	local Oldest = NULL
+
+	for _,v in ipairs( ents.FindByClass("simfphys_antitankmine" ) ) do
+		if v.CreatedBy ~= ply then continue end
+
+		Num = Num + 1
+
+		if TimeOldest > v.CreateTime then
+			TimeOldest = v.CreateTime 
+			Oldest = v
+		end
+	end
+
+	if Num >= GetConVar("sv_simfphys_maxmines"):GetInt() then
+		if IsValid( Oldest ) then
+			Oldest:Remove()
+		end
+	end
+
 	if IsValid( ent ) then
 		local EyeAng = ply:EyeAngles()
 		
 		ent:SetPos( ply:GetShootPos() - Vector(0,0,10) )
 		ent:SetAngles( Angle(0,EyeAng.y,0) )
 		ent.Thrown = true
+		ent.CreateTime = CurTime()
+		ent.CreatedBy = ply
 		ent:Spawn()
 		ent:Activate()
-		
+
 		ent:SetAttacker( ply )
-		
+
 		if CPPI then
 			ent:CPPISetOwner( ply )
 		end
@@ -154,13 +179,13 @@ function SWEP:PrimaryAttack()
 
 	self:SendWeaponAnim( ACT_VM_PRIMARYATTACK )
 	self.Owner:SetAnimation( PLAYER_ATTACK1 )
-	
+
 	self:ThrowMine()
-	
+
 	self:SetNextPrimaryFire( CurTime() + 1.5 )
-	
+
 	self:TakePrimaryAmmo( 1 )
-	
+
 	if SERVER then
 		if self:Ammo1() <= 0 then
 			self.Owner:StripWeapon( "weapon_simmines" ) 
