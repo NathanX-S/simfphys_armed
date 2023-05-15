@@ -18,10 +18,10 @@
 -- DO NOT EDIT OR REUPLOAD THIS SCRIPT
 -- DO NOT EDIT OR REUPLOAD THIS SCRIPT
 
-local function GetTrackPos( ent, div, smoother )
+local function GetTrackPos( ent, mult, smoother )
 	local FT =  FrameTime()
-	local spin_left = ent.trackspin_l and (-ent.trackspin_l / div) or 0
-	local spin_right = ent.trackspin_r and (-ent.trackspin_r / div) or 0
+	local spin_left = ent.trackspin_l and (-ent.trackspin_l * mult) or 0
+	local spin_right = ent.trackspin_r and (-ent.trackspin_r * mult) or 0
 	
 	ent.sm_TrackDelta_L = ent.sm_TrackDelta_L and (ent.sm_TrackDelta_L + (spin_left - ent.sm_TrackDelta_L) * smoother) or 0
 	ent.sm_TrackDelta_R = ent.sm_TrackDelta_R and (ent.sm_TrackDelta_R + (spin_right- ent.sm_TrackDelta_R) * smoother) or 0
@@ -34,19 +34,19 @@ local function UpdateTigerScrollTexture( ent )
 
 	if not ent.wheel_left_mat then
 		ent.wheel_left_mat = CreateMaterial("trackmat_"..id.."_left", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 1, "!trackmat_"..id.."_left" ) 
 	end
 
 	if not ent.wheel_right_mat then
 		ent.wheel_right_mat = CreateMaterial("trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 2, "!trackmat_"..id.."_right" ) 
 	end
 	
-	local TrackPos = GetTrackPos( ent, 100, 0.5 )
+	local TrackPos = GetTrackPos( ent, 0.01, 0.5 )
 	
-	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
-	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
+	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
+	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
 
-	ent:SetSubMaterial( 1, "!trackmat_"..id.."_left" ) 
-	ent:SetSubMaterial( 2, "!trackmat_"..id.."_right" )
 end
 
 local function UpdateShermanScrollTexture( ent )
@@ -54,19 +54,19 @@ local function UpdateShermanScrollTexture( ent )
 
 	if not ent.wheel_left_mat then
 		ent.wheel_left_mat = CreateMaterial("s_trackmat_"..id.."_left", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track_sherman", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 1, "!s_trackmat_"..id.."_left" ) 
 	end
 
 	if not ent.wheel_right_mat then
 		ent.wheel_right_mat = CreateMaterial("s_trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track_sherman", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 2, "!s_trackmat_"..id.."_right" )
 	end
 	
-	local TrackPos = GetTrackPos( ent, 350, 0.25 )
+	local TrackPos = GetTrackPos( ent, 0.0029, 0.25 )
 	
-	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
-	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
+	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
+	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
 
-	ent:SetSubMaterial( 1, "!s_trackmat_"..id.."_left" ) 
-	ent:SetSubMaterial( 2, "!s_trackmat_"..id.."_right" )
 end
 
 local function UpdateLeopardScrollTexture( ent )
@@ -74,18 +74,18 @@ local function UpdateLeopardScrollTexture( ent )
 
 	if not ent.wheel_left_mat then
 		ent.wheel_left_mat = CreateMaterial("l_trackmat_"..id.."_left", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track_leopard", ["$alphatest"] = "1",  ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 4, "!l_trackmat_"..id.."_left" ) 
 	end
 
 	if not ent.wheel_right_mat then
 		ent.wheel_right_mat = CreateMaterial("l_trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/track_leopard", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 3, "!l_trackmat_"..id.."_right" )
 	end
 	
-	local TrackPos = GetTrackPos( ent, 90, 0.25 )
-	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
-	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
+	local TrackPos = GetTrackPos( ent, 0.011, 0.25 )
+	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
+	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
 
-	ent:SetSubMaterial( 4, "!l_trackmat_"..id.."_left" ) 
-	ent:SetSubMaterial( 3, "!l_trackmat_"..id.."_right" )
 end
 
 local function UpdateT90ScrollTexture( ent )
@@ -93,18 +93,19 @@ local function UpdateT90ScrollTexture( ent )
 
 	if not ent.wheel_left_mat then
 		ent.wheel_left_mat = CreateMaterial("t90_trackmat_"..id.."_left", "VertexLitGeneric", { ["$basetexture"] = "models/blu/t90ms/t90ms_track_a_c", ["$alphatest"] = "1",  ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 2, "!t90_trackmat_"..id.."_left" ) 
 	end
 
 	if not ent.wheel_right_mat then
 		ent.wheel_right_mat = CreateMaterial("t90_trackmat_"..id.."_right", "VertexLitGeneric", { ["$basetexture"] = "models/blu/t90ms/t90ms_track_a_c", ["$alphatest"] = "1", ["$translate"] = "[0.0 0.0 0.0]", ["Proxies"] = { ["TextureTransform"] = { ["translateVar"] = "$translate", ["centerVar"]    = "$center",["resultVar"]    = "$basetexturetransform", } } } )
+		ent:SetSubMaterial( 1, "!t90_trackmat_"..id.."_right" )
 	end
 	
-	local TrackPos = GetTrackPos( ent, 80, 0.25 )
-	ent.wheel_left_mat:SetVector("$translate", Vector(0,TrackPos.Left,0) )
-	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
+	local TrackPos = GetTrackPos( ent, 0.0125, 0.25 )
+	local vector_zero = vector_origin
+	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
+	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
 
-	ent:SetSubMaterial( 2, "!t90_trackmat_"..id.."_left" ) 
-	ent:SetSubMaterial( 1, "!t90_trackmat_"..id.."_right" )
 end
 
 local TrackData = {
