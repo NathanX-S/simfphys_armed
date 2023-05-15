@@ -81,11 +81,7 @@ hook.Add( "CalcView", "zz_simfphys_gunner_view", function( ply, pos, ang )
 	local tr = util.TraceHull( {
 		start = view.origin,
 		endpos = TargetOrigin,
-		filter = function( e )
-			local c = e:GetClass()
-			local collide = not c:StartWith( "prop_physics" ) and not c:StartWith( "prop_dynamic" ) and not c:StartWith( "prop_ragdoll" ) and not e:IsVehicle() and not c:StartWith( "gmod_" ) and not c:StartWith( "player" )
-			return collide
-		end,
+		collisiongroup = COLLISION_GROUP_WORLD,
 		mins = Vector( -WallOffset, -WallOffset, -WallOffset ),
 		maxs = Vector( WallOffset, WallOffset, WallOffset ),
 	} )
