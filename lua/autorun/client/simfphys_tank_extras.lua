@@ -44,8 +44,8 @@ local function UpdateTigerScrollTexture( ent )
 	
 	local TrackPos = GetTrackPos( ent, 0.01, 0.5 )
 	
-	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
-	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
+	ent.wheel_left_mat:SetVector("$translate", Vector(0, TrackPos.Left, 0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
 end
 
@@ -64,8 +64,8 @@ local function UpdateShermanScrollTexture( ent )
 	
 	local TrackPos = GetTrackPos( ent, 0.0029, 0.25 )
 	
-	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
-	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
+	ent.wheel_left_mat:SetVector("$translate", Vector(0, TrackPos.Left, 0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
 end
 
@@ -83,8 +83,8 @@ local function UpdateLeopardScrollTexture( ent )
 	end
 	
 	local TrackPos = GetTrackPos( ent, 0.011, 0.25 )
-	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
-	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
+	ent.wheel_left_mat:SetVector("$translate", Vector(0, TrackPos.Left, 0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
 end
 
@@ -103,8 +103,8 @@ local function UpdateT90ScrollTexture( ent )
 	
 	local TrackPos = GetTrackPos( ent, 0.0125, 0.25 )
 	local vector_zero = vector_origin
-	ent.wheel_left_mat:SetVector("$translate", vector_origin:Add(Vector(0, TrackPos.Left, 0))  )
-	ent.wheel_right_mat:SetVector("$translate", vector_origin:Add(Vector(0,TrackPos.Right,0)) )
+	ent.wheel_left_mat:SetVector("$translate", Vector(0, TrackPos.Left, 0) )
+	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
 end
 
@@ -130,6 +130,8 @@ hook.Add( "Think", "simfphys_armed_trackupdater", function()
 		for _, ent in pairs( ents.FindByClass( "gmod_sent_vehicle_fphysics_base" ) ) do
 			local class = ent:GetSpawn_List()
 			
+			if !ent:GetActive() then continue end
+			
 			if isfunction( TrackData[class] ) then
 				local Data = {}
 				Data.Entity = ent
@@ -147,6 +149,9 @@ hook.Add( "Think", "simfphys_armed_trackupdater", function()
 		if tanks then
 			for index, data in pairs( tanks ) do
 				if IsValid( data.Entity ) then
+					// Don't update tracks on dead tanks.
+					if !data.Entity:GetActive() then continue end
+					print("balls")
 					data.Func( data.Entity )
 				else
 					tanks[index] = nil

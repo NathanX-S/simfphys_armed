@@ -73,8 +73,10 @@ function ENT:Think()
 		self:SetPos( trace.HitPos )
 		
 		local shootDirection = self:GetForward()
+
+		local acosResult = math.deg(math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ))
 		
-		local hitangle = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) ) - 90
+		local hitangle = acosResult - 90
 		
 		self.DeflectAng = self.DeflectAng or 25
 		
@@ -82,7 +84,7 @@ function ENT:Think()
 			
 			local thVel = self.Vel:Length()
 			
-			local Ax = math.deg( math.acos( math.Clamp( trace.HitNormal:Dot(shootDirection) ,-1,1) ) )
+			local Ax = acosResult
 			local Fx = math.cos( math.rad( Ax ) ) * thVel
 			
 			self.Vel = (shootDirection * thVel - trace.HitNormal * Fx * 2) * math.max((1 - hitangle / 45) * 0.5,0.2)

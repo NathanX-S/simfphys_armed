@@ -62,7 +62,7 @@ local function DrawCircle( X, Y, radius )
 
 	local cached_circle = circle_cache[radius]
 	for k, v in ipairs(cached_circle["points"]) do
-		surface.DrawLine(X + v.startX, Y - start.Y, X + endX, Y - endY)
+		surface.DrawLine(X + v.startX, Y - v.startY, X + v.endX, Y - v.endY)
 	end
 end
 
