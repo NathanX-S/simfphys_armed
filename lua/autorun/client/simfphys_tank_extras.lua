@@ -102,7 +102,6 @@ local function UpdateT90ScrollTexture( ent )
 	end
 	
 	local TrackPos = GetTrackPos( ent, 0.0125, 0.25 )
-	local vector_zero = vector_origin
 	ent.wheel_left_mat:SetVector("$translate", Vector(0, TrackPos.Left, 0) )
 	ent.wheel_right_mat:SetVector("$translate", Vector(0,TrackPos.Right,0) )
 
@@ -151,7 +150,6 @@ hook.Add( "Think", "simfphys_armed_trackupdater", function()
 				if IsValid( data.Entity ) then
 					// Don't update tracks on dead tanks.
 					if !data.Entity:GetActive() then continue end
-					print("balls")
 					data.Func( data.Entity )
 				else
 					tanks[index] = nil
